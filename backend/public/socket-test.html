@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket Test</title>
+</head>
+<body>
+
+<h2>Socket Test</h2>
+
+<button onclick="joinRoom()">Join Room</button>
+<button onclick="sendMessage()">Send Message</button>
+
+<!-- MUST be before your script -->
+<script src="http://localhost:5000/socket.io/socket.io.js"></script>
+
+<script>
+  const socket = io("http://localhost:5000");
+
+  socket.on("connect", () => {
+   
+  });
+
+  function joinRoom() {
+    
+    socket.emit("joinRoom", "room1");
+  }
+
+  function sendMessage() {
+    
+    socket.emit("sendMessage", {
+      room: "room1",
+      message: "Hello from browser"
+    });
+  }
+</script>
+
+</body>
+</html>
