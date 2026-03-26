@@ -234,12 +234,7 @@ const handleViewContact = async () => {
             {similar.map((p) => (
               <Link key={p._id} href={`/properties/${p._id}`}>
                 <div className="border rounded shadow hover:shadow-lg">
-                  {/* <img
-                    src={`http://localhost:5000/${p.images?.[0]}`}
-                    className="h-40 w-full object-cover rounded-t"
-                    alt={property.title}
-                  /> */}
-                    <Image
+                   <Image
                     src={property.images?.[0] || "/no-image.png"}
                     alt={property.title}
                     width={500}
