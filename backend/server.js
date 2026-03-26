@@ -26,7 +26,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://quickhome-26pu9j0sh-quickhome7070-9951s-projects.vercel.app","http://localhost:3000"],
+    origin: ["https://quickhome-liart.vercel.app","http://localhost:3000"],
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -45,7 +45,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // frontend URL
+    origin: ["http://localhost:3000", "https://quickhome-liart.vercel.app"], // frontend URL
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
