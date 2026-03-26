@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState<any[]>([]);
@@ -38,6 +38,10 @@ export default function PropertiesPage() {
     setLoading(false);
   };
 
+  useEffect(() => {
+  loadProperties(); // load default properties
+}, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
       
@@ -55,7 +59,7 @@ export default function PropertiesPage() {
       <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl p-4 sm:p-5 mb-6 border border-gray-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
 
         <input
-          placeholder="Search title..."
+          placeholder="Title"
           className="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-black outline-none"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
