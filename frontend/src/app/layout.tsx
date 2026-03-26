@@ -6,7 +6,7 @@ import { AuthProvider } from "../context/AuthContext";
 import { ReactNode } from "react";
 
 export const metadata = {
-  title: "Real Estate App",
+  title: "Quick Home",
   description: "Buy Sell Rent Properties",
 };
 
