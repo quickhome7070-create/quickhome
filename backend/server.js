@@ -26,7 +26,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://quickhome.vercel.app",],
+    origin: ["https://quickhome-26pu9j0sh-quickhome7070-9951s-projects.vercel.app","http://localhost:3000"],
     credentials: true,
     methods: ["GET", "POST"],
   },
