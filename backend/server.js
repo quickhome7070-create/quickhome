@@ -33,7 +33,9 @@ const io = new Server(server, {
 });
 
 
-
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
 
 // Connect DB
 connectDB();
