@@ -403,7 +403,7 @@ exports.getDashboardStats = async (req, res) => {
 
     res.json({
       totalProperties,
-      myProperties: totalProperties,
+      myProperties: myProperties,
   sold: soldCount,
   favorites: favoritesCount,
   views: user.contactViews || 0,

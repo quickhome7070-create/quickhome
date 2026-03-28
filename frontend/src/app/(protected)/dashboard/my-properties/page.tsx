@@ -57,7 +57,7 @@ const markSold = async (id: string) => {
       <h1 className="text-2xl font-bold">My Properties</h1>
 
       <Link
-        href="/dashboard/properties/create"
+        href="/addproperty"
         className="bg-blue-600 text-white px-4 py-2 rounded-lg"
       >
         + Create Property

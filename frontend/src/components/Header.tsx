@@ -60,7 +60,7 @@ export default function Header() {
               </Link>
 
               <Link
-                href="/my-properties"
+                href="/dashboard/my-properties"
                 className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg hover:bg-indigo-700 transition"
               >
                 My Property
