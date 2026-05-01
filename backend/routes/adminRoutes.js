@@ -10,6 +10,7 @@ const {
   getPendingProperties,
   approveProperty,
   rejectProperty,
+  getAdminStats
 } = require("../controllers/adminController");
 
 
