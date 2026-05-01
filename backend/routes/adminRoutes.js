@@ -18,7 +18,7 @@ router.get(
   "/pending",
   protect,
   isAdmin,
-  getPendingProperties
+  getPendingProperties,
 );
 
 
@@ -38,5 +38,6 @@ router.put(
   isAdmin,
   rejectProperty
 );
+router.get("/stats", protect, adminOnly, getAdminStats);
 
 module.exports = router;

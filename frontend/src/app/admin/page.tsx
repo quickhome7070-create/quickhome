@@ -16,6 +16,12 @@ export default function AdminDashboard() {
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
+  const [stats, setStats] = useState({
+  pending: 0,
+  approved: 0,
+  rejected: 0,
+  total: 0,
+});
 
   const token =
     typeof window !== "undefined"
@@ -49,24 +55,42 @@ export default function AdminDashboard() {
   }, [user, authLoading]);
 
   const fetchProperties = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const res = await fetch(`${API}/admin/pending`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    // pending properties
+    const pendingRes = await fetch(`${API}/admin/pending`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      const data = await res.json();
+    const pendingData = await pendingRes.json();
 
-      setProperties(data || []);
-    } catch (error) {
-      console.log(error);
-    }
+    setProperties(pendingData || []);
 
-    setLoading(false);
-  };
+    // dashboard stats
+    const statsRes = await fetch(`${API}/admin/stats`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const statsData = await statsRes.json();
+
+    setStats({
+      pending: statsData.pending || 0,
+      approved: statsData.approved || 0,
+      rejected: statsData.rejected || 0,
+      total: statsData.total || 0,
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  setLoading(false);
+};
 
   // ✅ prevent flicker
   if (authLoading || !user) {
@@ -176,7 +200,7 @@ export default function AdminDashboard() {
             </p>
 
             <h2 className="text-3xl font-bold text-orange-500 mt-2">
-              {properties.length}
+              {stats.pending}
             </h2>
           </div>
 
@@ -186,7 +210,7 @@ export default function AdminDashboard() {
             </p>
 
             <h2 className="text-3xl font-bold text-green-500 mt-2">
-              12
+              {stats.approved}
             </h2>
           </div>
 
@@ -196,7 +220,7 @@ export default function AdminDashboard() {
             </p>
 
             <h2 className="text-3xl font-bold text-red-500 mt-2">
-              4
+              {stats.rejected}
             </h2>
           </div>
 
@@ -206,7 +230,7 @@ export default function AdminDashboard() {
             </p>
 
             <h2 className="text-3xl font-bold text-blue-600 mt-2">
-              124
+              {stats.total}
             </h2>
           </div>
         </div>
