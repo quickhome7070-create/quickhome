@@ -85,3 +85,15 @@ exports.getAdminStats = async (req, res) => {
     });
   }
 };
+
+exports.getApprovedProperties = async (req, res) => {
+  try {
+    const properties = await Property.find({
+      approvalStatus: "approved",
+    }).populate("owner", "name email");
+
+    res.json(properties);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

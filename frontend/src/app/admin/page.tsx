@@ -12,7 +12,8 @@ export default function AdminDashboard() {
 
   // ✅ get loading also
   const { user, loading: authLoading } = useAuth();
-
+  const [showModal, setShowModal] = useState(false);
+const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
@@ -138,20 +139,26 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleReject = async (id: string) => {
-    try {
-      await fetch(`${API}/admin/reject/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+const handleReject = async () => {
+  try {
 
-      setProperties((prev) => prev.filter((p) => p._id !== id));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    await fetch(`${API}/admin/reject/${selectedPropertyId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setProperties((prev) =>
+      prev.filter((p) => p._id !== selectedPropertyId)
+    );
+
+    setShowModal(false);
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -249,16 +256,37 @@ export default function AdminDashboard() {
             Pending
           </button>
 
-          <button
-            onClick={() => setActiveTab("approved")}
-            className={`px-5 py-2 rounded-xl font-medium transition ${
-              activeTab === "approved"
-                ? "bg-black text-white"
-                : "bg-white border text-gray-700"
-            }`}
-          >
-            Approved
-          </button>
+         <button
+  onClick={async () => {
+    setActiveTab("approved");
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API}/admin/approved`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      // ✅ show approved properties
+      setProperties(data);
+
+    } catch (error) {
+      console.log(error);
+    }
+
+    setLoading(false);
+  }}
+  className={`px-5 py-2 rounded-xl font-medium transition ${
+    activeTab === "approved"
+      ? "bg-black text-white"
+      : "bg-white border text-gray-700"
+  }`}
+>
+  Approved
+</button>
 
           <button
             onClick={() => setActiveTab("rejected")}
@@ -304,6 +332,8 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        
+
         {/* PROPERTY GRID */}
         {!loading && properties.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -323,9 +353,11 @@ export default function AdminDashboard() {
                     className="w-full h-56 object-cover"
                   />
 
-                  <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                   {activeTab === "pending"?<div className="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
                     Pending Review
-                  </div>
+                  </div>:null}
+
+                  
                 </div>
 
                 <div className="p-5">
@@ -358,29 +390,75 @@ export default function AdminDashboard() {
                     {property.description || "No description available"}
                   </p>
 
-                  <div className="flex gap-3 mt-6">
+                 
+  <div className="flex gap-3 mt-6">
+{activeTab === "pending" && (
+    <button
+      onClick={() => handleApprove(property._id)}
+      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition"
+    >
+      Approve
+    </button>
+)}
+    <button
+  onClick={() => {
+    setSelectedPropertyId(property._id);
+    setShowModal(true);
+  }}
+  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition"
+>
+  {activeTab === "pending" ? "Reject" : "Delete"}
+</button>
 
-                    <button
-                      onClick={() => handleApprove(property._id)}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition"
-                    >
-                      Approve
-                    </button>
+  </div>
 
-                    <button
-                      onClick={() => handleReject(property._id)}
-                      className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition"
-                    >
-                      Reject
-                    </button>
-
-                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+      {showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+
+    <div className="bg-white w-[90%] max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-300">
+
+      <div className="flex items-center justify-center w-16 h-16 mx-auto rounded-full bg-red-100">
+        <span className="text-3xl">⚠️</span>
+      </div>
+
+      <h2 className="text-2xl font-bold text-center mt-5 text-gray-800">
+        {activeTab === "pending"
+          ? "Reject Property?"
+          : "Delete Property?"}
+      </h2>
+
+      <p className="text-gray-500 text-center mt-3">
+        {activeTab === "pending"
+          ? "This property will be rejected by admin."
+          : "This property will be permanently removed."}
+      </p>
+
+      <div className="flex gap-3 mt-8">
+
+        <button
+          onClick={() => setShowModal(false)}
+          className="flex-1 py-3 rounded-xl border border-gray-300 font-semibold hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleReject}
+          className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition"
+        >
+          Confirm
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

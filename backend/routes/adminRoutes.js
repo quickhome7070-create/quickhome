@@ -10,7 +10,8 @@ const {
   getPendingProperties,
   approveProperty,
   rejectProperty,
-  getAdminStats
+  getAdminStats,
+   getApprovedProperties
 } = require("../controllers/adminController");
 
 
@@ -37,8 +38,10 @@ router.put(
   "/reject/:id",
   protect,
   isAdmin,
-  rejectProperty
+  rejectProperty,
+ 
 );
 router.get("/stats", protect, adminOnly, getAdminStats);
+router.get("/approved", protect, adminOnly, getApprovedProperties);
 
 module.exports = router;
