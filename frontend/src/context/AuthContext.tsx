@@ -10,7 +10,8 @@ type User = {
   _id: string;
   name: string;
   email: string;
-   subscription?: Subscription;
+  role: "user" | "admin";
+  subscription?: Subscription;
 };
 
 type AuthContextType = {
