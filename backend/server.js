@@ -22,6 +22,7 @@ const authRoutes = require("./routes/authRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
 const userRoutes = require("./routes/userRoutes");
 
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -56,6 +57,7 @@ app.use("/api/razorpay/webhook", express.raw({ type: "application/json" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/property", propertyRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/razorpay", razorpayRoutes);
 app.use("/api/subscription", subscriptionRoutes);
 const path = require("path");

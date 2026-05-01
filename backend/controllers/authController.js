@@ -31,7 +31,9 @@ exports.register = async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { userId: user._id },
+      { userId: user._id,
+        role: user.role,
+       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -63,7 +65,9 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
-      { userId: user._id },
+      { userId: user._id,
+        role: user.role,
+       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -72,10 +76,11 @@ exports.login = async (req, res) => {
       message: "Login successful",
       token,   // 🔥 send token to frontend
       user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+  _id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+},
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

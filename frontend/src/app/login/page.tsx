@@ -26,12 +26,20 @@ export default function LoginPage() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        login(data);
-        router.push("/");
-      } else {
-        alert(data.message || "Login failed");
-      }
+     if (res.ok) {
+
+  // 🔐 Check if admin
+  if (data.user.role === "admin") {
+    login(data);
+    router.push("/admin"); // ✅ admin dashboard
+  } else {
+    login(data);
+    router.push("/"); // ✅ normal user
+  }
+
+} else {
+  alert(data.message || "Login failed");
+}
     } catch (err) {
       alert("Something went wrong");
     }

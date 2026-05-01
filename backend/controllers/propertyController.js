@@ -322,7 +322,10 @@ exports.searchProperties = async (req, res) => {
 // 🆕 Recently Added Properties
 exports.getRecentProperties = async (req, res) => {
   try {
-    const properties = await Property.find()
+    const properties = await Property.find({
+  approvalStatus: "approved",
+  status: "active"
+})
       .populate("owner", "name email")
       .sort({ createdAt: -1 })
       .limit(2);
@@ -348,6 +351,8 @@ exports.getSimilarProperties = async (req, res) => {
 
     const similar = await Property.find({
       _id: { $ne: propertyId },
+      approvalStatus: "approved",
+      status: "active",
       location: { $regex: currentProperty.location, $options: "i" },
       price: { $gte: priceRangeMin, $lte: priceRangeMax },
     })
@@ -463,7 +468,10 @@ exports.getTrendingProperties = async (req, res) => {
     });
 
     // Get recent properties
-    const properties = await Property.find()
+    const properties = await Property.find({
+  approvalStatus: "approved",
+  status: "active"
+})
       .sort({ createdAt: -1 })
       .limit(20)
       .populate("owner", "name email");
@@ -504,7 +512,8 @@ exports.getAllProperties = async (req, res) => {
     } = req.query;
 
     let query = {
-  status: { $ne: "sold" }   // Hide sold properties
+  approvalStatus: "approved",   // ✅ only approved
+  status: { $ne: "sold" }       // ✅ hide sold
 };
 
     // 🔎 Keyword search (title + description)

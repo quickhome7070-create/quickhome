@@ -24,6 +24,13 @@ const propertySchema = new mongoose.Schema({
     default: "active",
   },
 
+    // ✅ Approval status (ADMIN CONTROL)
+  approvalStatus: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
