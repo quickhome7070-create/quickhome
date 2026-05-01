@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useAuth } from "@/src/context/AuthContext";
-const API = process.env.NEXT_PUBLIC_API_URL;
 import { useRouter } from "next/navigation";
 
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 export default function AdminDashboard() {
-    const router = useRouter();
-  const { user } = useAuth();
+  const router = useRouter();
+
+  // ✅ get loading also
+  const { user, loading: authLoading } = useAuth();
+
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
@@ -18,6 +21,32 @@ export default function AdminDashboard() {
     typeof window !== "undefined"
       ? localStorage.getItem("token")
       : null;
+
+  // ✅ AUTH PROTECTION
+  useEffect(() => {
+    // wait until auth finishes
+    if (authLoading) return;
+
+    // not logged in
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+
+    // not admin
+    if (user.role !== "admin") {
+      router.replace("/403");
+    }
+  }, [user, authLoading, router]);
+
+  // ✅ FETCH ONLY AFTER ADMIN VERIFIED
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user || user.role !== "admin") return;
+
+    fetchProperties();
+  }, [user, authLoading]);
 
   const fetchProperties = async () => {
     try {
@@ -39,39 +68,37 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
-  useEffect(() => {
-    if (!loading) {
-      // not logged in
-      if (!user) {
-        router.push("/login");
-      }
-
-      // not admin
-      else if (user.role !== "admin") {
-        router.push("/");
-      }
-    }
-  }, [user, loading, router]);
-
-   if (user && user.role !== "admin") {
+  // ✅ prevent flicker
+  if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold text-red-600">
+      <div className="min-h-screen flex items-center justify-center text-lg font-semibold">
+        Loading...
+      </div>
+    );
+  }
+
+  // ✅ access denied
+  if (user.role !== "admin") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-10 rounded-3xl shadow-xl text-center border">
+          
+          <h1 className="text-6xl font-bold text-red-600">
             403
           </h1>
 
-          <p className="mt-4 text-gray-600">
+          <p className="text-xl font-semibold text-gray-700 mt-4">
             Access Denied
+          </p>
+
+          <p className="text-gray-500 mt-2">
+            You are not authorized to access this page.
           </p>
         </div>
       </div>
     );
   }
+
   const handleApprove = async (id: string) => {
     try {
       await fetch(`${API}/admin/approve/${id}`, {
@@ -102,14 +129,13 @@ export default function AdminDashboard() {
     }
   };
 
-  
   return (
     <div className="min-h-screen bg-gray-100">
-      
+
       {/* TOP HEADER */}
       <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          
+
           <div>
             <h1 className="text-2xl font-bold text-gray-800">
               Admin Dashboard
@@ -127,7 +153,7 @@ export default function AdminDashboard() {
               </span>
 
               <span className="text-xs text-gray-500">
-                {user?.role === "admin" ? "Super Admin" : "User"}
+                Super Admin
               </span>
             </div>
 
@@ -264,7 +290,6 @@ export default function AdminDashboard() {
                 className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 border"
               >
 
-                {/* IMAGE */}
                 <div className="relative">
                   <Image
                     src={property.images?.[0] || "/no-image.png"}
@@ -279,7 +304,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* CONTENT */}
                 <div className="p-5">
 
                   <h2 className="text-xl font-bold text-gray-800 line-clamp-1">
@@ -306,12 +330,10 @@ export default function AdminDashboard() {
                     </p>
                   </div>
 
-                  {/* DESCRIPTION */}
                   <p className="text-gray-600 text-sm mt-4 line-clamp-3">
                     {property.description || "No description available"}
                   </p>
 
-                  {/* ACTIONS */}
                   <div className="flex gap-3 mt-6">
 
                     <button
@@ -327,6 +349,7 @@ export default function AdminDashboard() {
                     >
                       Reject
                     </button>
+
                   </div>
                 </div>
               </div>
