@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 exports.protect = (req, res, next) => {
   try {
@@ -19,3 +20,22 @@ exports.protect = (req, res, next) => {
 };
 
 // module.exports = protect;
+exports.adminOnly = async (req, res, next) => {
+  try {
+
+    const user = await User.findById(req.user.userId);
+
+    if (!user || user.role !== "admin") {
+      return res.status(403).json({
+        message: "Admin access only",
+      });
+    }
+
+    next();
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
