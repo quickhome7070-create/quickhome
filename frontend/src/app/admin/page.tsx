@@ -56,6 +56,22 @@ export default function AdminDashboard() {
       }
     }
   }, [user, loading, router]);
+
+   if (user && user.role !== "admin") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold text-red-600">
+            403
+          </h1>
+
+          <p className="mt-4 text-gray-600">
+            Access Denied
+          </p>
+        </div>
+      </div>
+    );
+  }
   const handleApprove = async (id: string) => {
     try {
       await fetch(`${API}/admin/approve/${id}`, {
