@@ -56,7 +56,7 @@ export default function Header() {
                 href="/addproperty"
                 className="bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition"
               >
-                + Add
+                + Post
               </Link>
 
               <Link
