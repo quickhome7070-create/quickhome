@@ -29,7 +29,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://ghardestiny.com","https://GharDestiny-liart.vercel.app","http://localhost:3000"],
+    // origin: ["https://ghardestiny.com","https://GharDestiny-liart.vercel.app","http://localhost:3000"],
+    origin: ["https://ghardestiny.com","https://www.ghardestiny.com"],
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -48,10 +49,11 @@ connectDB();
 
 app.use(
   cors({
-    origin: ["https://ghardestiny.com","http://localhost:3000", "https://GharDestiny-liart.vercel.app"], // frontend URL
+    origin: [
+      "https://ghardestiny.com",
+      "https://www.ghardestiny.com",
+    ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use("/api/razorpay/webhook", express.raw({ type: "application/json" }));
