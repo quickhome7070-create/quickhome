@@ -51,7 +51,7 @@ export default function AddProperty() {
     setLoading(true);
     setProgress(15);
 
-    const token = localStorage.getItem("token");
+     
 
     const formData = new FormData();
     Object.keys(form).forEach((key) =>
@@ -65,7 +65,7 @@ export default function AddProperty() {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            credentials: "include",
           },
           body: formData,
         }

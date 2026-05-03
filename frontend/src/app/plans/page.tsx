@@ -17,15 +17,13 @@ export default function PlansPage() {
     );
   }
 const startTrial = async () => {
-  const token = localStorage.getItem("token");
+   
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/subscription/trial/start`,
     {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include",
     }
   );
 

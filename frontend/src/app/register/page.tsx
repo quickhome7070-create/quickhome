@@ -53,7 +53,7 @@ export default function RegisterPage() {
           Create Account
         </h2>
         <p className="text-center text-gray-500 text-sm mt-1">
-          Join QuickHome today
+          Join GharDestiny today
         </p>
 
         {/* Inputs */}

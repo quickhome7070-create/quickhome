@@ -6,8 +6,6 @@ import Link from "next/link";
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null);
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -15,7 +13,7 @@ export default function DashboardPage() {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/property/stats`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            credentials: "include",
           }
         );
         const data = await res.json();

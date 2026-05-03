@@ -10,28 +10,27 @@ export async function login(data: any) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
   const result = await res.json();
 
   // 🔥 SAVE TOKEN
-  if (result.token) {
-    localStorage.setItem("token", result.token);
-  }
+  // if (result.token) {
+  //   localStorage.setItem("token", result.token);
+  // }
 
   return result;
 }
 
 
 export const getMe = async () => {
-  const token = localStorage.getItem("token");
+   
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   });
 
   if (!res.ok) throw new Error("Not authenticated");
@@ -44,4 +43,5 @@ export const getMe = async () => {
 export const logout = () =>
   apiFetch("/auth/logout", {
     method: "POST",
+    credentials: "include",
   });

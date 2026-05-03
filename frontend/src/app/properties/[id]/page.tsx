@@ -47,7 +47,7 @@ const { user, logout } = useAuth();
         const favRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/property/favorite-status/${id}`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            credentials: "include",
           }
         );
         const favData = await favRes.json();
@@ -58,7 +58,7 @@ const { user, logout } = useAuth();
           `${process.env.NEXT_PUBLIC_API_URL}/property/recent/${id}`,
           {
             method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
+            credentials: "include",
           }
         );
 
@@ -92,7 +92,7 @@ const handleViewContact = async () => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       }
     );
 
@@ -123,7 +123,7 @@ const handleViewContact = async () => {
         `${process.env.NEXT_PUBLIC_API_URL}/property/favorite/${id}`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         }
       );
       setIsFavorite(!isFavorite);

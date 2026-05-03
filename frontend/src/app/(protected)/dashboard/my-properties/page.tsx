@@ -6,18 +6,17 @@ import { useEffect, useState } from "react";
 export default function MyPropertiesPage() {
   const [properties, setProperties] = useState<any[]>([]);
   
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+ 
 
     const deleteProperty = async (id: string) => {
   if (!confirm("Delete this property?")) return;
 
-  const token = localStorage.getItem("token");
+   
 
   await fetch(`${process.env.NEXT_PUBLIC_API_URL}/property/${id}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`,
+      credentials: "include",
     },
   });
 
@@ -28,7 +27,7 @@ export default function MyPropertiesPage() {
 const markSold = async (id: string) => {
   await fetch(`${process.env.NEXT_PUBLIC_API_URL}/property/${id}/sold`, {
     method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
   });
 
   alert("Marked as Sold");
@@ -40,7 +39,7 @@ const markSold = async (id: string) => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property/my-properties`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         }
       );
       const data = await res.json();

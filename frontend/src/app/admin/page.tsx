@@ -24,10 +24,7 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
   total: 0,
 });
 
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("token")
-      : null;
+ 
 
   // ✅ AUTH PROTECTION
   useEffect(() => {
@@ -61,9 +58,7 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
 
     // pending properties
     const pendingRes = await fetch(`${API}/admin/pending`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include",
     });
 
     const pendingData = await pendingRes.json();
@@ -72,9 +67,7 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
 
     // dashboard stats
     const statsRes = await fetch(`${API}/admin/stats`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+     credentials: "include",
     });
 
     const statsData = await statsRes.json();
@@ -128,9 +121,7 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
     try {
       await fetch(`${API}/admin/approve/${id}`, {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
       });
 
       setProperties((prev) => prev.filter((p) => p._id !== id));
@@ -144,9 +135,7 @@ const handleReject = async () => {
 
     await fetch(`${API}/admin/reject/${selectedPropertyId}`, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+     credentials: "include",
     });
 
     setProperties((prev) =>
@@ -180,7 +169,7 @@ const handleReject = async () => {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-sm font-semibold text-gray-700">
-                QuickHome Admin
+                GharDestiny Admin
               </span>
 
               <span className="text-xs text-gray-500">
@@ -263,9 +252,7 @@ const handleReject = async () => {
 
     try {
       const res = await fetch(`${API}/admin/approved`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+       credentials: "include",
       });
 
       const data = await res.json();

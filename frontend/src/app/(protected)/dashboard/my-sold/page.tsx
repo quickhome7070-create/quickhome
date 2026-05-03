@@ -5,15 +5,14 @@ import { useEffect, useState } from "react";
 export default function MySoldPage() {
   const [sold, setSold] = useState<any[]>([]);
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
 
   useEffect(() => {
     const load = async () => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property/my-sold`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         }
       );
       const data = await res.json();

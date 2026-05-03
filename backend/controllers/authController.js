@@ -65,24 +65,22 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { userId: user._id,
-        role: user.role,
-       },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+  const token = jwt.sign(
+  { id: user._id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);
 
-    res.json({
-      message: "Login successful",
-      token,   // 🔥 send token to frontend
-      user: {
-  _id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-},
-    });
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true, // true only in production HTTPS
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
+res.json({
+  user,
+});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -112,7 +110,7 @@ exports.logout = async (req, res) => {
   try {
     // If using JWT in header → nothing to clear on server
     // If using cookies → you would clear cookie here
-
+res.clearCookie("token");
     res.json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -27,7 +29,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://quickhome-liart.vercel.app","http://localhost:3000"],
+    origin: ["https://GharDestiny-liart.vercel.app","http://localhost:3000"],
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -46,7 +48,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://quickhome-liart.vercel.app"], // frontend URL
+    origin: ["https://ghardestiny.com","http://localhost:3000", "https://GharDestiny-liart.vercel.app"], // frontend URL
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

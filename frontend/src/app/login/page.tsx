@@ -7,6 +7,7 @@ import { API } from "@/src/lib/api";
 import Link from "next/link";
 
 export default function LoginPage() {
+  const { setUser } = useAuth();
   const router = useRouter();
   const { login } = useAuth();
 
@@ -21,19 +22,19 @@ export default function LoginPage() {
       const res = await fetch(API.login, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
      if (res.ok) {
-
+setUser(data.user)
   // 🔐 Check if admin
   if (data.user.role === "admin") {
-    login(data);
     router.push("/admin"); // ✅ admin dashboard
   } else {
-    login(data);
+    
     router.push("/"); // ✅ normal user
   }
 

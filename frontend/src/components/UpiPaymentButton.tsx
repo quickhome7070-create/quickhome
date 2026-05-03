@@ -10,7 +10,7 @@ export default function UpiPaymentButton() {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("token");
+       
 
       // 🔹 Step 1: Create Razorpay order
       const res = await fetch(
@@ -19,8 +19,9 @@ export default function UpiPaymentButton() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            
           },
+          credentials: "include",
           body: JSON.stringify({
             amount: 500,
           }),
@@ -41,7 +42,7 @@ export default function UpiPaymentButton() {
         amount: order.amount,
         currency: order.currency,
         order_id: order.id,
-        name: "QuickHome Premium",
+        name: "GharDestiny Premium",
 
         method: {
           upi: true,
@@ -56,8 +57,9 @@ export default function UpiPaymentButton() {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
+                  
                 },
+                credentials: "include",
                 body: JSON.stringify(response), // ✅ VERY IMPORTANT
               }
             );

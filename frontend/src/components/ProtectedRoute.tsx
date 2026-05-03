@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function ProtectedRoute({
   children,
@@ -9,19 +10,20 @@ export default function ProtectedRoute({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [authorized, setAuthorized] = useState(false);
+
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
+    if (!loading && !user) {
       router.push("/login");
-    } else {
-      setAuthorized(true);
     }
-  }, [router]);
+  }, [user, loading, router]);
 
-  if (!authorized) return <p>Checking auth...</p>;
+  if (loading) {
+    return <p>Checking auth...</p>;
+  }
+
+  if (!user) return null;
 
   return <>{children}</>;
 }

@@ -10,15 +10,14 @@ export default function EditPropertyPage() {
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  
 
   useEffect(() => {
     const loadProperty = async () => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property/${id}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         }
       );
       const data = await res.json();
@@ -38,7 +37,7 @@ export default function EditPropertyPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          credentials: "include",
         },
         body: JSON.stringify(property),
       }

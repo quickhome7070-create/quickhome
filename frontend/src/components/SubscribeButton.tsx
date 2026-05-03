@@ -21,7 +21,7 @@ export default function SubscribeButton({ planId }: Props) {
  const subscribe = async () => {
   setLoading(true);
 
-  const token = localStorage.getItem("token");
+   
 
   if (!(window as any).Razorpay) {
     alert("Razorpay SDK not loaded yet. Please try again.");
@@ -35,8 +35,9 @@ export default function SubscribeButton({ planId }: Props) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        
       },
+      credentials: "include",
       body: JSON.stringify({ planId }),
     }
   );
@@ -53,7 +54,7 @@ const order = await res.json();
    
   },
   theme: { color: "#2563eb" },
-    name: "QuickHome Premium",
+    name: "GharDestiny Premium",
     description: "Premium Plan",
     
     handler: async () => {
@@ -61,7 +62,7 @@ const order = await res.json();
         `${process.env.NEXT_PUBLIC_API_URL}/razorpay/subscription/activate`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         }
       );
       window.location.href = "/subscription-success";

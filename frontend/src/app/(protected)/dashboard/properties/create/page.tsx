@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function CreatePropertyPage() {
-  const token = localStorage.getItem("token");
+   
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -37,7 +37,7 @@ export default function CreatePropertyPage() {
       const res = await fetch("/api/properties", {
         method: "POST",
          headers: {
-    Authorization: `Bearer ${token}`,
+    credentials: "include",
   },
         body: formData,
       });

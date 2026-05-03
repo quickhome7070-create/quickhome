@@ -17,7 +17,7 @@ export default function Header() {
           href="/"
           className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight"
         >
-          QuickHome
+          GharDestiny
         </Link>
 
         {/* Desktop Nav */}

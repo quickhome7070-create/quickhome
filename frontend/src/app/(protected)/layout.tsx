@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function ProtectedLayout({
   children,
@@ -9,19 +10,24 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [checking, setChecking] = useState(true);
+
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
+    if (!loading && !user) {
       router.push("/login");
-    } else {
-      setChecking(false);
     }
-  }, []);
+  }, [user, loading, router]);
 
-  if (checking) return <div className="p-6">Checking auth...</div>;
+  if (loading) {
+    return (
+      <div className="p-6">
+        Checking auth...
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return <>{children}</>;
 }

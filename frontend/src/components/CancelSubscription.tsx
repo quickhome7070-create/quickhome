@@ -11,6 +11,7 @@ export default function CancelSubscription({ subscriptionId }: Props) {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ subscriptionId }),
     });
 
