@@ -42,7 +42,7 @@ export default function UpiPaymentButton() {
         amount: order.amount,
         currency: order.currency,
         order_id: order.id,
-        name: "GharDestiny Premium",
+        name: "gharDestiny Premium",
 
         method: {
           upi: true,

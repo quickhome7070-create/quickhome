@@ -169,7 +169,7 @@ const handleReject = async () => {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-sm font-semibold text-gray-700">
-                GharDestiny Admin
+                gharDestiny Admin
               </span>
 
               <span className="text-xs text-gray-500">

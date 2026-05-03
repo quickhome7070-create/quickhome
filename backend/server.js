@@ -29,7 +29,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    // origin: ["https://ghardestiny.com","https://GharDestiny-liart.vercel.app","http://localhost:3000"],
+    // origin: ["https://ghardestiny.com","https://gharDestiny-liart.vercel.app","http://localhost:3000"],
     origin: ["https://ghardestiny.com","https://www.ghardestiny.com"],
     credentials: true,
     methods: ["GET", "POST"],

@@ -54,7 +54,7 @@ const order = await res.json();
    
   },
   theme: { color: "#2563eb" },
-    name: "GharDestiny Premium",
+    name: "gharDestiny Premium",
     description: "Premium Plan",
     
     handler: async () => {

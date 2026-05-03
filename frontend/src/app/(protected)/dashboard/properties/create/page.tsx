@@ -36,9 +36,7 @@ export default function CreatePropertyPage() {
 
       const res = await fetch("/api/properties", {
         method: "POST",
-         headers: {
-    credentials: "include",
-  },
+       credentials: "include",
         body: formData,
       });
 
