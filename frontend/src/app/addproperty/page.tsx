@@ -64,9 +64,7 @@ export default function AddProperty() {
         `${process.env.NEXT_PUBLIC_API_URL}/property`,
         {
           method: "POST",
-          headers: {
-            credentials: "include",
-          },
+          credentials: "include",
           body: formData,
         }
       );

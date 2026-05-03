@@ -66,16 +66,20 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
   const token = jwt.sign(
-  { id: user._id, role: user.role },
+   {
+    userId: user._id,
+    role: user.role,
+  },
   process.env.JWT_SECRET,
   { expiresIn: "7d" }
 );
 
 res.cookie("token", token, {
   httpOnly: true,
-  secure: true, // true only in production HTTPS
+  secure: process.env.NODE_ENV === "production",
   sameSite: "none",
   maxAge: 7 * 24 * 60 * 60 * 1000,
+  domain: ".ghardestiny.com",
 });
 
 res.json({
@@ -110,7 +114,12 @@ exports.logout = async (req, res) => {
   try {
     // If using JWT in header → nothing to clear on server
     // If using cookies → you would clear cookie here
-res.clearCookie("token");
+res.clearCookie("token", {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "none",
+  domain: ".ghardestiny.com",
+});
     res.json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
