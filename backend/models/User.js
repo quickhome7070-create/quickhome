@@ -3,78 +3,65 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
+
+  subscription: {
+  status: {
+    type: String,
+    enum: ["trial", "active", "expired", "inactive"],
+    default: "inactive",
+  },
+  isActive: { type: Boolean, default: false },
+  trialEndsAt: Date,
+  freeContactsRemaining: { type: Number, default: 0 },
+  viewedProperties: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Property" }
+  ],
+},
+
+  phone: {
+    type: String,
+    unique: true,
+  },
+
   email: {
     type: String,
-    required: true,
-    unique: true
   },
-  phone: {
-  type: String,
-},
+
+  isPhoneVerified: {
+    type: Boolean,
+    default: false,
+  },
+
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
+
+  authMethods: {
+    type: [String],
+    enum: ["otp", "password", "google"],
+    default: ["otp"],
+  },
+
   password: {
-    type: String,
-    required: true
+    type: String, // only if using password login
   },
-    role: {
+
+  role: {
     type: String,
     enum: ["user", "admin"],
     default: "user",
   },
+
   favorites: [
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Property",
-  },
-  
-],
-
-recentlyViewed: [
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Property",
-  },
-],
-
-// subscription: {
-//   subscriptionId: String,
-//   planId: String,
-//   status: String,
-//   isActive: Boolean,
-//   expiresAt: Date,
-// },
-
-subscription: {
-  status: { type: String, default: "inactive" },
-  isActive: { type: Boolean, default: false },
-  trialEndsAt: { type: Date },
-  freeContactsRemaining: { type: Number, default: 0 },
-  viewedProperties: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Property",
-    },
+    { type: mongoose.Schema.Types.ObjectId, ref: "Property" },
   ],
-},
-contactViews: {
-  type: Number,
-  default: 0,
-},
 
-isSubscribed: {
-  type: Boolean,
-  default: true,
-},
-
-
-viewedContacts: [
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Property",
-  }
-],
-
+  recentlyViewed: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Property" },
+  ],
 
 }, { timestamps: true });
 

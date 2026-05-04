@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const isProd = process.env.NODE_ENV === "production";
 
 // REGISTER
 exports.register = async (req, res) => {
@@ -74,12 +75,20 @@ exports.login = async (req, res) => {
   { expiresIn: "7d" }
 );
 
+// res.cookie("token", token, {
+//   httpOnly: true,
+//   maxAge: 7 * 24 * 60 * 60 * 1000,
+//   secure: process.env.NODE_ENV === "production",  
+//   sameSite: "none",  
+//   domain: ".ghardestiny.com",
+// });
+
 res.cookie("token", token, {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000,
-  domain: ".ghardestiny.com",
+  ...(isProd && { domain: ".ghardestiny.com" }),
 });
 
 res.json({
@@ -94,6 +103,7 @@ res.json({
 
 // GET CURRENT USER (BACKEND)
 exports.getMe = async (req, res) => {
+  
   try {
     const user = await User.findById(req.user.userId).select("-password");
 
@@ -114,12 +124,22 @@ exports.logout = async (req, res) => {
   try {
     // If using JWT in header → nothing to clear on server
     // If using cookies → you would clear cookie here
+// res.clearCookie("token", {
+//   httpOnly: true,
+//   secure: process.env.NODE_ENV === "production",
+//   sameSite: "none",
+//   domain: ".ghardestiny.com",
+// });
+
+
+
 res.clearCookie("token", {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
-  domain: ".ghardestiny.com",
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
+  ...(isProd && { domain: ".ghardestiny.com" }),
 });
+
     res.json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });

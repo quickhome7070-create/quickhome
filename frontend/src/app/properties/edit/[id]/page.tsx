@@ -36,9 +36,9 @@ export default function EditPropertyPage() {
       {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
-          credentials: "include",
+          "Content-Type": "application/json",          
         },
+        credentials: "include",
         body: JSON.stringify(property),
       }
     );

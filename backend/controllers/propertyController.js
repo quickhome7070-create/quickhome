@@ -96,7 +96,7 @@ exports.getMyProperties = async (req, res) => {
 exports.getPropertyById = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id)
-      .populate("owner", "name email");
+      .populate("owner", "name email phone");
 
     if (!property) {
       return res.status(404).json({ message: "Property not found" });

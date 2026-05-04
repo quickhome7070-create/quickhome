@@ -15,9 +15,7 @@ export default function MyPropertiesPage() {
 
   await fetch(`${process.env.NEXT_PUBLIC_API_URL}/property/${id}`, {
     method: "DELETE",
-    headers: {
-      credentials: "include",
-    },
+   credentials: "include",
   });
 
   // remove from UI

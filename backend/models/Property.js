@@ -34,6 +34,7 @@ const propertySchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
   contactViews: { type: Number, default: 0 },
 

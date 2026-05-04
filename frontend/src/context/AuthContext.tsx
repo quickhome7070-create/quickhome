@@ -1,5 +1,5 @@
 "use client";
-
+import { useParams, useRouter } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -12,7 +12,7 @@ const AuthContext = createContext<any>(null);
 const API = process.env.NEXT_PUBLIC_API_URL;
 
 export const AuthProvider = ({ children }: any) => {
-
+const router = useRouter();
   const [user, setUser] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -37,11 +37,15 @@ export const AuthProvider = ({ children }: any) => {
           setUser(data.user);
         }
 
+         
+
       } catch (error) {
+       
         console.log(error);
       }
 
       setLoading(false);
+      
     };
 
     loadUser();
@@ -63,6 +67,7 @@ export const AuthProvider = ({ children }: any) => {
 
       // ✅ CLEAR USER
       setUser(null);
+      router.push("/login")
 
     } catch (error) {
       console.log(error);

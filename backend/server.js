@@ -1,3 +1,4 @@
+require('win-ca');
 const express = require("express");
 const app = express();
 const helmet = require("helmet");
@@ -30,7 +31,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     // origin: ["https://ghardestiny.com","https://gharDestiny-liart.vercel.app","http://localhost:3000"],
-    origin: ["https://ghardestiny.com","https://www.ghardestiny.com"],
+    origin: ["https://ghardestiny.com","https://www.ghardestiny.com", "http://localhost:3000"],
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -52,6 +53,7 @@ app.use(
     origin: [
       "https://ghardestiny.com",
       "https://www.ghardestiny.com",
+      "http://localhost:3000"
     ],
     credentials: true,
   })
@@ -61,6 +63,7 @@ app.use("/api/razorpay/webhook", express.raw({ type: "application/json" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/property", propertyRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/otp", require("./routes/otpRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/razorpay", razorpayRoutes);
 app.use("/api/subscription", subscriptionRoutes);

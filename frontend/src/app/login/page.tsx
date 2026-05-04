@@ -61,6 +61,29 @@ setUser(data.user)
           Login to your account
         </p>
 
+        {/* OTP LOGIN BUTTON */}
+
+<Link
+  href="/otp-login"
+  className="w-full flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl font-semibold hover:bg-gray-50 transition"
+>
+  📱 Login with OTP
+</Link>
+
+{/* Divider */}
+
+<div className="flex items-center gap-2 my-5">
+  <div className="flex-1 h-px bg-gray-300"></div>
+
+  <span className="text-gray-400 text-sm">
+    OR LOGIN WITH EMAIL
+  </span>
+
+  <div className="flex-1 h-px bg-gray-300"></div>
+</div>
+
+
+
         {/* Inputs */}
         <div className="mt-6 space-y-4">
           <input

@@ -27,8 +27,8 @@ const [locked, setLocked] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [similar, setSimilar] = useState<Property[]>([]);
 const router = useRouter();
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  // const token =
+  //   typeof window !== "undefined" ? localStorage.getItem("token") : null;
 const { user, logout } = useAuth();
   useEffect(() => {
     if (!id) return;
@@ -81,14 +81,15 @@ const { user, logout } = useAuth();
 
 
 const handleViewContact = async () => {
-  if (!token) {
-    router.push("/login");
+  if (!user) {
+    router.push("/");
     return;
   }
- setLoadingContact(true);
- setError("");
-  try {  
 
+  setLoadingContact(true);
+  setError("");
+
+  try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
       {
@@ -96,15 +97,17 @@ const handleViewContact = async () => {
       }
     );
 
-    // 🔒 Subscription required
+    const data = await res.json();
+
+    // 🔥 HANDLE SUBSCRIPTION CASE
     if (res.status === 403) {
       setLocked(true);
-      setLoadingContact(false);
+      setError(data.message); // ✅ show reason
       return;
     }
 
-    const data = await res.json();
     setContact(data);
+
   } catch (err) {
     console.error(err);
     setError("Something went wrong");
@@ -112,10 +115,6 @@ const handleViewContact = async () => {
     setLoadingContact(false);
   }
 };
-
-
-
-
 
   const toggleFavorite = async () => {
     try {
@@ -195,20 +194,29 @@ const handleViewContact = async () => {
 
   {/* 🔒 LOCK OVERLAY */}
   {locked && !contact && (
-    <div className="absolute inset-0 bg-white/90 backdrop-blur rounded-xl flex flex-col items-center justify-center z-10 border">
-      <p className="font-semibold text-lg mb-2">🔒 Premium Feature</p>
-      <p className="text-sm text-gray-600 mb-4">
-        Subscribe to view owner contact
-      </p>
+  <div className="absolute inset-0 bg-white/90 backdrop-blur rounded-xl flex flex-col items-center justify-center z-10 border">
+    
+    <p className="font-semibold text-lg mb-2">🔒 Premium Feature</p>
 
-      <button
-        onClick={() => router.push("/plans")}
-        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-lg shadow hover:scale-105 transition"
-      >
-        Subscribe Now
-      </button>
-    </div>
-  )}
+    {/* ✅ SHOW REAL MESSAGE */}
+    {error && (
+      <p className="text-sm text-red-500 mb-2 text-center">
+        {error}
+      </p>
+    )}
+
+    <p className="text-sm text-gray-600 mb-4">
+      Subscribe to view owner contact
+    </p>
+
+    <button
+      onClick={() => router.push("/plans")}
+      className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-lg shadow hover:scale-105 transition"
+    >
+      Subscribe Now
+    </button>
+  </div>
+)}
 
   {/* Contact Card */}
  {contact && (
