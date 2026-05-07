@@ -178,8 +178,8 @@ exports.forgotPassword = async (req, res) => {
 
     // FRONTEND URL
     // const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
-    // const resetUrl = `https://www.ghardestiny.com/reset-password/${resetToken}`;
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+   const resetUrl =
+ `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
  
 
     await sendEmail({
