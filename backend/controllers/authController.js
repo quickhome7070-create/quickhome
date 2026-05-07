@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const isProd = process.env.NODE_ENV === "production";
 
@@ -141,6 +142,102 @@ res.clearCookie("token", {
 });
 
     res.json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+//Forgot Controller
+
+exports.forgotPassword = async (req, res) => {
+  const sendEmail = require("../utils/sendEmail");
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Generate token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // Save hashed token
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 min
+
+    await user.save();
+
+    // FRONTEND URL
+    // const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+    const resetUrl = `https://www.ghardestiny.com/reset-password/${resetToken}`;
+
+    await sendEmail({
+  to: user.email,
+  subject: "Password Reset",
+  html: `
+    <h2>Password Reset</h2>
+
+    <p>Click below link:</p>
+
+    <a href="${resetUrl}">
+      Reset Password
+    </a>
+  `,
+});
+
+    // Later send email here
+
+    res.json({
+      message: "Reset link generated",
+      resetUrl,
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const resetToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: resetToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid or expired token",
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    user.password = hashedPassword;
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.json({
+      message: "Password reset successful",
+    });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

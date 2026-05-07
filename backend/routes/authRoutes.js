@@ -8,17 +8,16 @@ const {
   login,
   getMe,
   logout,
+  resetPassword,
+  forgotPassword,
 } = require("../controllers/authController");
 
 // ROUTES
 router.post("/register", register);
 router.post("/login", login);
  router.get("/me", protect, getMe);   // protect must be FUNCTION
-// router.get("/me", protect, (req, res) => {
-//    res.json({
-//     user: req.user,
-//   });
-// });
+router.post("/forgot-password", forgotPassword);
+router.put("/reset-password/:token", resetPassword);
 router.post("/logout", logout);
 
 module.exports = router;

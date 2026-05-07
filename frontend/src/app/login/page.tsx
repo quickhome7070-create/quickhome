@@ -100,6 +100,15 @@ setUser(data.user)
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          <div className="text-right mt-2">
+  <Link
+    href="/forgot-password"
+    className="text-sm text-blue-600 hover:underline"
+  >
+    Forgot Password?
+  </Link>
+</div>
         </div>
 
         {/* Button */}
