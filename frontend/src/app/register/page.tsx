@@ -265,13 +265,13 @@ const validateForm = () => {
         </div>
 
         {/* Button */}
-        <button
-          onClick={handleRegister}
-          disabled={loading}
-          className="w-full mt-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition disabled:opacity-70"
-        >
-          {loading ? "Creating account..." : "Register"}
-        </button>
+      <button
+  onClick={handleRegister}
+  disabled={loading}
+  className="w-full mt-5 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 hover:from-orange-600 hover:via-amber-500 hover:to-yellow-400 text-black py-3 rounded-xl font-semibold shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-70"
+>
+  {loading ? "Creating account..." : "Register"}
+</button>
 
         {/* Divider */}
         <div className="flex items-center gap-2 my-5">

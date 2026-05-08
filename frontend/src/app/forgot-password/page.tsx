@@ -57,10 +57,10 @@ const [sent, setSent] = useState(false)
      <button
   onClick={handleSubmit}
   disabled={loading || sent}
-  className={`w-full mt-4 py-3 rounded font-semibold transition ${
+  className={`w-full mt-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-xl ${
     sent
       ? "bg-green-600 text-white cursor-not-allowed"
-      : "bg-blue-600 hover:bg-blue-700 text-white"
+      : "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 hover:from-orange-600 hover:via-amber-500 hover:to-yellow-400 text-black hover:scale-[1.02]"
   }`}
 >
   {loading
