@@ -97,16 +97,20 @@ export default function OTPLogin() {
             />
 
             <button
-              disabled={loading || timer > 0}
-              onClick={sendOTP}
-              className="w-full mt-4 bg-black text-white py-3 rounded-xl disabled:opacity-60"
-            >
-              {loading
-                ? "Sending..."
-                : timer > 0
-                ? `Wait ${timer}s`
-                : "Send OTP"}
-            </button>
+  disabled={loading || timer > 0}
+  onClick={sendOTP}
+  className={`w-full mt-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md ${
+    loading || timer > 0
+      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+      : "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 hover:from-orange-600 hover:via-amber-500 hover:to-yellow-400 text-black hover:shadow-xl hover:scale-[1.02]"
+  }`}
+>
+  {loading
+    ? "Sending..."
+    : timer > 0
+    ? `Wait ${timer}s`
+    : "Send OTP"}
+</button>
           </>
         )}
 
@@ -129,15 +133,19 @@ export default function OTPLogin() {
             </button>
 
             {/* 🔁 RESEND */}
-            <button
-              disabled={timer > 0}
-              onClick={sendOTP}
-              className="w-full mt-3 text-sm text-blue-600 disabled:text-gray-400"
-            >
-              {timer > 0
-                ? `Resend OTP in ${timer}s`
-                : "Resend OTP"}
-            </button>
+           <button
+  disabled={timer > 0}
+  onClick={sendOTP}
+  className={`w-full mt-3 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md ${
+    timer > 0
+      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+      : "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 hover:from-orange-600 hover:via-amber-500 hover:to-yellow-400 text-black hover:shadow-xl hover:scale-[1.02]"
+  }`}
+>
+  {timer > 0
+    ? `Resend OTP in ${timer}s`
+    : "Resend OTP"}
+</button>
           </>
         )}
       </div>

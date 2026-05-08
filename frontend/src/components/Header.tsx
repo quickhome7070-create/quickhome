@@ -57,62 +57,73 @@ export default function Header() {
 
   </div>
 </div>
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6 text-gray-700 font-medium">
+{/* Desktop Nav */}
+<nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-900">
 
-          <Link href="/properties" className="relative group">
-            Properties
-            <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-blue-600 transition-all group-hover:w-full"></span>
-          </Link>
+  <Link
+    href="/properties"
+    className="hover:text-black transition-all duration-300"
+  >
+    Properties
+  </Link>
 
-          {!loading && !user && (
-            <>
-              <Link href="/login" className="hover:text-blue-600">
-                Login
-              </Link>
+  {!loading && !user && (
+    <>
+      <Link
+        href="/login"
+        className="hover:text-black transition-all duration-300"
+      >
+        Login
+      </Link>
 
-              <Link
-                href="/register"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1.5 rounded-lg shadow hover:scale-105 transition"
-              >
-                Register
-              </Link>
-            </>
-          )}
+      <Link
+        href="/register"
+        className="hover:text-black transition-all duration-300"
+      >
+        Register
+      </Link>
+    </>
+  )}
 
-          {!loading && user && (
-            <>
-              <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold">
-                  {user?.name?.charAt(0)?.toUpperCase()}
-                </div>
-                <span className="text-sm font-semibold">{user?.name}</span>
-              </div>
+  {!loading && user && (
+    <>
+      <Link
+        href="/profile"
+        className="flex items-center gap-2 hover:opacity-80 transition-all duration-300"
+      >
+        <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold">
+          {user?.name?.charAt(0)?.toUpperCase()}
+        </div>
 
-              <Link
-                href="/addproperty"
-                className="bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition"
-              >
-                + Post
-              </Link>
+        <span>
+          {user?.name}
+        </span>
+      </Link>
 
-              <Link
-                href="/dashboard/my-properties"
-                className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg hover:bg-indigo-700 transition"
-              >
-                My Property
-              </Link>
+      <Link
+        href="/addproperty"
+        className="hover:text-black transition-all duration-300"
+      >
+        + Post Property
+      </Link>
 
-              <button
-                onClick={logout}
-                className="text-red-500 hover:text-red-600 font-semibold"
-              >
-                Logout
-              </button>
-            </>
-          )}
-        </nav>
+      <Link
+        href="/dashboard/my-properties"
+        className="hover:text-black transition-all duration-300"
+      >
+        My Property
+      </Link>
 
+      <Link
+        href="/"
+        onClick={logout}
+        className="text-red-600 hover:text-red-700 transition-all duration-300"
+      >
+        Logout
+      </Link>
+    </>
+  )}
+</nav>
         {/* Mobile Menu Button */}
         <button
           className="md:hidden text-2xl"

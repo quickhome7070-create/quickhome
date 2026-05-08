@@ -109,13 +109,17 @@ export default function CreatePropertyPage() {
           ))}
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-black text-white px-4 py-2"
-        >
-          {loading ? "Creating..." : "Create Property"}
-        </button>
+       <button
+  type="submit"
+  disabled={loading}
+  className={`px-4 py-2 rounded-xl font-semibold transition-all duration-300 shadow-md ${
+    loading
+      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+      : "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 hover:from-orange-600 hover:via-amber-500 hover:to-yellow-400 text-black hover:shadow-xl hover:scale-[1.02]"
+  }`}
+>
+  {loading ? "Creating..." : "Create Property"}
+</button>
       </form>
     </div>
   );

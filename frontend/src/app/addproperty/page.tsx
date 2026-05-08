@@ -198,11 +198,15 @@ export default function AddProperty() {
 
           {/* Submit */}
           <button
-            disabled={loading}
-            className="w-full bg-gray-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold shadow-lg transition"
-          >
-            {loading ? "Uploading..." : "Create Property"}
-          </button>
+  disabled={loading}
+  className={`w-full py-3 rounded-xl font-semibold shadow-md transition-all duration-300 ${
+    loading
+      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+      : "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 hover:from-orange-600 hover:via-amber-500 hover:to-yellow-400 text-black hover:shadow-xl hover:scale-[1.02]"
+  }`}
+>
+  {loading ? "Uploading..." : "Create Property"}
+</button>
         </form>
       </div>
 

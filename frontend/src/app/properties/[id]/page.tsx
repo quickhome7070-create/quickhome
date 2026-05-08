@@ -82,7 +82,7 @@ const { user, logout } = useAuth();
 
 const handleViewContact = async () => {
   if (!user) {
-    router.push("/");
+    router.push("/login");
     return;
   }
 
