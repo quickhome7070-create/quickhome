@@ -7,19 +7,56 @@ import { useState } from "react";
 export default function Header() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+   const [type, setType] = useState("");
+   const params = new URLSearchParams({
+    
+      type,
+     
+    });
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-lg bg-white/70 border-b border-gray-200 shadow-sm">
+  <header className="sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 border-b border-orange-200 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
         
         {/* Logo */}
-        <Link
-          href="/"
-          className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight"
-        >
-          Ghar Destiny
-        </Link>
+        {/* Left Side */}
+<div className="flex items-center gap-4">
 
+  {/* Logo */}
+  <Link
+    href="/"
+    className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight"
+  >
+    Ghar Destiny
+  </Link>
+
+  {/* Buy / Rent */}
+  <div className="hidden sm:flex items-center gap-3">
+
+    <button
+      onClick={() => setType("buy")}
+      className={`px-5 py-2 rounded-full text-sm font-semibold transition border ${
+        type === "buy"
+          ? "bg-black text-white shadow"
+          : "bg-white text-gray-700 border-gray-200 hover:shadow-sm"
+      }`}
+    >
+      Buy
+    </button>
+
+    <button
+      onClick={() => setType("rent")}
+      className={`px-5 py-2 rounded-full text-sm font-semibold transition border ${
+        type === "rent"
+          ? "bg-black text-white shadow"
+          : "bg-white text-gray-700 border-gray-200 hover:shadow-sm"
+      }`}
+    >
+      Rent
+    </button>
+
+  </div>
+</div>
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6 text-gray-700 font-medium">
 

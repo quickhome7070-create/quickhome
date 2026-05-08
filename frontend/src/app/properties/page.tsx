@@ -13,7 +13,7 @@ export default function PropertiesPage() {
   const [location, setLocation] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [type, setType] = useState("");
+ 
   const [sort, setSort] = useState("");
 
   const loadProperties = async () => {
@@ -24,7 +24,7 @@ export default function PropertiesPage() {
       location,
       minPrice,
       maxPrice,
-      type,
+     
       sort,
     });
 
@@ -88,15 +88,7 @@ export default function PropertiesPage() {
           onChange={(e) => setMaxPrice(e.target.value)}
         />
 
-        <select
-          className="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-black outline-none"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-          <option value="">All</option>
-          <option value="buy">Buy</option>
-          <option value="rent">Rent</option>
-        </select>
+      
 
         <select
           className="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-black outline-none"
@@ -108,12 +100,14 @@ export default function PropertiesPage() {
           <option value="price_high">Price High → Low</option>
         </select>
 
-        <button
+         <button
           onClick={loadProperties}
-          className="sm:col-span-2 lg:col-span-6 bg-black hover:bg-gray-900 text-white py-2.5 rounded-lg transition font-semibold text-sm sm:text-base"
+          className="sm:col-span-1 lg:col-span-1 bg-black hover:bg-gray-900 text-white py-2.5 rounded-lg transition font-semibold text-sm sm:text-base"
         >
           {loading ? "Loading..." : "Apply Filters"}
         </button>
+
+       
       </div>
 
       {/* Loading */}
