@@ -1,264 +1,327 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { useAuth } from "@/src/context/AuthContext";
 
-interface Property {
+type Property = {
   _id: string;
   title: string;
   price: number;
   location: string;
+  description: string;
   images: string[];
-  type?: string;
-}
+};
 
-export default function PropertiesPage() {
+export default function PropertyDetailsPage() {
+  const { id } = useParams();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const [isMobile, setIsMobile] = useState(false);
+  const { user } = useAuth();
 
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [property, setProperty] = useState<Property | null>(null);
+  const [similar, setSimilar] = useState<Property[]>([]);
+
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- MOBILE CHECK ---------------- */
+  const [isFavorite, setIsFavorite] = useState(false);
 
+  const [contact, setContact] = useState<any>(null);
+  const [loadingContact, setLoadingContact] = useState(false);
+
+  const [locked, setLocked] = useState(false);
+  const [error, setError] = useState("");
+
+  // LOAD PROPERTY DATA
   useEffect(() => {
-    const checkDevice = () => {
-      setIsMobile(window.innerWidth < 768);
+    if (!id) return;
+
+    const fetchData = async () => {
+      try {
+        // PROPERTY
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/property/${id}`
+        );
+
+        const data = await res.json();
+
+        setProperty(data);
+
+        // FAVORITE STATUS
+        const favRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/property/favorite-status/${id}`,
+          {
+            credentials: "include",
+          }
+        );
+
+        const favData = await favRes.json();
+
+        setIsFavorite(favData.isFavorite);
+
+        // RECENTLY VIEWED
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/property/recent/${id}`,
+          {
+            method: "POST",
+            credentials: "include",
+          }
+        );
+
+        // SIMILAR PROPERTIES
+        const simRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/property/similar/${id}`
+        );
+
+        const simData = await simRes.json();
+
+        setSimilar(simData || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    checkDevice();
+    fetchData();
+  }, [id]);
 
-    window.addEventListener("resize", checkDevice);
+  // VIEW CONTACT
+  const handleViewContact = async () => {
+    if (!user) {
+      router.push("/");
+      return;
+    }
 
-    return () => {
-      window.removeEventListener("resize", checkDevice);
-    };
-  }, []);
+    setLoadingContact(true);
+    setError("");
 
-  /* ---------------- FILTERS ---------------- */
-
-  const location = searchParams.get("location") || "";
-  const minPrice = searchParams.get("minPrice") || "";
-  const maxPrice = searchParams.get("maxPrice") || "";
-  const propertyType = searchParams.get("propertyType") || "";
-  const category = searchParams.get("category") || "";
-  const sort = searchParams.get("sort") || "";
-
-  /* ---------------- LOAD PROPERTIES ---------------- */
-
-  useEffect(() => {
-    fetchProperties();
-  }, [
-    location,
-    minPrice,
-    maxPrice,
-    propertyType,
-    category,
-    sort,
-  ]);
-
-  const fetchProperties = async () => {
     try {
-      setLoading(true);
-
-      const params = new URLSearchParams();
-
-      if (location) params.append("location", location);
-      if (minPrice) params.append("minPrice", minPrice);
-      if (maxPrice) params.append("maxPrice", maxPrice);
-      if (propertyType)
-        params.append("propertyType", propertyType);
-      if (category) params.append("category", category);
-      if (sort) params.append("sort", sort);
-
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/property?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
+        {
+          credentials: "include",
+        }
       );
 
       const data = await res.json();
 
-      setProperties(data.properties || []);
+      // SUBSCRIPTION REQUIRED
+      if (res.status === 403) {
+        setLocked(true);
+        setError(data.message);
+        return;
+      }
+
+      setContact(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      setError("Something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingContact(false);
     }
   };
 
-  /* ---------------- UI ---------------- */
+  // FAVORITE
+  const toggleFavorite = async () => {
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/property/favorite/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // LOADING
+  if (loading) {
+    return <div className="p-6">Loading...</div>;
+  }
+
+  // NOT FOUND
+  if (!property) {
+    return <div className="p-6">Property not found</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-10">
-      {/* HEADER */}
+    <div className="max-w-5xl mx-auto p-4 md:p-6">
 
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-              Discover Properties
-            </h1>
-
-            <p className="text-sm text-gray-400 font-light mt-1">
-              Search city, budget & property type
-            </p>
-          </div>
-
-          {/* MOBILE FILTER BUTTON */}
-
-          {isMobile && (
-            <button
-              onClick={() => router.push("/property-filters")}
-              className="bg-black text-white text-sm px-4 py-2 rounded-lg"
-            >
-              Filters
-            </button>
-          )}
-        </div>
+      {/* IMAGES */}
+      <div className="flex gap-3 overflow-x-auto">
+        {property.images?.length > 0 ? (
+          property.images.map((img, index) => (
+            <Image
+              key={index}
+              src={img}
+              alt={property.title}
+              width={300}
+              height={200}
+              className="w-64 h-44 object-cover rounded-xl flex-shrink-0"
+            />
+          ))
+        ) : (
+          <Image
+            src="/no-image.png"
+            alt="No Image"
+            width={300}
+            height={200}
+            className="w-64 h-44 object-cover rounded-xl"
+          />
+        )}
       </div>
 
-      {/* DESKTOP FILTERS */}
+      {/* DETAILS */}
+      <div className="mt-5">
+        <h1 className="text-3xl font-bold text-gray-800">
+          {property.title}
+        </h1>
 
-      {!isMobile && (
-        <div className="max-w-7xl mx-auto px-4 mt-6">
-          <div className="bg-white border border-gray-200 rounded-xl p-4 grid grid-cols-6 gap-3">
-            <input
-              type="text"
-              value={location}
-              readOnly
-              placeholder="City"
-              className="border rounded-lg px-3 py-2 text-sm outline-none"
-            />
+        <p className="text-2xl font-semibold text-green-600 mt-2">
+          ₹ {property.price}
+        </p>
 
-            <input
-              type="text"
-              value={propertyType}
-              readOnly
-              placeholder="Property Type"
-              className="border rounded-lg px-3 py-2 text-sm outline-none"
-            />
+        <p className="text-gray-500 mt-1">
+          📍 {property.location}
+        </p>
 
-            <input
-              type="text"
-              value={category}
-              readOnly
-              placeholder="Category"
-              className="border rounded-lg px-3 py-2 text-sm outline-none"
-            />
+        <p className="mt-4 text-gray-700 leading-7">
+          {property.description}
+        </p>
+      </div>
 
-            <input
-              type="text"
-              value={minPrice}
-              readOnly
-              placeholder="Min Price"
-              className="border rounded-lg px-3 py-2 text-sm outline-none"
-            />
+      {/* ACTION BUTTONS */}
+      <div className="flex gap-3 mt-6 flex-wrap">
 
-            <input
-              type="text"
-              value={maxPrice}
-              readOnly
-              placeholder="Max Price"
-              className="border rounded-lg px-3 py-2 text-sm outline-none"
-            />
+        <button
+          onClick={handleViewContact}
+          disabled={loadingContact}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition"
+        >
+          {loadingContact ? "Checking..." : "View Contact"}
+        </button>
+
+        <button
+          onClick={toggleFavorite}
+          className={`px-5 py-2 rounded-xl transition ${
+            isFavorite
+              ? "bg-red-600 text-white"
+              : "bg-gray-200 text-black"
+          }`}
+        >
+          {isFavorite
+            ? "❤️ Shortlisted"
+            : "🤍 Add Shortlist"}
+        </button>
+      </div>
+
+      {/* CONTACT */}
+      <div className="mt-6 relative">
+
+        {/* LOCKED */}
+        {locked && !contact && (
+          <div className="border rounded-2xl p-6 bg-white shadow-sm flex flex-col items-center text-center">
+
+            <p className="text-xl font-semibold mb-2">
+              🔒 Premium Feature
+            </p>
+
+            {error && (
+              <p className="text-red-500 text-sm mb-3">
+                {error}
+              </p>
+            )}
+
+            <p className="text-gray-500 mb-5">
+              Subscribe to view owner contact
+            </p>
 
             <button
-              onClick={() => router.push("/property-filters")}
-              className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium"
+              onClick={() => router.push("/plans")}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-xl shadow hover:scale-105 transition"
             >
-              Edit Filters
+              Subscribe Now
             </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* LOADING */}
+        {/* CONTACT CARD */}
+        {contact && (
+          <div className="border rounded-2xl p-5 bg-gray-50">
 
-      {loading && (
-        <div className="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[...Array(6)].map((_, index) => (
-            <div
-              key={index}
-              className="animate-pulse bg-white rounded-xl p-3 border"
-            >
-              <div className="bg-gray-200 h-48 rounded-lg" />
+            <p>
+              <b>Name:</b> {contact.name}
+            </p>
 
-              <div className="h-4 bg-gray-200 rounded mt-4" />
+            <p className="mt-2">
+              <b>Phone:</b> {contact.phone}
+            </p>
 
-              <div className="h-4 bg-gray-200 rounded mt-2 w-2/3" />
-            </div>
-          ))}
-        </div>
-      )}
+            <p className="mt-2">
+              <b>Email:</b> {contact.email}
+            </p>
 
-      {/* EMPTY */}
-
-      {!loading && properties.length === 0 && (
-        <div className="flex items-center justify-center py-32">
-          <div className="text-center">
-            <h2 className="text-lg font-semibold text-gray-700">
-              No properties found
-            </h2>
-
-            <p className="text-sm text-gray-400 mt-1">
-              Try changing filters
+            <p className="text-sm text-gray-500 mt-4">
+              Remaining: {contact.contactsRemaining}
             </p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* PROPERTIES */}
+      {/* SIMILAR PROPERTIES */}
+      {similar.length > 0 && (
+        <div className="mt-12">
 
-      {!loading && properties.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {properties.map((property) => (
-            <Link
-              key={property._id}
-              href={`/properties/${property._id}`}
-            >
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                {/* IMAGE */}
+          <h2 className="text-2xl font-bold mb-5">
+            Similar Properties
+          </h2>
 
-                <div className="relative">
+          <div className="grid md:grid-cols-3 gap-5">
+
+            {similar.map((p) => (
+              <Link
+                key={p._id}
+                href={`/properties/${p._id}`}
+              >
+                <div className="border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition">
+
                   <Image
-                    src={
-                      property.images?.[0] ||
-                      "/no-image.png"
-                    }
-                    alt={property.title}
+                    src={p.images?.[0] || "/no-image.png"}
+                    alt={p.title}
                     width={500}
                     height={300}
-                    className="w-full h-52 object-cover"
+                    className="w-full h-48 object-cover"
                   />
 
-                  <span className="absolute top-3 left-3 bg-black/80 text-white text-xs px-3 py-1 rounded-md">
-                    {property.type || "Property"}
-                  </span>
+                  <div className="p-4">
+
+                    <h3 className="font-semibold text-lg">
+                      {p.title}
+                    </h3>
+
+                    <p className="text-green-600 font-bold mt-1">
+                      ₹ {p.price}
+                    </p>
+
+                    <p className="text-sm text-gray-500 mt-1">
+                      📍 {p.location}
+                    </p>
+                  </div>
                 </div>
-
-                {/* CONTENT */}
-
-                <div className="p-4">
-                  <h2 className="font-semibold text-gray-800 line-clamp-1">
-                    {property.title}
-                  </h2>
-
-                  <p className="text-xl font-bold text-black mt-2">
-                    ₹ {property.price}
-                  </p>
-
-                  <p className="text-sm text-gray-500 mt-2">
-                    📍 {property.location}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+
