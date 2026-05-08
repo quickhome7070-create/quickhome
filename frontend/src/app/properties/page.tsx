@@ -100,12 +100,12 @@ export default function PropertiesPage() {
           <option value="price_high">Price High → Low</option>
         </select>
 
-         <button
-          onClick={loadProperties}
-          className="sm:col-span-1 lg:col-span-1 bg-black hover:bg-gray-900 text-white py-2.5 rounded-lg transition font-semibold text-sm sm:text-base"
-        >
-          {loading ? "Loading..." : "Apply Filters"}
-        </button>
+  <button
+  onClick={loadProperties}
+  className="sm:col-span-1 lg:col-span-1 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-500 text-white py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm sm:text-base shadow-[0_6px_20px_rgba(251,146,60,0.35)] hover:shadow-[0_10px_25px_rgba(251,146,60,0.45)] hover:scale-[1.02] active:scale-95"
+>
+  {loading ? "Loading..." : "Apply Filters"}
+</button>
 
        
       </div>
