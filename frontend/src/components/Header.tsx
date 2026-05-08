@@ -35,7 +35,7 @@ export default function Header() {
 
     <button
       onClick={() => setType("buy")}
-      className={`w-[72px] sm:w-auto px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition border text-center ${
+      className={`w-[72px] h-9 rounded-full text-xs sm:text-sm font-semibold transition border flex items-center justify-center ${
         type === "buy"
           ? "bg-black text-white shadow"
           : "bg-white text-gray-700 border-gray-200 hover:shadow-sm"
