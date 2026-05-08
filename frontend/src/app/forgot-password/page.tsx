@@ -5,8 +5,14 @@ import { useState } from "react";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-
+  const [loading, setLoading] = useState(false);
+const [sent, setSent] = useState(false)
   const handleSubmit = async () => {
+  if (sent) return;
+
+  setLoading(true);
+
+  try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`,
       {
@@ -20,8 +26,18 @@ export default function ForgotPasswordPage() {
 
     const data = await res.json();
 
-    setMessage(data.message || "Done");
-  };
+    setMessage(data.message || "Reset link sent");
+
+    if (res.ok) {
+      setSent(true);
+    }
+
+  } catch (err) {
+    setMessage("Something went wrong");
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -38,12 +54,21 @@ export default function ForgotPasswordPage() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-600 text-white w-full mt-4 py-3 rounded"
-        >
-          Send Reset Link
-        </button>
+     <button
+  onClick={handleSubmit}
+  disabled={loading || sent}
+  className={`w-full mt-4 py-3 rounded font-semibold transition ${
+    sent
+      ? "bg-green-600 text-white cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700 text-white"
+  }`}
+>
+  {loading
+    ? "Sending..."
+    : sent
+    ? "Link Sent ✓"
+    : "Send Reset Link"}
+</button>
 
         {message && (
           <p className="mt-3 text-sm text-green-600">

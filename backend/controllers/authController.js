@@ -10,9 +10,28 @@ exports.register = async (req, res) => {
     const { name, email, password, phone } = req.body;
 
     // Check required fields
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields required" });
-    }
+   // Check required fields
+if (!name || !email || !password) {
+  return res.status(400).json({ message: "All fields required" });
+}
+
+// Empty password not allowed
+if (!password || password.trim() === "") {
+  return res.status(400).json({
+    message: "Password is required",
+  });
+}
+
+// Password Rule
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+if (!passwordRegex.test(password)) {
+  return res.status(400).json({
+    message:
+      "Password must be at least 8 characters and include uppercase, lowercase, number and special character",
+  });
+}
 
     // Check existing user
     const userExists = await User.findOne({ email });
@@ -123,17 +142,6 @@ exports.getMe = async (req, res) => {
 // LOGOUT
 exports.logout = async (req, res) => {
   try {
-    // If using JWT in header → nothing to clear on server
-    // If using cookies → you would clear cookie here
-// res.clearCookie("token", {
-//   httpOnly: true,
-//   secure: process.env.NODE_ENV === "production",
-//   sameSite: "none",
-//   domain: ".ghardestiny.com",
-// });
-
-
-
 res.clearCookie("token", {
   httpOnly: true,
   secure: isProd,
