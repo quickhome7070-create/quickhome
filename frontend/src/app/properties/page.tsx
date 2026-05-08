@@ -43,8 +43,7 @@ export default function PropertiesPage() {
 }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
-      
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6">      
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
