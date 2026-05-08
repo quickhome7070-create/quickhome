@@ -16,7 +16,7 @@ export default function PropertyFiltersPage() {
           onClick={() => router.push("/properties")}
           className="mt-4 bg-black text-white px-4 py-2 rounded-lg"
         >
-          Back
+          Back again
         </button>
       </div>
     </div>
