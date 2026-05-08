@@ -7,6 +7,9 @@ import { ReactNode } from "react";
 
 export const metadata = {
   title: "Ghar Destiny",
+  //  icons: {
+  //   icon: "/logo.png",
+  // },
   description: "Buy Sell Rent Properties",
 };
 
