@@ -31,11 +31,11 @@ export default function Header() {
   </Link>
 
   {/* Buy / Rent */}
-  <div className="hidden sm:flex items-center gap-3">
+  <div className="flex items-center gap-2 sm:gap-3">
 
     <button
       onClick={() => setType("buy")}
-      className={`px-5 py-2 rounded-full text-sm font-semibold transition border ${
+      className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition border ${
         type === "buy"
           ? "bg-black text-white shadow"
           : "bg-white text-gray-700 border-gray-200 hover:shadow-sm"
