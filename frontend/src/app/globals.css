@@ -28,3 +28,7 @@ body {
 button, link{
   cursor: pointer;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

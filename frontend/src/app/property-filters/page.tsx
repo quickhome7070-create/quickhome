@@ -123,7 +123,11 @@ const propertyTabs = [
 
 </div>
 
-    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"    style={{
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+  }}>
+    
 
   {propertyTabs.map((item) => {
 
@@ -142,6 +146,7 @@ const propertyTabs = [
             ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
             : "bg-white text-gray-700 border-gray-200"
         }`}
+        
       >
         <Icon size={22} />
 
