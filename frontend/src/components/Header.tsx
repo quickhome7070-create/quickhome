@@ -8,11 +8,7 @@ export default function Header() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
    const [type, setType] = useState("");
-   const params = new URLSearchParams({
-    
-      type,
-     
-    });
+   
 
   return (
   <header className="sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 border-b border-orange-200 shadow-md">

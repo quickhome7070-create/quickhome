@@ -3,63 +3,62 @@
 import { useState } from "react";
 
 export default function AddProperty() {
+  const [loading, setLoading] =
+    useState(false);
+
   const [form, setForm] = useState({
     title: "",
     price: "",
     location: "",
     description: "",
+    listingType: "buy",
   });
 
-  const [images, setImages] = useState<File[]>([]);
-  const [preview, setPreview] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [images, setImages] = useState<
+    File[]
+  >([]);
 
-  const handleChange = (e: any) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement |
+      HTMLTextAreaElement |
+      HTMLSelectElement
+    >
+  ) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  // Handle image select
-  const handleImages = (files: FileList) => {
-    const fileArray = Array.from(files);
-    setImages((prev) => [...prev, ...fileArray]);
+  const handleImages = (
+    files: FileList | null
+  ) => {
+    if (!files) return;
 
-    const previewUrls = fileArray.map((file) =>
-      URL.createObjectURL(file)
-    );
-    setPreview((prev) => [...prev, ...previewUrls]);
+    setImages(Array.from(files));
   };
 
-  // Drag & Drop
-  const handleDrop = (e: any) => {
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
-    handleImages(e.dataTransfer.files);
-  };
-
-  // Remove image
-  const removeImage = (index: number) => {
-    const newImages = [...images];
-    const newPreview = [...preview];
-    newImages.splice(index, 1);
-    newPreview.splice(index, 1);
-    setImages(newImages);
-    setPreview(newPreview);
-  };
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    setLoading(true);
-    setProgress(15);
-
-     
-
-    const formData = new FormData();
-    Object.keys(form).forEach((key) =>
-      formData.append(key, (form as any)[key])
-    );
-    images.forEach((img) => formData.append("images", img));
 
     try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      Object.entries(form).forEach(
+        ([key, value]) => {
+          formData.append(key, value);
+        }
+      );
+
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property`,
         {
@@ -69,163 +68,114 @@ export default function AddProperty() {
         }
       );
 
-      setProgress(70);
       const data = await res.json();
 
-      if (res.ok) {
-        setProgress(100);
-        alert("✅ Property created successfully");
-
-        setForm({
-          title: "",
-          price: "",
-          location: "",
-          description: "",
-        });
-        setImages([]);
-        setPreview([]);
-      } else {
-        alert(data.message || "Error");
+      if (!res.ok) {
+        throw new Error(data.message);
       }
-    } catch (err) {
-      alert("Server error");
+
+      alert("Property Added");
+
+      setForm({
+        title: "",
+        price: "",
+        location: "",
+        description: "",
+        listingType: "buy",
+      });
+
+      setImages([]);
+
+    } catch (error: any) {
+      alert(error.message);
+
     } finally {
       setLoading(false);
-      setTimeout(() => setProgress(0), 1200);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-white/70 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-gray-200">
-        
-        {/* Title */}
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Post Property
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
 
-        {/* Progress Bar */}
-        {progress > 0 && (
-          <div className="w-full bg-gray-200 h-2 rounded-full mb-5 overflow-hidden">
-            <div
-              className="bg-blue-600 h-2 transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        )}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white w-full max-w-xl p-6 rounded-2xl shadow-lg space-y-4"
+      >
+        <h1 className="text-2xl font-bold">
+          Add Property
+        </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Property Title"
-            required
-            className="input"
-          />
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          value={form.title}
+          onChange={handleChange}
+          required
+          className="w-full border p-3 rounded-xl"
+        />
 
-          {/* Price */}
-          <input
-            name="price"
-            type="number"
-            value={form.price}
-            onChange={handleChange}
-            placeholder="Price"
-            required
-            className="input"
-          />
+        <input
+          type="number"
+          name="price"
+          placeholder="Price"
+          value={form.price}
+          onChange={handleChange}
+          required
+          className="w-full border p-3 rounded-xl"
+        />
 
-          {/* Location */}
-          <input
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            placeholder="Location"
-            required
-            className="input"
-          />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={form.location}
+          onChange={handleChange}
+          required
+          className="w-full border p-3 rounded-xl"
+        />
 
-          {/* Description */}
-          <textarea
-            name="description"
-            rows={4}
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Description"
-            required
-            className="input"
-          />
+        <select
+          name="listingType"
+          value={form.listingType}
+          onChange={handleChange}
+          className="w-full border p-3 rounded-xl"
+        >
+          <option value="buy">
+            Buy
+          </option>
 
-          {/* Drag & Drop Upload */}
-          <div
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-            className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition cursor-pointer"
-          >
-            <p className="text-gray-500">Drag & Drop property images</p>
-            <p className="text-sm text-gray-400 mb-2">or click below</p>
+          <option value="rent">
+            Rent
+          </option>
+        </select>
 
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={(e) => handleImages(e.target.files!)}
-              className="text-sm"
-            />
-          </div>
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={form.description}
+          onChange={handleChange}
+          rows={4}
+          className="w-full border p-3 rounded-xl"
+        />
 
-          {/* Image Preview */}
-          {preview.length > 0 && (
-            <div className="grid grid-cols-3 gap-3">
-              {preview.map((src, i) => (
-                <div key={i} className="relative group">
-                  <img
-                    src={src}
-                    className="h-24 w-full object-cover rounded-lg shadow"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+        <input
+          type="file"
+          multiple
+          onChange={(e) =>
+            handleImages(e.target.files)
+          }
+        />
 
-          {/* Submit */}
-          <button
-  disabled={loading}
-  className={`w-full py-3 rounded-xl font-semibold shadow-md transition-all duration-300 ${
-    loading
-      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-      : "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 hover:from-orange-600 hover:via-amber-500 hover:to-yellow-400 text-black hover:shadow-xl hover:scale-[1.02]"
-  }`}
->
-  {loading ? "Uploading..." : "Create Property"}
-</button>
-        </form>
-      </div>
-
-      {/* Reusable Tailwind Input Style */}
-      <style jsx>{`
-        .input {
-          width: 100%;
-          border: 1px solid #e5e7eb;
-          border-radius: 0.75rem;
-          padding: 0.65rem 0.9rem;
-          outline: none;
-          transition: 0.2s;
-          background: transparent;
-        }
-        .input:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-        }
-      `}</style>
+        <button
+          disabled={loading}
+          className="w-full bg-orange-500 text-white py-3 rounded-xl"
+        >
+          {loading
+            ? "Uploading..."
+            : "Create Property"}
+        </button>
+      </form>
     </div>
   );
 }

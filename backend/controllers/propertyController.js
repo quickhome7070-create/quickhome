@@ -4,14 +4,24 @@ const mongoose = require("mongoose");
 // CREATE PROPERTY
 exports.createProperty = async (req, res) => {
   try {
-    const { title, price, location,description  } = req.body;
-    const images = req.files ? req.files.map(file=>file.path ):[];
+    const {
+      title,
+      price,
+      location,
+      description,
+      listingType,
+    } = req.body;
+
+    const images = req.files
+      ? req.files.map((file) => file.path)
+      : [];
 
     const property = await Property.create({
       title,
       price,
       location,
       description,
+      listingType,
       images,
       owner: req.user.userId,
     });
@@ -19,7 +29,11 @@ exports.createProperty = async (req, res) => {
     res.status(201).json(property);
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
@@ -502,56 +516,91 @@ exports.getTrendingProperties = async (req, res) => {
 exports.getAllProperties = async (req, res) => {
   try {
     const {
-      page = 1,
-      limit = 6,
+      keyword,
       location,
       minPrice,
       maxPrice,
-      keyword,
+      listingType,
       sort,
+      page = 1,
+      limit = 6,
     } = req.query;
 
     let query = {
-  approvalStatus: "approved",   // ✅ only approved
-  status: { $ne: "sold" }       // ✅ hide sold
-};
+      approvalStatus: "approved",
+      status: { $ne: "sold" },
+    };
 
-    // 🔎 Keyword search (title + description)
+    // Keyword
     if (keyword) {
       query.$or = [
-        { title: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
+        {
+          title: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
       ];
     }
 
-    // 📍 Location filter
+    // Location
     if (location) {
-      query.location = { $regex: location, $options: "i" };
+      query.location = {
+        $regex: location,
+        $options: "i",
+      };
     }
 
-    // 💰 Price filter
+    // Listing Type
+    if (listingType) {
+      query.listingType = listingType;
+    }
+
+    // Price
     if (minPrice || maxPrice) {
       query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+
+      if (minPrice) {
+        query.price.$gte = Number(minPrice);
+      }
+
+      if (maxPrice) {
+        query.price.$lte = Number(maxPrice);
+      }
     }
 
-    // 📊 Sorting
-    let sortOption = { createdAt: -1 }; // default newest
+    // Sorting
+    let sortOption = {
+      createdAt: -1,
+    };
 
-    if (sort === "oldest") sortOption = { createdAt: 1 };
-    if (sort === "priceLow") sortOption = { price: 1 };
-    if (sort === "priceHigh") sortOption = { price: -1 };
+    if (sort === "priceLow") {
+      sortOption = { price: 1 };
+    }
 
-    const skip = (page - 1) * limit;
+    if (sort === "priceHigh") {
+      sortOption = { price: -1 };
+    }
 
-    const properties = await Property.find(query)
+    const skip =
+      (Number(page) - 1) * Number(limit);
+
+    const properties = await Property.find(
+      query
+    )
       .populate("owner", "name email")
       .sort(sortOption)
       .skip(skip)
       .limit(Number(limit));
 
-    const total = await Property.countDocuments(query);
+    const total =
+      await Property.countDocuments(query);
 
     res.json({
       total,
@@ -559,8 +608,13 @@ exports.getAllProperties = async (req, res) => {
       pages: Math.ceil(total / limit),
       properties,
     });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
