@@ -117,9 +117,7 @@ const validateForm = () => {
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800">
           Create Account
         </h2>
-        <p className="text-center text-gray-500 text-sm mt-1">
-          Join gharDestiny today
-        </p>
+       
 
         {/* Inputs */}
         <div className="mt-6 space-y-4">
