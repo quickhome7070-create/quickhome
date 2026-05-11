@@ -14,6 +14,7 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
+import Loader from "@/src/components/Loader";
 
 type Property = {
   _id: string;
@@ -127,6 +128,9 @@ setPropertyType(propertyTypeParam);
     try {
 
       setLoading(true);
+      if (loading) {
+  return <Loader/>;
+}
 
       const finalFilters =
         filters || {

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/src/context/AuthContext";
+import Loader from "@/src/components/Loader";
 
 type Property = {
   _id: string;
@@ -143,7 +144,7 @@ export default function PropertyDetailsPage() {
 
   // LOADING
   if (loading) {
-    return <div className="p-6">Loading...</div>;
+    return <div className="p-6"><Loader/></div>;
   }
 
   // NOT FOUND
