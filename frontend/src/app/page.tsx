@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import PropertiesClient from "./properties/PropertiesClient";
-import Loader from "../components/Loader";
+
 
 export default function HomePage() {
   return (
@@ -12,7 +12,7 @@ export default function HomePage() {
           Welcome to the fastest home search destination
         </h1>
 
-        <Suspense fallback={<p><Loader/></p>}>
+        <Suspense fallback={<p>Loading</p>}>
           <PropertiesClient
             searchParams={{}}
           />

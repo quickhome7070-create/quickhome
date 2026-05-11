@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/src/components/Loader";
 import { useState } from "react";
 
 export default function AddProperty() {
@@ -55,6 +56,9 @@ export default function AddProperty() {
 
     try {
       setLoading(true);
+      if (loading){
+        return <Loader/>
+      }
 
       const formData = new FormData();
 

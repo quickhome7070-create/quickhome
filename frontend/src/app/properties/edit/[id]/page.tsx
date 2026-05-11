@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Loader from "@/src/components/Loader";
 
 export default function EditPropertyPage() {
   const { id } = useParams();
@@ -49,7 +50,7 @@ export default function EditPropertyPage() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) return <div className="p-6"><Loader/></div>;
 
   return (
     <div className="p-6 max-w-xl mx-auto">

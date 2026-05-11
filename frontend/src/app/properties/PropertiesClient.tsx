@@ -49,7 +49,7 @@ export default function PropertiesClient({
     useState<Property[]>([]);
 
   const [loading, setLoading] =
-    useState(false);
+    useState(true);
 
     const [propertyType, setPropertyType] =
   useState("");
@@ -73,6 +73,8 @@ export default function PropertiesClient({
     useState("");
 
   useEffect(() => {
+
+   
 
     const keywordParam =
       params.get("keyword") || "";
@@ -126,11 +128,7 @@ setPropertyType(propertyTypeParam);
   ) => {
 
     try {
-
       setLoading(true);
-      if (loading) {
-  return <Loader/>;
-}
 
       const finalFilters =
         filters || {
@@ -199,6 +197,7 @@ setPropertyType(propertyTypeParam);
         `${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`
       );
 
+  
       const data =
         await res.json();
 
@@ -421,7 +420,12 @@ setPropertyType(propertyTypeParam);
       </div>
 
       {/* PROPERTY GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      {loading && 
+  <div className="fixed inset-0 z-50 bg-white flex items-center justify-center">
+    <Loader />
+  </div>  }
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
         {properties.map(
           (property) => (
@@ -497,6 +501,8 @@ setPropertyType(propertyTypeParam);
           )
         )}
       </div>
+    
+      
     </div>
   );
 }

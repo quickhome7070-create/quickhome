@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import PropertiesClient from "./PropertiesClient";
 
+
 type Props = {
   searchParams: Promise<{
     keyword?: string;
@@ -36,7 +37,7 @@ export default async function PropertiesPage({
 
       <div className="max-w-7xl mx-auto">
 
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<p>Loading</p>}>
           <PropertiesClient
             searchParams={params}
           />

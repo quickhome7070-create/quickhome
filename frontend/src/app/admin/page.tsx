@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useAuth } from "@/src/context/AuthContext";
 import { useRouter } from "next/navigation";
+import Loader from "@/src/components/Loader";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -90,7 +91,7 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center text-lg font-semibold">
-        Loading...
+        <Loader/>
       </div>
     );
   }
