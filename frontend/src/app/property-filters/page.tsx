@@ -92,7 +92,7 @@ const propertyTabs = [
 
     <input
         type="text"
-        placeholder="City"
+        placeholder="Search City"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         className="w-full border rounded-xl px-4 py-3"
