@@ -111,7 +111,7 @@ const propertyTabs = [
       className={`flex-1 py-3 rounded-xl text-sm font-medium border transition ${
         listingType === type
           ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-          : "bg-white text-gray-700 border-gray-200"
+          : "bg-white text-gray-700 border-grey-200"
       }`}
     >
       {type === "buy"
@@ -141,10 +141,10 @@ const propertyTabs = [
           setKeyword(item.name)
           
         }
-        className={`flex flex-col w-16 h-16 items-center justify-center min-w-[90px] px-4 py-3 rounded-2xl text-sm font-medium border transition ${
+        className={`flex flex-col  w-16 h-16 items-center justify-center min-w-[90px] px-4 py-3 rounded-2xl text-sm font-medium border transition ${
           keyword === item.name
             ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-            : "bg-white text-gray-700 border-gray-200"
+            : "bg-white text-gray-700 border-grey-200"
         }`}
         
       >
