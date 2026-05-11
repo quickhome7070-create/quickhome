@@ -48,6 +48,7 @@ router.put("/:id/sold", protect, markAsSold);
 router.get("/my-sold", protect, getSoldProperties);
 router.get("/:id", getPropertyById);
 
+
 // UPDATE
 router.put("/:id", protect, upload.array("images", 5), updateProperty);
 
