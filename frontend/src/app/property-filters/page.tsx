@@ -90,7 +90,13 @@ const propertyTabs = [
   return (
     <div className="min-h-screen bg-gray-50 p-4 space-y-4">
 
-    
+    <input
+        type="text"
+        placeholder="City"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        className="w-full border rounded-xl px-4 py-3"
+      />
 
      <div className="flex gap-3">
 
@@ -148,13 +154,7 @@ const propertyTabs = [
 
 </div>
      
-   <input
-        type="text"
-        placeholder="Location"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        className="w-full border rounded-xl px-4 py-3"
-      />
+
       <div className="grid grid-cols-2 gap-3">
         <input
           type="number"
