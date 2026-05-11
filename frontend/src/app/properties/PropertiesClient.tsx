@@ -428,16 +428,31 @@ setPropertyType(propertyTypeParam);
             >
               <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition">
 
-                <Image
+                {/* <Image
                   src={
                     property.images?.[0] ||
                     "/no-image.png"
                   }
                   alt={property.title}
                   width={500}
-                  height={300}
+                  height={300}                   
                   className="w-full h-52 object-cover"
-                />
+                /> */}
+                <Image
+  src={
+    property.images?.[0]
+      ?.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto,w_800/"
+      ) || "/no-image.png"
+  }
+  alt={property.title}
+  width={500}
+  height={300}
+  loading="lazy"
+  quality={60}
+  className="w-full h-52 object-cover"
+/>
 
              <div className="p-4">
 
