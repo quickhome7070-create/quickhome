@@ -90,6 +90,7 @@ export default function Header() {
         <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold">
           {user?.name?.charAt(0)?.toUpperCase()}
         </div>
+        
 
         <span>
           {user?.name}
