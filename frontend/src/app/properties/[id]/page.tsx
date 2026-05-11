@@ -1,10 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  useParams,
+  useRouter,
+} from "next/navigation";
+
 import { useAuth } from "@/src/context/AuthContext";
+
 import Loader from "@/src/components/Loader";
 
 type Property = {
@@ -17,31 +27,48 @@ type Property = {
 };
 
 export default function PropertyDetailsPage() {
+
   const { id } = useParams();
+
   const router = useRouter();
 
   const { user } = useAuth();
 
-  const [property, setProperty] = useState<Property | null>(null);
-  const [similar, setSimilar] = useState<Property[]>([]);
+  const [property, setProperty] =
+    useState<Property | null>(null);
 
-  const [loading, setLoading] = useState(true);
+  const [similar, setSimilar] =
+    useState<Property[]>([]);
 
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [contact, setContact] = useState<any>(null);
-  const [loadingContact, setLoadingContact] = useState(false);
+  const [isFavorite, setIsFavorite] =
+    useState(false);
 
-  const [locked, setLocked] = useState(false);
-  const [error, setError] = useState("");
+  const [contact, setContact] =
+    useState<any>(null);
 
-  // LOAD PROPERTY DATA
+  const [loadingContact, setLoadingContact] =
+    useState(false);
+
+  const [locked, setLocked] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [activeImage, setActiveImage] =
+    useState(0);
+
   useEffect(() => {
+
     if (!id) return;
 
     const fetchData = async () => {
+
       try {
-        // PROPERTY
+
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/property/${id}`
         );
@@ -50,7 +77,6 @@ export default function PropertyDetailsPage() {
 
         setProperty(data);
 
-        // FAVORITE STATUS
         const favRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/property/favorite-status/${id}`,
           {
@@ -58,11 +84,13 @@ export default function PropertyDetailsPage() {
           }
         );
 
-        const favData = await favRes.json();
+        const favData =
+          await favRes.json();
 
-        setIsFavorite(favData.isFavorite);
+        setIsFavorite(
+          favData.isFavorite
+        );
 
-        // RECENTLY VIEWED
         await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/property/recent/${id}`,
           {
@@ -71,35 +99,44 @@ export default function PropertyDetailsPage() {
           }
         );
 
-        // SIMILAR PROPERTIES
         const simRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/property/similar/${id}`
         );
 
-        const simData = await simRes.json();
+        const simData =
+          await simRes.json();
 
         setSimilar(simData || []);
+
       } catch (error) {
-        console.error(error);
+
+        console.log(error);
+
       } finally {
+
         setLoading(false);
       }
     };
 
     fetchData();
+
   }, [id]);
 
-  // VIEW CONTACT
   const handleViewContact = async () => {
+
     if (!user) {
+
       router.push("/login");
+
       return;
     }
 
     setLoadingContact(true);
+
     setError("");
 
     try {
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
         {
@@ -107,27 +144,38 @@ export default function PropertyDetailsPage() {
         }
       );
 
-      const data = await res.json();
+      const data =
+        await res.json();
 
-      // SUBSCRIPTION REQUIRED
       if (res.status === 403) {
+
         setLocked(true);
+
         setError(data.message);
+
         return;
       }
 
       setContact(data);
+
     } catch (error) {
-      console.error(error);
-      setError("Something went wrong");
+
+      console.log(error);
+
+      setError(
+        "Something went wrong"
+      );
+
     } finally {
+
       setLoadingContact(false);
     }
   };
 
-  // FAVORITE
   const toggleFavorite = async () => {
+
     try {
+
       await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property/favorite/${id}`,
         {
@@ -136,193 +184,337 @@ export default function PropertyDetailsPage() {
         }
       );
 
-      setIsFavorite(!isFavorite);
+      setIsFavorite(
+        !isFavorite
+      );
+
     } catch (error) {
-      console.error(error);
+
+      console.log(error);
     }
   };
 
-  // LOADING
   if (loading) {
-    return <div className="p-6"><Loader/></div>;
+    return <Loader />;
   }
 
-  // NOT FOUND
   if (!property) {
-    return <div className="p-6">Property not found</div>;
+    return (
+      <div className="p-10 text-center text-gray-500">
+        Property not found
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6">
+    <div className="min-h-screen bg-[#f5f7fb] pb-20">
 
-      {/* IMAGES */}
-      <div className="flex gap-3 overflow-x-auto">
-        {property.images?.length > 0 ? (
-          property.images.map((img, index) => (
-            <Image
-              key={index}
-              src={img}
-              alt={property.title}
-              width={300}
-              height={200}
-              className="w-64 h-44 object-cover rounded-xl flex-shrink-0"
-            />
-          ))
-        ) : (
-          <Image
-            src="/no-image.png"
-            alt="No Image"
-            width={300}
-            height={200}
-            className="w-64 h-44 object-cover rounded-xl"
-          />
-        )}
-      </div>
+      {/* HERO IMAGE */}
+      <div className="relative h-[320px] md:h-[520px] overflow-hidden">
 
-      {/* DETAILS */}
-      <div className="mt-5">
-        <h1 className="text-3xl font-bold text-gray-800">
-          {property.title}
-        </h1>
+        <Image
+          src={
+            property.images?.[
+              activeImage
+            ] || "/no-image.png"
+          }
+          alt={property.title}
+          fill
+          priority
+          className="object-cover"
+        />
 
-        <p className="text-2xl font-semibold text-green-600 mt-2">
-          ₹ {property.price}
-        </p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        <p className="text-gray-500 mt-1">
-          📍 {property.location}
-        </p>
+        {/* TOP BUTTONS */}
+        <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-10">
 
-        <p className="mt-4 text-gray-700 leading-7">
-          {property.description}
-        </p>
-      </div>
+          <button
+            onClick={() =>
+              router.back()
+            }
+            className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-sm font-medium shadow-lg"
+          >
+            ← Back
+          </button>
 
-      {/* ACTION BUTTONS */}
-      <div className="flex gap-3 mt-6 flex-wrap">
+          <button
+            onClick={
+              toggleFavorite
+            }
+            className={`px-4 py-2 rounded-full text-sm font-medium shadow-lg backdrop-blur ${
+              isFavorite
+                ? "bg-red-500 text-white"
+                : "bg-white/90 text-black"
+            }`}
+          >
+            {isFavorite
+              ? "❤️ Saved"
+              : "🤍 Save"}
+          </button>
+        </div>
 
-        <button
-          onClick={handleViewContact}
-          disabled={loadingContact}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition"
-        >
-          {loadingContact ? "Checking..." : "View Contact"}
-        </button>
+        {/* PROPERTY INFO */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 text-white z-10">
 
-        <button
-          onClick={toggleFavorite}
-          className={`px-5 py-2 rounded-xl transition ${
-            isFavorite
-              ? "bg-red-600 text-white"
-              : "bg-gray-200 text-black"
-          }`}
-        >
-          {isFavorite
-            ? "❤️ Shortlisted"
-            : "🤍 Add Shortlist"}
-        </button>
-      </div>
+          <div className="max-w-6xl mx-auto">
 
-      {/* CONTACT */}
-      <div className="mt-6 relative">
-
-        {/* LOCKED */}
-        {locked && !contact && (
-          <div className="border rounded-2xl p-6 bg-white shadow-sm flex flex-col items-center text-center">
-
-            <p className="text-xl font-semibold mb-2">
-              🔒 Premium Feature
+            <p className="inline-block bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-4">
+              Premium Property
             </p>
 
-            {error && (
-              <p className="text-red-500 text-sm mb-3">
-                {error}
+            <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+              {property.title}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-5 mt-5">
+
+              <p className="text-3xl font-bold text-green-300">
+                ₹ {property.price}
               </p>
-            )}
 
-            <p className="text-gray-500 mb-5">
-              Subscribe to view owner contact
-            </p>
-
-            <button
-              onClick={() => router.push("/plans")}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-xl shadow hover:scale-105 transition"
-            >
-              Subscribe Now
-            </button>
+              <p className="text-white/90">
+                📍 {property.location}
+              </p>
+            </div>
           </div>
-        )}
-
-        {/* CONTACT CARD */}
-        {contact && (
-          <div className="border rounded-2xl p-5 bg-gray-50">
-
-            <p>
-              <b>Name:</b> {contact.name}
-            </p>
-
-            <p className="mt-2">
-              <b>Phone:</b> {contact.phone}
-            </p>
-
-            <p className="mt-2">
-              <b>Email:</b> {contact.email}
-            </p>
-
-            <p className="text-sm text-gray-500 mt-4">
-              Remaining: {contact.contactsRemaining}
-            </p>
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* SIMILAR PROPERTIES */}
-      {similar.length > 0 && (
-        <div className="mt-12">
+      {/* THUMBNAILS */}
+      {property.images?.length > 1 && (
+        <div className="max-w-6xl mx-auto px-4 -mt-10 relative z-20">
 
-          <h2 className="text-2xl font-bold mb-5">
-            Similar Properties
-          </h2>
+          <div className="flex gap-3 overflow-x-auto pb-2">
 
-          <div className="grid md:grid-cols-3 gap-5">
-
-            {similar.map((p) => (
-              <Link
-                key={p._id}
-                href={`/properties/${p._id}`}
-              >
-                <div className="border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition">
-
+            {property.images.map(
+              (img, index) => (
+                <button
+                  key={index}
+                  onClick={() =>
+                    setActiveImage(
+                      index
+                    )
+                  }
+                  className={`relative min-w-[110px] h-24 rounded-2xl overflow-hidden border-4 ${
+                    activeImage ===
+                    index
+                      ? "border-orange-500"
+                      : "border-white"
+                  } shadow-lg`}
+                >
                   <Image
-                    src={p.images?.[0] || "/no-image.png"}
-                    alt={p.title}
-                    width={500}
-                    height={300}
-                    className="w-full h-48 object-cover"
+                    src={img}
+                    alt="thumb"
+                    fill
+                    className="object-cover"
                   />
-
-                  <div className="p-4">
-
-                    <h3 className="font-semibold text-lg">
-                      {p.title}
-                    </h3>
-
-                    <p className="text-green-600 font-bold mt-1">
-                      ₹ {p.price}
-                    </p>
-
-                    <p className="text-sm text-gray-500 mt-1">
-                      📍 {p.location}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </button>
+              )
+            )}
           </div>
         </div>
       )}
+
+      {/* CONTENT */}
+      <div className="max-w-6xl mx-auto px-4 mt-10 grid lg:grid-cols-3 gap-8">
+
+        {/* LEFT */}
+        <div className="lg:col-span-2 space-y-6">
+
+          {/* DESCRIPTION */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+
+            <h2 className="text-2xl font-bold mb-5">
+              About Property
+            </h2>
+
+            <p className="text-gray-600 leading-8">
+              {property.description}
+            </p>
+          </div>
+
+          {/* SIMILAR */}
+          {similar.length > 0 && (
+            <div>
+
+              <h2 className="text-2xl font-bold mb-5">
+                Similar Properties
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-5">
+
+                {similar.map((p) => (
+
+                  <Link
+                    key={p._id}
+                    href={`/properties/${p._id}`}
+                  >
+                    <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
+
+                      <div className="relative h-52">
+
+                        <Image
+                          src={
+                            p.images?.[0] ||
+                            "/no-image.png"
+                          }
+                          alt={p.title}
+                          fill
+                          className="object-cover"
+                        />
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+                        <div className="absolute bottom-4 left-4 text-white">
+
+                          <p className="font-bold text-xl">
+                            ₹ {p.price}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-5">
+
+                        <h3 className="font-semibold text-lg line-clamp-1">
+                          {p.title}
+                        </h3>
+
+                        <p className="text-gray-500 text-sm mt-2">
+                          📍 {p.location}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT SIDEBAR */}
+        <div className="space-y-6">
+
+          {/* CONTACT CARD */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-6">
+
+            <div className="flex items-center justify-between">
+
+              <h2 className="text-2xl font-bold">
+                Owner Details
+              </h2>
+
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                O
+              </div>
+            </div>
+
+            {!contact && !locked && (
+
+              <div className="mt-6">
+
+                <p className="text-gray-500 leading-7">
+                  View owner phone number and email instantly.
+                </p>
+
+                <button
+                  onClick={
+                    handleViewContact
+                  }
+                  disabled={
+                    loadingContact
+                  }
+                  className="w-full mt-6 bg-gradient-to-r from-orange-500 to-pink-500 text-white py-4 rounded-2xl font-semibold shadow-lg hover:scale-[1.02] transition"
+                >
+                  {loadingContact
+                    ? "Checking..."
+                    : "View Contact"}
+                </button>
+              </div>
+            )}
+
+            {/* LOCKED */}
+            {locked && !contact && (
+
+              <div className="mt-6 text-center">
+
+                <div className="text-5xl">
+                  🔒
+                </div>
+
+                <p className="font-semibold text-xl mt-4">
+                  Premium Access
+                </p>
+
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  onClick={() =>
+                    router.push(
+                      "/plans"
+                    )
+                  }
+                  className="w-full mt-6 bg-black text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition"
+                >
+                  Upgrade Plan
+                </button>
+              </div>
+            )}
+
+            {/* CONTACT */}
+            {contact && (
+
+              <div className="mt-6 space-y-4">
+
+                <div className="bg-gray-50 rounded-2xl p-4">
+
+                  <p className="text-sm text-gray-500">
+                    Name
+                  </p>
+
+                  <p className="font-semibold mt-1">
+                    {contact.name}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-2xl p-4">
+
+                  <p className="text-sm text-gray-500">
+                    Phone
+                  </p>
+
+                  <p className="font-semibold mt-1">
+                    {contact.phone}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-2xl p-4">
+
+                  <p className="text-sm text-gray-500">
+                    Email
+                  </p>
+
+                  <p className="font-semibold mt-1 break-all">
+                    {contact.email}
+                  </p>
+                </div>
+
+                <p className="text-sm text-gray-500 text-center pt-2">
+                  Remaining contacts:
+                  {" "}
+                  {
+                    contact.contactsRemaining
+                  }
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-
