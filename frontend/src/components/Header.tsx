@@ -7,7 +7,7 @@ import { useState } from "react";
 export default function Header() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-   const [type, setType] = useState("");
+  
    
 
   return (
@@ -26,32 +26,8 @@ export default function Header() {
     Ghar Destiny
   </Link>
 
-  {/* Buy / Rent */}
-  <div className="flex items-center gap-2 sm:gap-3">
 
-    <button
-      onClick={() => setType("buy")}
-      className={`w-[72px] h-9 rounded-full text-xs sm:text-sm font-semibold transition border flex items-center justify-center ${
-        type === "buy"
-          ? "bg-black text-white shadow"
-          : "bg-white text-gray-700 border-gray-200 hover:shadow-sm"
-      }`}
-    >
-      Buy
-    </button>
-
-    <button
-      onClick={() => setType("rent")}
-      className={`px-5 py-2 rounded-full text-sm font-semibold transition border ${
-        type === "rent"
-          ? "bg-black text-white shadow"
-          : "bg-white text-gray-700 border-gray-200 hover:shadow-sm"
-      }`}
-    >
-      Rent
-    </button>
-
-  </div>
+  
 </div>
 {/* Desktop Nav */}
 <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-900">

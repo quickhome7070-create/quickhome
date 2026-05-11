@@ -7,6 +7,18 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
+    propertyType: {
+      type: String,
+      enum: [
+        "Flat",
+        "House",
+        "Plot",
+        "Office Space",
+        "Shop",
+      ],
+      required: true,
+    },
+
     price: {
       type: Number,
       required: true,

@@ -10,6 +10,7 @@ exports.createProperty = async (req, res) => {
       location,
       description,
       listingType,
+      propertyType,
     } = req.body;
 
     const images = req.files
@@ -23,6 +24,7 @@ exports.createProperty = async (req, res) => {
       description,
       listingType,
       images,
+      propertyType,
       owner: req.user.userId,
     });
 
@@ -242,6 +244,7 @@ exports.updateProperty = async (req, res) => {
     property.price = req.body.price || property.price;
     property.location = req.body.location || property.location;
     property.description = req.body.description || property.description;
+    property.propertyType = req.body.propertyType || property.propertyType;
 
     // Images (append new images)
     if (req.files && req.files.length > 0) {
@@ -524,6 +527,7 @@ exports.getAllProperties = async (req, res) => {
       minPrice = "",
       maxPrice = "",
       listingType = "",
+      propertyType = "",
       sort = "",
       page = 1,
       limit = 6,
@@ -564,6 +568,11 @@ exports.getAllProperties = async (req, res) => {
     if (listingType.trim()) {
       query.listingType = listingType;
     }
+
+    //PropertyType
+    if (propertyType.trim()) {
+  query.propertyType = propertyType;
+}
 
     // Price Filter
     if (minPrice || maxPrice) {

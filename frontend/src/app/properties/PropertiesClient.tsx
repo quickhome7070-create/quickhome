@@ -22,6 +22,7 @@ type Property = {
   location: string;
   images?: string[];
   listingType?: "buy" | "rent";
+  propertyType?:string;
 };
 
 type Props = {
@@ -49,6 +50,9 @@ export default function PropertiesClient({
   const [loading, setLoading] =
     useState(false);
 
+    const [propertyType, setPropertyType] =
+  useState("");
+
   const [search, setSearch] =
     useState("");
 
@@ -74,6 +78,11 @@ export default function PropertiesClient({
 
     const locationParam =
       params.get("location") || "";
+
+      const propertyTypeParam =
+  params.get("propertyType") || "";
+
+setPropertyType(propertyTypeParam);
 
     const minPriceParam =
       params.get("minPrice") || "";
@@ -105,6 +114,7 @@ export default function PropertiesClient({
       minPrice: minPriceParam,
       maxPrice: maxPriceParam,
       listingType: listingTypeParam,
+      propertyType: propertyTypeParam,
       sort: sortParam,
     });
 
@@ -126,6 +136,7 @@ export default function PropertiesClient({
           maxPrice,
           listingType,
           sort,
+          propertyType,
         };
 
       const query =
@@ -144,6 +155,13 @@ export default function PropertiesClient({
           finalFilters.location
         );
       }
+
+      if (finalFilters.propertyType) {
+  query.append(
+    "propertyType",
+    finalFilters.propertyType
+  );
+}
 
       if (finalFilters.minPrice) {
         query.append(
@@ -218,7 +236,7 @@ export default function PropertiesClient({
       {/* DESKTOP FILTERS */}
       <div className="hidden md:grid bg-white border border-gray-200 rounded-2xl shadow-sm p-4 mb-6 grid-cols-7 gap-3">
 
-        <input
+        {/* <input
           type="text"
           placeholder="Search"
           value={search}
@@ -226,7 +244,45 @@ export default function PropertiesClient({
             setSearch(e.target.value)
           }
           className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
-        />
+        /> */}
+
+      {/* DESKTOP DROPDOWN */}
+
+
+  <select
+    value={propertyType}
+    onChange={(e) =>
+      setPropertyType(
+        e.target.value
+      )
+    }
+    className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
+  >
+    <option value="">
+      Property Type
+    </option>
+
+    <option value="Flat">
+      Flat
+    </option>
+
+    <option value="House">
+      House
+    </option>
+
+    <option value="Plot">
+      Plot
+    </option>
+
+    <option value="Office Space">
+      Office Space
+    </option>
+
+    <option value="Shop">
+      Shop
+    </option>
+  </select>
+
 
         <input
           type="text"
@@ -301,9 +357,57 @@ export default function PropertiesClient({
         </select>
 
         <button
-          onClick={() =>
-            loadProperties()
-          }
+          onClick={() => {
+
+  const query =
+    new URLSearchParams();
+
+  if (propertyType) {
+    query.append(
+      "propertyType",
+      propertyType
+    );
+  }
+
+  if (location) {
+    query.append(
+      "location",
+      location
+    );
+  }
+
+  if (minPrice) {
+    query.append(
+      "minPrice",
+      minPrice
+    );
+  }
+
+  if (maxPrice) {
+    query.append(
+      "maxPrice",
+      maxPrice
+    );
+  }
+
+  if (listingType) {
+    query.append(
+      "listingType",
+      listingType
+    );
+  }
+
+  if (sort) {
+    query.append(
+      "sort",
+      sort
+    );
+  }
+
+  router.push(
+    `/properties?${query.toString()}`
+  );
+}}
           className="bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-xl font-medium shadow-md"
         >
           {loading
@@ -335,13 +439,17 @@ export default function PropertiesClient({
                   className="w-full h-52 object-cover"
                 />
 
-                <div className="p-4">
+             <div className="p-4">
 
-                  <h2 className="font-semibold text-lg line-clamp-1">
-                    {property.title}
-                  </h2>
+  <h2 className="font-semibold text-lg line-clamp-1">
+    {property.title}
+  </h2>
 
-                  <div className="flex items-center justify-between mt-2">
+  <p className="text-sm text-gray-500 mt-1">
+    🏠 {property.propertyType}
+  </p>
+
+  <div className="flex items-center justify-between mt-2">
 
                     <p className="text-orange-600 text-xl font-bold">
                       ₹ {property.price}

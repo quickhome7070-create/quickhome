@@ -12,13 +12,21 @@ export default function PropertyFiltersPage() {
   const [maxPrice, setMaxPrice] = useState("");
   const [listingType, setListingType] = useState("");
   const [sort, setSort] = useState("");
+      const propertyTabs = [
+  "Flat",
+  "House",
+  "Plot",
+  "Office Space",
+  "Shop",
+];
 
   const applyFilters = () => {
+
     const params = new URLSearchParams();
 
     if (keyword.trim()) {
-      params.append("keyword", keyword);
-    }
+  params.append("propertyType", keyword);
+}
 
     if (location.trim()) {
       params.append("location", location);
@@ -55,13 +63,33 @@ export default function PropertyFiltersPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 space-y-4">
 
-      <input
+      {/* <input
         type="text"
         placeholder="Search properties"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         className="w-full border rounded-xl px-4 py-3"
-      />
+      /> */}
+
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+
+  {propertyTabs.map((item) => (
+
+    <button
+      key={item}
+      onClick={() => setKeyword(item)}
+      className={`whitespace-nowrap px-4 py-3 rounded-2xl text-sm font-medium border transition ${
+        keyword === item
+          ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+          : "bg-white text-gray-700 border-gray-200"
+      }`}
+    >
+      {item}
+    </button>
+
+  ))}
+
+</div>
 
       <input
         type="text"
@@ -117,12 +145,12 @@ export default function PropertyFiltersPage() {
           Reset
         </button>
 
-        <button
-          onClick={applyFilters}
-          className="w-2/3 bg-orange-500 text-white rounded-xl py-3"
-        >
-          Apply Filters
-        </button>
+      <button
+  onClick={applyFilters}
+  className="w-2/3 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-xl py-3 shadow-md"
+>
+  Search
+</button>
       </div>
     </div>
   );

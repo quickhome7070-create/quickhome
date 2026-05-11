@@ -12,11 +12,20 @@ export default function AddProperty() {
     location: "",
     description: "",
     listingType: "buy",
+    propertyType: "Flat",
   });
 
   const [images, setImages] = useState<
     File[]
   >([]);
+
+  const propertyTypes = [
+    "Flat",
+    "House",
+    "Plot",
+    "Office Space",
+    "Shop",
+  ];
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -82,6 +91,7 @@ export default function AddProperty() {
         location: "",
         description: "",
         listingType: "buy",
+        propertyType: "Flat",
       });
 
       setImages([]);
@@ -135,6 +145,37 @@ export default function AddProperty() {
           className="w-full border p-3 rounded-xl"
         />
 
+        {/* PROPERTY TYPE */}
+        <div>
+          <p className="font-medium mb-3">
+            Property Type
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+
+            {propertyTypes.map((type) => (
+
+              <button
+                type="button"
+                key={type}
+                onClick={() =>
+                  setForm({
+                    ...form,
+                    propertyType: type,
+                  })
+                }
+                className={`rounded-2xl border p-3 text-sm font-medium transition ${
+                  form.propertyType === type
+                    ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                    : "bg-white text-gray-700"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <select
           name="listingType"
           value={form.listingType}
@@ -169,7 +210,7 @@ export default function AddProperty() {
 
         <button
           disabled={loading}
-          className="w-full bg-orange-500 text-white py-3 rounded-xl"
+          className="w-full bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white py-3 rounded-xl shadow-md"
         >
           {loading
             ? "Uploading..."
