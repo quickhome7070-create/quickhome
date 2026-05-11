@@ -227,8 +227,8 @@ setPropertyType(propertyTypeParam);
           className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 shadow-sm text-left"
         >
           <p className="text-sm text-gray-400">
-            🔍 Search city, budget,
-            buy/rent...
+          Search...
+            
           </p>
         </button>
       </div>

@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Building2,
+  Home,
+  Map,
+  Briefcase,
+  Store,
+} from "lucide-react";
 
 export default function PropertyFiltersPage() {
   const router = useRouter();
@@ -12,13 +19,33 @@ export default function PropertyFiltersPage() {
   const [maxPrice, setMaxPrice] = useState("");
   const [listingType, setListingType] = useState("");
   const [sort, setSort] = useState("");
-      const propertyTabs = [
-  "Flat",
-  "House",
-  "Plot",
-  "Office Space",
-  "Shop",
+
+
+const propertyTabs = [
+  {
+    name: "Flat",
+    icon: Building2,
+    
+  },
+  {
+    name: "House",
+    icon: Home,
+  },
+  {
+    name: "Plot",
+    icon: Map,
+  },
+  {
+    name: "Office Space",
+    icon: Briefcase,
+  },
+  {
+    name: "Shop",
+    icon: Store,
+  },
 ];
+
+
 
   const applyFilters = () => {
 
@@ -71,26 +98,36 @@ export default function PropertyFiltersPage() {
         className="w-full border rounded-xl px-4 py-3"
       /> */}
 
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
 
-  {propertyTabs.map((item) => (
+  {propertyTabs.map((item) => {
 
-    <button
-      key={item}
-      onClick={() => setKeyword(item)}
-      className={`whitespace-nowrap px-4 py-3 rounded-2xl text-sm font-medium border transition ${
-        keyword === item
-          ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-          : "bg-white text-gray-700 border-gray-200"
-      }`}
-    >
-      {item}
-    </button>
+    const Icon = item.icon;
 
-  ))}
+    return (
+
+      <button
+        key={item.name}
+        onClick={() =>
+          setKeyword(item.name)
+          
+        }
+        className={`flex flex-col w-16 h-16 items-center justify-center min-w-[90px] px-4 py-3 rounded-2xl text-sm font-medium border transition ${
+          keyword === item.name
+            ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+            : "bg-white text-gray-700 border-gray-200"
+        }`}
+      >
+        <Icon size={22} />
+
+        <span className="mt-2 text-xs">
+          {item.name}
+        </span>
+      </button>
+    );
+  })}
 
 </div>
-
       <input
         type="text"
         placeholder="Location"
