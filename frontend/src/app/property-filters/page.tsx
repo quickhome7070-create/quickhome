@@ -90,13 +90,32 @@ const propertyTabs = [
   return (
     <div className="min-h-screen bg-gray-50 p-4 space-y-4">
 
-      {/* <input
-        type="text"
-        placeholder="Search properties"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        className="w-full border rounded-xl px-4 py-3"
-      /> */}
+    
+
+     <div className="flex gap-3">
+
+  {["buy", "rent"].map((type) => (
+
+    <button
+      key={type}
+      type="button"
+      onClick={() =>
+        setListingType(type)
+      }
+      className={`flex-1 py-3 rounded-xl text-sm font-medium border transition ${
+        listingType === type
+          ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+          : "bg-white text-gray-700 border-gray-200"
+      }`}
+    >
+      {type === "buy"
+        ? "Buy"
+        : "Rent"}
+    </button>
+
+  ))}
+
+</div>
 
     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
 
@@ -128,14 +147,14 @@ const propertyTabs = [
   })}
 
 </div>
-      <input
+     
+   <input
         type="text"
         placeholder="Location"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         className="w-full border rounded-xl px-4 py-3"
       />
-
       <div className="grid grid-cols-2 gap-3">
         <input
           type="number"
@@ -154,15 +173,7 @@ const propertyTabs = [
         />
       </div>
 
-      <select
-        value={listingType}
-        onChange={(e) => setListingType(e.target.value)}
-        className="w-full border rounded-xl px-4 py-3"
-      >
-        <option value="">All</option>
-        <option value="buy">Buy</option>
-        <option value="rent">Rent</option>
-      </select>
+          
 
       <select
         value={sort}
@@ -177,14 +188,14 @@ const propertyTabs = [
       <div className="flex gap-3">
         <button
           onClick={clearFilters}
-          className="w-1/3 border rounded-xl py-3"
+          className="w-1/2 border rounded-xl py-3"
         >
           Reset
         </button>
 
       <button
   onClick={applyFilters}
-  className="w-2/3 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-xl py-3 shadow-md"
+  className="w-1/2 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-xl py-3 shadow-md"
 >
   Search
 </button>
