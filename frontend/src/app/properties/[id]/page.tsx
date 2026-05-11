@@ -91,7 +91,7 @@ export default function PropertyDetailsPage() {
   // VIEW CONTACT
   const handleViewContact = async () => {
     if (!user) {
-      router.push("/");
+      router.push("/login");
       return;
     }
 
