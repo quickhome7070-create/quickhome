@@ -10,7 +10,10 @@ import {
   useState,
 } from "react";
 
-import { useRouter } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 
 type Property = {
   _id: string;
@@ -23,6 +26,7 @@ type Property = {
 
 type Props = {
   searchParams: {
+    keyword?: string;
     location?: string;
     minPrice?: string;
     maxPrice?: string;
@@ -37,13 +41,14 @@ export default function PropertiesClient({
 
   const router = useRouter();
 
+  const params = useSearchParams();
+
   const [properties, setProperties] =
     useState<Property[]>([]);
 
   const [loading, setLoading] =
     useState(false);
 
-  // Filters
   const [search, setSearch] =
     useState("");
 
@@ -62,31 +67,40 @@ export default function PropertiesClient({
   const [sort, setSort] =
     useState("");
 
-  // Load filters from URL
   useEffect(() => {
 
+    const keywordParam =
+      params.get("keyword") || "";
+
     const locationParam =
-      searchParams.location || "";
+      params.get("location") || "";
 
     const minPriceParam =
-      searchParams.minPrice || "";
+      params.get("minPrice") || "";
 
     const maxPriceParam =
-      searchParams.maxPrice || "";
+      params.get("maxPrice") || "";
 
     const listingTypeParam =
-      searchParams.listingType || "";
+      params.get("listingType") || "";
 
     const sortParam =
-      searchParams.sort || "";
+      params.get("sort") || "";
+
+    setSearch(keywordParam);
 
     setLocation(locationParam);
+
     setMinPrice(minPriceParam);
+
     setMaxPrice(maxPriceParam);
+
     setListingType(listingTypeParam);
+
     setSort(sortParam);
 
     loadProperties({
+      keyword: keywordParam,
       location: locationParam,
       minPrice: minPriceParam,
       maxPrice: maxPriceParam,
@@ -94,18 +108,19 @@ export default function PropertiesClient({
       sort: sortParam,
     });
 
-  }, []);
+  }, [params]);
 
   const loadProperties = async (
     filters?: any
   ) => {
 
     try {
+
       setLoading(true);
 
       const finalFilters =
         filters || {
-          search,
+          keyword: search,
           location,
           minPrice,
           maxPrice,
@@ -113,56 +128,57 @@ export default function PropertiesClient({
           sort,
         };
 
-      const params =
+      const query =
         new URLSearchParams();
 
-      if (finalFilters.search) {
-        params.append(
+      if (finalFilters.keyword) {
+        query.append(
           "keyword",
-          finalFilters.search
+          finalFilters.keyword
         );
       }
 
       if (finalFilters.location) {
-        params.append(
+        query.append(
           "location",
           finalFilters.location
         );
       }
 
       if (finalFilters.minPrice) {
-        params.append(
+        query.append(
           "minPrice",
           finalFilters.minPrice
         );
       }
 
       if (finalFilters.maxPrice) {
-        params.append(
+        query.append(
           "maxPrice",
           finalFilters.maxPrice
         );
       }
 
       if (finalFilters.listingType) {
-        params.append(
+        query.append(
           "listingType",
           finalFilters.listingType
         );
       }
 
       if (finalFilters.sort) {
-        params.append(
+        query.append(
           "sort",
           finalFilters.sort
         );
       }
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/property?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`
       );
 
-      const data = await res.json();
+      const data =
+        await res.json();
 
       setProperties(
         data.properties || []
@@ -170,7 +186,7 @@ export default function PropertiesClient({
 
     } catch (error) {
 
-      console.error(error);
+      console.log(error);
 
     } finally {
 
@@ -181,7 +197,7 @@ export default function PropertiesClient({
   return (
     <div>
 
-      {/* MOBILE SEARCH */}
+      {/* MOBILE FILTER */}
       <div className="md:hidden mb-5">
 
         <button
@@ -202,7 +218,6 @@ export default function PropertiesClient({
       {/* DESKTOP FILTERS */}
       <div className="hidden md:grid bg-white border border-gray-200 rounded-2xl shadow-sm p-4 mb-6 grid-cols-7 gap-3">
 
-        {/* Search */}
         <input
           type="text"
           placeholder="Search"
@@ -213,7 +228,6 @@ export default function PropertiesClient({
           className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
         />
 
-        {/* Location */}
         <input
           type="text"
           placeholder="City"
@@ -224,7 +238,6 @@ export default function PropertiesClient({
           className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
         />
 
-        {/* Min Price */}
         <input
           type="number"
           placeholder="Min Price"
@@ -235,7 +248,6 @@ export default function PropertiesClient({
           className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
         />
 
-        {/* Max Price */}
         <input
           type="number"
           placeholder="Max Price"
@@ -246,7 +258,6 @@ export default function PropertiesClient({
           className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
         />
 
-        {/* Buy / Rent */}
         <select
           value={listingType}
           onChange={(e) =>
@@ -269,7 +280,6 @@ export default function PropertiesClient({
           </option>
         </select>
 
-        {/* Sort */}
         <select
           value={sort}
           onChange={(e) =>
@@ -290,7 +300,6 @@ export default function PropertiesClient({
           </option>
         </select>
 
-        {/* Search Button */}
         <button
           onClick={() =>
             loadProperties()

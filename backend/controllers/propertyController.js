@@ -513,26 +513,29 @@ exports.getTrendingProperties = async (req, res) => {
 };
 
 // GET ALL PROPERTIES (Advanced Search + Filters + Sorting)
+// GET ALL PROPERTIES
 exports.getAllProperties = async (req, res) => {
   try {
+    
+
     const {
-      keyword,
-      location,
-      minPrice,
-      maxPrice,
-      listingType,
-      sort,
+      keyword = "",
+      location = "",
+      minPrice = "",
+      maxPrice = "",
+      listingType = "",
+      sort = "",
       page = 1,
       limit = 6,
     } = req.query;
 
-    let query = {
+    const query = {
       approvalStatus: "approved",
-      status: { $ne: "sold" },
+      status: "active",
     };
 
-    // Keyword
-    if (keyword) {
+    // Keyword Search
+    if (keyword.trim()) {
       query.$or = [
         {
           title: {
@@ -549,20 +552,20 @@ exports.getAllProperties = async (req, res) => {
       ];
     }
 
-    // Location
-    if (location) {
+    // Location Search
+    if (location.trim()) {
       query.location = {
-        $regex: location,
+        $regex: location.trim(),
         $options: "i",
       };
     }
 
     // Listing Type
-    if (listingType) {
+    if (listingType.trim()) {
       query.listingType = listingType;
     }
 
-    // Price
+    // Price Filter
     if (minPrice || maxPrice) {
       query.price = {};
 
@@ -591,9 +594,9 @@ exports.getAllProperties = async (req, res) => {
     const skip =
       (Number(page) - 1) * Number(limit);
 
-    const properties = await Property.find(
-      query
-    )
+    
+
+    const properties = await Property.find(query)
       .populate("owner", "name email")
       .sort(sortOption)
       .skip(skip)
@@ -605,7 +608,7 @@ exports.getAllProperties = async (req, res) => {
     res.json({
       total,
       page: Number(page),
-      pages: Math.ceil(total / limit),
+      pages: Math.ceil(total / Number(limit)),
       properties,
     });
 
@@ -700,3 +703,5 @@ exports.getSoldProperties = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
