@@ -12,9 +12,9 @@ import {
 
 import {
   useRouter,
-  useSearchParams,
+  
 } from "next/navigation";
-import Loader from "@/src/components/Loader";
+
 
 type Property = {
   _id: string;
@@ -23,10 +23,12 @@ type Property = {
   location: string;
   images?: string[];
   listingType?: "buy" | "rent";
-  propertyType?:string;
+  propertyType?: string;
 };
 
 type Props = {
+  initialProperties: Property[];
+
   searchParams: {
     keyword?: string;
     location?: string;
@@ -34,22 +36,25 @@ type Props = {
     maxPrice?: string;
     listingType?: string;
     sort?: string;
+    propertyType?: string;
   };
 };
 
 export default function PropertiesClient({
+  initialProperties,
   searchParams,
 }: Props) {
 
   const router = useRouter();
 
-  const params = useSearchParams();
+  
 
-  const [properties, setProperties] =
-    useState<Property[]>([]);
+ const [properties] =
+  useState<Property[]>(
+    initialProperties
+  );
 
-  const [loading, setLoading] =
-    useState(true);
+
 
     const [propertyType, setPropertyType] =
   useState("");
@@ -72,63 +77,63 @@ export default function PropertiesClient({
   const [sort, setSort] =
     useState("");
 
-  useEffect(() => {
+//   useEffect(() => {
 
    
 
-    const keywordParam =
-      params.get("keyword") || "";
+//     const keywordParam =
+//       params.get("keyword") || "";
 
-    const locationParam =
-      params.get("location") || "";
+//     const locationParam =
+//       params.get("location") || "";
 
-      const propertyTypeParam =
-  params.get("propertyType") || "";
+//       const propertyTypeParam =
+//   params.get("propertyType") || "";
 
-setPropertyType(propertyTypeParam);
+// setPropertyType(propertyTypeParam);
 
-    const minPriceParam =
-      params.get("minPrice") || "";
+//     const minPriceParam =
+//       params.get("minPrice") || "";
 
-    const maxPriceParam =
-      params.get("maxPrice") || "";
+//     const maxPriceParam =
+//       params.get("maxPrice") || "";
 
-    const listingTypeParam =
-      params.get("listingType") || "";
+//     const listingTypeParam =
+//       params.get("listingType") || "";
 
-    const sortParam =
-      params.get("sort") || "";
+//     const sortParam =
+//       params.get("sort") || "";
 
-    setSearch(keywordParam);
+//     setSearch(keywordParam);
 
-    setLocation(locationParam);
+//     setLocation(locationParam);
 
-    setMinPrice(minPriceParam);
+//     setMinPrice(minPriceParam);
 
-    setMaxPrice(maxPriceParam);
+//     setMaxPrice(maxPriceParam);
 
-    setListingType(listingTypeParam);
+//     setListingType(listingTypeParam);
 
-    setSort(sortParam);
+//     setSort(sortParam);
 
-    loadProperties({
-      keyword: keywordParam,
-      location: locationParam,
-      minPrice: minPriceParam,
-      maxPrice: maxPriceParam,
-      listingType: listingTypeParam,
-      propertyType: propertyTypeParam,
-      sort: sortParam,
-    });
+//     loadProperties({
+//       keyword: keywordParam,
+//       location: locationParam,
+//       minPrice: minPriceParam,
+//       maxPrice: maxPriceParam,
+//       listingType: listingTypeParam,
+//       propertyType: propertyTypeParam,
+//       sort: sortParam,
+//     });
 
-  }, [params]);
+//   }, [params]);
 
   const loadProperties = async (
     filters?: any
   ) => {
 
     try {
-      setLoading(true);
+    
 
       const finalFilters =
         filters || {
@@ -201,9 +206,7 @@ setPropertyType(propertyTypeParam);
       const data =
         await res.json();
 
-      setProperties(
-        data.properties || []
-      );
+      
 
     } catch (error) {
 
@@ -211,7 +214,7 @@ setPropertyType(propertyTypeParam);
 
     } finally {
 
-      setLoading(false);
+      
     }
   };
 
@@ -413,18 +416,13 @@ setPropertyType(propertyTypeParam);
 }}
           className="bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-xl font-medium shadow-md"
         >
-          {loading
-            ? "Loading..."
-            : "Search"}
+          Search
         </button>
       </div>
 
       {/* PROPERTY GRID */}
 
-      {loading && 
-  <div className="fixed inset-0 z-50 bg-white flex items-center justify-center">
-    <Loader />
-  </div>  }
+  
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
         {properties.map(

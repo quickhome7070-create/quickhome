@@ -1,7 +1,6 @@
-import { Suspense } from "react";
+// app/properties/page.tsx
 
 import PropertiesClient from "./PropertiesClient";
-
 
 type Props = {
   searchParams: Promise<{
@@ -11,20 +10,72 @@ type Props = {
     maxPrice?: string;
     listingType?: string;
     sort?: string;
+    propertyType?: string;
   }>;
 };
 
 export default async function PropertiesPage({
   searchParams,
 }: Props) {
-
   const params = await searchParams;
+
+  const query = new URLSearchParams();
+
+  if (params.keyword) {
+    query.append("keyword", params.keyword);
+  }
+
+  if (params.location) {
+    query.append("location", params.location);
+  }
+
+  if (params.propertyType) {
+    query.append(
+      "propertyType",
+      params.propertyType
+    );
+  }
+
+  if (params.minPrice) {
+    query.append(
+      "minPrice",
+      params.minPrice
+    );
+  }
+
+  if (params.maxPrice) {
+    query.append(
+      "maxPrice",
+      params.maxPrice
+    );
+  }
+
+  if (params.listingType) {
+    query.append(
+      "listingType",
+      params.listingType
+    );
+  }
+
+  if (params.sort) {
+    query.append("sort", params.sort);
+  }
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`,
+    {
+      next: {
+        revalidate: 60,
+      },
+    }
+  );
+
+  const data = await res.json();
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
 
       <div className="max-w-7xl mx-auto mb-6">
-
         <h1 className="text-3xl font-bold text-gray-800">
           Discover Properties
         </h1>
@@ -32,18 +83,17 @@ export default async function PropertiesPage({
         <p className="text-sm text-gray-500 mt-1">
           Find your dream home
         </p>
-
       </div>
 
       <div className="max-w-7xl mx-auto">
-
-        <Suspense fallback={<p>Loading</p>}>
-          <PropertiesClient
-            searchParams={params}
-          />
-        </Suspense>
-
+        <PropertiesClient
+          initialProperties={
+            data.properties || []
+          }
+          searchParams={params}
+        />
       </div>
+
     </main>
   );
 }
