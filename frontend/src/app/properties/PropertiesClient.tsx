@@ -490,7 +490,7 @@ const properties = initialProperties;
                   </p>
 
                   <p className="text-sm text-gray-500 mt-2">
-                    Posted By <b className="text-blue-500">{property.seller?.charAt(0).toUpperCase()+property.seller?.slice(1)}</b>
+                    Posted By <b className="text-blue-500">{property.seller?.toUpperCase()}</b>
                   </p>
                 </div>
               </div>
