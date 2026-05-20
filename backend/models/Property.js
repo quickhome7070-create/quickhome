@@ -40,6 +40,12 @@ const propertySchema = new mongoose.Schema(
       default: "buy",
     },
 
+    seller:{
+      type: String,
+      enum:["owner", "agent"],
+      default:""
+    },
+
     status: {
       type: String,
       enum: ["active", "sold", "inactive"],

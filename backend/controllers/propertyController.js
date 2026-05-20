@@ -11,6 +11,7 @@ exports.createProperty = async (req, res) => {
       description,
       listingType,
       propertyType,
+      seller
     } = req.body;
 
     const images = req.files
@@ -25,6 +26,7 @@ exports.createProperty = async (req, res) => {
       listingType,
       images,
       propertyType,
+      seller,
       owner: req.user.userId,
     });
 
@@ -245,6 +247,7 @@ exports.updateProperty = async (req, res) => {
     property.location = req.body.location || property.location;
     property.description = req.body.description || property.description;
     property.propertyType = req.body.propertyType || property.propertyType;
+    property.seller = req.body.seller || property.seller;
 
     // Images (append new images)
     if (req.files && req.files.length > 0) {
@@ -297,7 +300,7 @@ exports.deleteProperty = async (req, res) => {
 // 🔍 Advanced Search
 exports.searchProperties = async (req, res) => {
   try {
-    const { keyword, location, minPrice, maxPrice, page = 1, limit = 6 } = req.query;
+    const { keyword, location, minPrice, maxPrice, seller, page = 1, limit = 6 } = req.query;
 
     let query = {};
 
@@ -307,6 +310,10 @@ exports.searchProperties = async (req, res) => {
 
     if (location) {
       query.location = { $regex: location, $options: "i" };
+    }
+
+    if (seller) {
+      query.seller = { $regex: seller, $options: "i" };
     }
 
     if (minPrice || maxPrice) {
@@ -531,6 +538,7 @@ exports.getAllProperties = async (req, res) => {
       sort = "",
       page = 1,
       limit = 6,
+      seller =""
     } = req.query;
 
     const query = {
@@ -572,6 +580,11 @@ exports.getAllProperties = async (req, res) => {
     //PropertyType
     if (propertyType.trim()) {
   query.propertyType = propertyType;
+}
+
+  //Seller
+    if (seller.trim()) {
+  query.seller = seller;
 }
 
     // Price Filter

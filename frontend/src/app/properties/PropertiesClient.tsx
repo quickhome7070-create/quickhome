@@ -24,6 +24,7 @@ type Property = {
   images?: string[];
   listingType?: "buy" | "rent";
   propertyType?: string;
+  seller?:"owner" | "agent";
 };
 
 type Props = {
@@ -37,6 +38,7 @@ type Props = {
     listingType?: string;
     sort?: string;
     propertyType?: string;
+    seller?:string
   };
 };
 
@@ -49,11 +51,12 @@ export default function PropertiesClient({
 
   
 
- const [properties] =
-  useState<Property[]>(
-    initialProperties
-  );
+//  const [properties] =
+//   useState<Property[]>(
+//     initialProperties
+//   );
 
+const properties = initialProperties;
 
 
     const [propertyType, setPropertyType] =
@@ -74,59 +77,21 @@ export default function PropertiesClient({
   const [listingType, setListingType] =
     useState("");
 
+    const [seller, setSeller] =
+    useState("");
+
   const [sort, setSort] =
     useState("");
 
-//   useEffect(() => {
-
-   
-
-//     const keywordParam =
-//       params.get("keyword") || "";
-
-//     const locationParam =
-//       params.get("location") || "";
-
-//       const propertyTypeParam =
-//   params.get("propertyType") || "";
-
-// setPropertyType(propertyTypeParam);
-
-//     const minPriceParam =
-//       params.get("minPrice") || "";
-
-//     const maxPriceParam =
-//       params.get("maxPrice") || "";
-
-//     const listingTypeParam =
-//       params.get("listingType") || "";
-
-//     const sortParam =
-//       params.get("sort") || "";
-
-//     setSearch(keywordParam);
-
-//     setLocation(locationParam);
-
-//     setMinPrice(minPriceParam);
-
-//     setMaxPrice(maxPriceParam);
-
-//     setListingType(listingTypeParam);
-
-//     setSort(sortParam);
-
-//     loadProperties({
-//       keyword: keywordParam,
-//       location: locationParam,
-//       minPrice: minPriceParam,
-//       maxPrice: maxPriceParam,
-//       listingType: listingTypeParam,
-//       propertyType: propertyTypeParam,
-//       sort: sortParam,
-//     });
-
-//   }, [params]);
+    useEffect(() => {
+  setPropertyType(searchParams.propertyType || "");
+  setLocation(searchParams.location || "");
+  setMinPrice(searchParams.minPrice || "");
+  setMaxPrice(searchParams.maxPrice || "");
+  setListingType(searchParams.listingType || "");
+  setSeller(searchParams.seller || "");
+  setSort(searchParams.sort || "");
+}, [searchParams]);
 
   const loadProperties = async (
     filters?: any
@@ -144,6 +109,7 @@ export default function PropertiesClient({
           listingType,
           sort,
           propertyType,
+          seller
         };
 
       const query =
@@ -190,6 +156,14 @@ export default function PropertiesClient({
           finalFilters.listingType
         );
       }
+
+      if (finalFilters.seller) {
+        query.append(
+          "seller",
+          finalFilters.seller
+        );
+      }
+      
 
       if (finalFilters.sort) {
         query.append(
@@ -240,17 +214,9 @@ export default function PropertiesClient({
       </div>
 
       {/* DESKTOP FILTERS */}
-      <div className="hidden md:grid bg-white border border-gray-200 rounded-2xl shadow-sm p-4 mb-6 grid-cols-7 gap-3">
+      <div className="hidden md:grid bg-white border border-gray-200 rounded-2xl shadow-sm p-4 mb-6 grid-cols-8 gap-3">
 
-        {/* <input
-          type="text"
-          placeholder="Search"
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
-        /> */}
+    
 
       {/* DESKTOP DROPDOWN */}
 
@@ -319,6 +285,28 @@ export default function PropertiesClient({
           }
           className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
         />
+
+        <select
+          value={seller}
+          onChange={(e) =>
+            setSeller(
+              e.target.value
+            )
+          }
+          className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-400"
+        >
+          <option value="">
+            Seller
+          </option>
+
+          <option value="owner">
+            Owner
+          </option>
+
+          <option value="agent">
+            Agent
+          </option>
+        </select>
 
         <select
           value={listingType}
@@ -403,6 +391,13 @@ export default function PropertiesClient({
     );
   }
 
+   if (seller) {
+    query.append(
+      "seller",
+      seller
+    );
+  }
+
   if (sort) {
     query.append(
       "sort",
@@ -467,7 +462,7 @@ export default function PropertiesClient({
   </h2>
 
   <p className="text-sm text-gray-500 mt-1">
-    🏠 {property.propertyType}
+     {property.propertyType}
   </p>
 
   <div className="flex items-center justify-between mt-2">
@@ -491,7 +486,11 @@ export default function PropertiesClient({
                   </div>
 
                   <p className="text-sm text-gray-500 mt-2">
-                    📍 {property.location}
+                     {property.location}
+                  </p>
+
+                  <p className="text-sm text-gray-500 mt-2">
+                    Posted By <b className="text-blue-500">{property.seller?.charAt(0).toUpperCase()+property.seller?.slice(1)}</b>
                   </p>
                 </div>
               </div>

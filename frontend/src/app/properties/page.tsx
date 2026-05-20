@@ -11,22 +11,32 @@ type Props = {
     listingType?: string;
     sort?: string;
     propertyType?: string;
+    seller?: string;
   }>;
 };
 
 export default async function PropertiesPage({
   searchParams,
 }: Props) {
-  const params = await searchParams;
 
-  const query = new URLSearchParams();
+  const params =
+    await searchParams;
+
+  const query =
+    new URLSearchParams();
 
   if (params.keyword) {
-    query.append("keyword", params.keyword);
+    query.append(
+      "keyword",
+      params.keyword
+    );
   }
 
   if (params.location) {
-    query.append("location", params.location);
+    query.append(
+      "location",
+      params.location
+    );
   }
 
   if (params.propertyType) {
@@ -57,8 +67,19 @@ export default async function PropertiesPage({
     );
   }
 
+  // ✅ SELLER
+  if (params.seller) {
+    query.append(
+      "seller",
+      params.seller
+    );
+  }
+
   if (params.sort) {
-    query.append("sort", params.sort);
+    query.append(
+      "sort",
+      params.sort
+    );
   }
 
   const res = await fetch(
@@ -70,12 +91,14 @@ export default async function PropertiesPage({
     }
   );
 
-  const data = await res.json();
+  const data =
+    await res.json();
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
 
       <div className="max-w-7xl mx-auto mb-6">
+
         <h1 className="text-3xl font-bold text-gray-800">
           Discover Properties
         </h1>
@@ -83,15 +106,18 @@ export default async function PropertiesPage({
         <p className="text-sm text-gray-500 mt-1">
           Find your dream home
         </p>
+
       </div>
 
       <div className="max-w-7xl mx-auto">
+
         <PropertiesClient
           initialProperties={
             data.properties || []
           }
           searchParams={params}
         />
+
       </div>
 
     </main>

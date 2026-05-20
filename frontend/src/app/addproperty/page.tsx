@@ -13,7 +13,8 @@ export default function AddProperty() {
     location: "",
     description: "",
     listingType: "buy",
-    propertyType: "Flat",
+    propertyType: "",
+    seller:""
   });
 
   const [images, setImages] = useState<
@@ -95,7 +96,8 @@ export default function AddProperty() {
         location: "",
         description: "",
         listingType: "buy",
-        propertyType: "Flat",
+        propertyType: "",
+        seller:""
       });
 
       setImages([]);
@@ -148,6 +150,41 @@ export default function AddProperty() {
           required
           className="w-full border p-3 rounded-xl"
         />
+
+        {/* Seeler */}
+         <div>
+          <p className="font-medium mb-3">
+            Seller
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+
+        {["owner", "agent"].map((type) => (
+
+    <button
+      key={type}
+      type="button"
+     
+       onClick={() =>
+                  setForm({
+                    ...form,
+                    seller: type,
+                  })
+                }
+                 className={`rounded-2xl border p-3 text-sm font-medium transition ${
+                  form.seller === type
+                    ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                    : "bg-white text-gray-700"
+                }`}
+    >
+      {type === "owner"
+        ? "Owner"
+        : "Agent"}
+    </button>
+
+  ))}
+
+  </div></div>
 
         {/* PROPERTY TYPE */}
         <div>
