@@ -6,12 +6,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 import {
+  useEffect,
+  useRef,
   useState,
 } from "react";
 
 import {
-  useRouter,
   useParams,
+  useRouter,
 } from "next/navigation";
 
 import { useAuth } from "@/src/context/AuthContext";
@@ -51,6 +53,13 @@ export default function PropertyDetailsClient({
   const { user } =
     useAuth();
 
+  const sliderRef =
+    useRef<HTMLDivElement>(null);
+
+    
+const [showGallery, setShowGallery] =
+  useState(false);
+
   const [activeImage, setActiveImage] =
     useState(0);
 
@@ -69,11 +78,45 @@ export default function PropertyDetailsClient({
   const [error, setError] =
     useState("");
 
+  useEffect(() => {
+
+    const slider =
+      sliderRef.current;
+
+    if (!slider) return;
+
+    const handleScroll =
+      () => {
+
+        const index =
+          Math.round(
+            slider.scrollLeft /
+            slider.clientWidth
+          );
+
+        setActiveImage(index);
+      };
+
+    slider.addEventListener(
+      "scroll",
+      handleScroll
+    );
+
+    return () =>
+      slider.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+
+  }, []);
+
   const handleViewContact =
     async () => {
 
       if (!user) {
+
         router.push("/login");
+
         return;
       }
 
@@ -81,17 +124,18 @@ export default function PropertyDetailsClient({
 
       try {
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
-          {
-            credentials: "include",
-          }
-        );
+        const response =
+          await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
+            {
+              credentials: "include",
+            }
+          );
 
         const data =
-          await res.json();
+          await response.json();
 
-        if (res.status === 403) {
+        if (response.status === 403) {
 
           setLocked(true);
 
@@ -142,93 +186,155 @@ export default function PropertyDetailsClient({
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f8fafc] to-[#eef2ff] pb-20">
 
-      {/* HERO */}
-      <div className="relative h-[320px] md:h-[520px] overflow-hidden">
+   {/* HERO CAROUSEL */}
+<div className="relative">
 
-        <Image
-          src={
-            property.images?.[
-              activeImage
-            ]?.replace(
-              "/upload/",
-              "/upload/f_auto,q_auto,w_1400/"
-            ) || "/no-image.png"
-          }
-          alt={property.title}
-          fill
-          priority
-          className="object-cover transition-all duration-500"
+  {/* SLIDER */}
+  <div
+    ref={sliderRef}
+    className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth"
+  >
+
+    {property.images.map(
+      (img, index) => (
+
+        <div
+          key={index}
+          onClick={() => {
+
+            setActiveImage(index);
+
+            setShowGallery(true);
+          }}
+          className="relative min-w-full h-[320px] md:h-[520px] snap-center cursor-pointer"
+        >
+          <Image
+            src={
+              img?.replace(
+                "/upload/",
+                "/upload/f_auto,q_auto,w_1400/"
+              ) || "/no-image.png"
+            }
+            alt={`${property.title}-${index}`}
+            fill
+            priority={index === 0}
+            className="object-cover"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        </div>
+      )
+    )}
+  </div>
+
+  {/* TOP ACTIONS */}
+  <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between">
+
+    <button
+      onClick={() =>
+        router.back()
+      }
+      className="bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg text-sm font-medium"
+    >
+      ← Back
+    </button>
+
+    <button
+      onClick={
+        toggleFavorite
+      }
+      className={`w-11 h-11 rounded-full backdrop-blur flex items-center justify-center shadow-lg transition ${
+        isFavorite
+          ? "bg-red-500 text-white"
+          : "bg-white/90 text-black"
+      }`}
+    >
+      ❤️
+    </button>
+  </div>
+
+  {/* IMAGE COUNT */}
+  <div className="absolute bottom-6 right-6 bg-black/50 backdrop-blur text-white px-4 py-2 rounded-full text-sm z-20">
+    {activeImage + 1} / {property.images.length}
+  </div>
+
+  {/* DOTS */}
+  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+
+    {property.images.map(
+      (_, index) => (
+
+        <button
+          key={index}
+          onClick={() => {
+
+            setActiveImage(index);
+
+            sliderRef.current?.scrollTo({
+              left:
+                index *
+                sliderRef.current.clientWidth,
+              behavior: "smooth",
+            });
+          }}
+          className={`h-2.5 rounded-full transition-all duration-300 ${
+            activeImage === index
+              ? "bg-white w-6"
+              : "bg-white/50 w-2.5"
+          }`}
         />
+      )
+    )}
+  </div>
+</div>
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+{/* FULLSCREEN GALLERY */}
+{showGallery && (
 
-        {/* TOP ACTIONS */}
-        <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between">
+  <div className="fixed inset-0 bg-black z-[9999]">
 
-          <button
-            onClick={() =>
-              router.back()
-            }
-            className="bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg text-sm font-medium"
+    {/* CLOSE BUTTON */}
+    <button
+      onClick={() =>
+        setShowGallery(false)
+      }
+      className="absolute top-5 right-5 z-50 w-11 h-11 rounded-full bg-white/20 backdrop-blur text-white text-xl"
+    >
+      ✕
+    </button>
+
+    {/* FULLSCREEN SLIDER */}
+    <div className="flex overflow-x-auto snap-x snap-mandatory h-full scrollbar-hide scroll-smooth">
+
+      {property.images.map(
+        (img, index) => (
+
+          <div
+            key={index}
+            className="relative min-w-full h-screen snap-center flex items-center justify-center"
           >
-            ← Back
-          </button>
-
-          <button
-            onClick={
-              toggleFavorite
-            }
-            className={`w-11 h-11 rounded-full backdrop-blur flex items-center justify-center shadow-lg ${
-              isFavorite
-                ? "bg-red-500 text-white"
-                : "bg-white/90 text-black"
-            }`}
-          >
-            ❤️
-          </button>
-        </div>
-
-        {/* IMAGE COUNT */}
-        <div className="absolute bottom-6 right-6 bg-black/50 backdrop-blur text-white px-4 py-2 rounded-full text-sm z-20">
-          {activeImage + 1} / {property.images.length}
-        </div>
-      </div>
-
-      {/* THUMBNAILS */}
-      {property.images?.length > 1 && (
-        <div className="max-w-6xl mx-auto px-4 -mt-10 relative z-20">
-
-          <div className="flex gap-3 overflow-x-auto pb-2">
-
-            {property.images.map(
-              (img, index) => (
-
-                <button
-                  key={index}
-                  onClick={() =>
-                    setActiveImage(
-                      index
-                    )
-                  }
-                  className={`relative min-w-[110px] h-24 rounded-2xl overflow-hidden border-4 shadow-lg ${
-                    activeImage ===
-                    index
-                      ? "border-orange-500"
-                      : "border-white"
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt="thumb"
-                    fill
-                    className="object-cover hover:scale-110 transition duration-300"
-                  />
-                </button>
-              )
-            )}
+            <Image
+              src={
+                img?.replace(
+                  "/upload/",
+                  "/upload/f_auto,q_auto,w_1600/"
+                ) || "/no-image.png"
+              }
+              alt={`gallery-${index}`}
+              fill
+              className="object-contain"
+            />
           </div>
-        </div>
+        )
       )}
+    </div>
+
+    {/* GALLERY COUNT */}
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur text-white px-4 py-2 rounded-full text-sm">
+      {activeImage + 1} / {property.images.length}
+    </div>
+  </div>
+)}
 
       {/* CONTENT */}
       <div className="max-w-6xl mx-auto px-4 mt-10 grid lg:grid-cols-3 gap-8">
@@ -293,11 +399,11 @@ export default function PropertyDetailsClient({
 
               <div className="grid md:grid-cols-2 gap-5">
 
-                {similar.map((p) => (
+                {similar.map((item) => (
 
                   <Link
-                    key={p._id}
-                    href={`/properties/${p._id}`}
+                    key={item._id}
+                    href={`/properties/${item._id}`}
                   >
                     <div className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
 
@@ -305,10 +411,10 @@ export default function PropertyDetailsClient({
 
                         <Image
                           src={
-                            p.images?.[0] ||
+                            item.images?.[0] ||
                             "/no-image.png"
                           }
-                          alt={p.title}
+                          alt={item.title}
                           fill
                           className="object-cover"
                         />
@@ -317,15 +423,15 @@ export default function PropertyDetailsClient({
                       <div className="p-5">
 
                         <h3 className="font-semibold text-lg line-clamp-1">
-                          {p.title}
+                          {item.title}
                         </h3>
 
                         <p className="text-green-600 font-bold mt-2">
-                          ₹ {p.price}
+                          ₹ {item.price}
                         </p>
 
                         <p className="text-sm text-gray-500 mt-2">
-                          📍 {p.location}
+                          📍 {item.location}
                         </p>
                       </div>
                     </div>
@@ -367,7 +473,7 @@ export default function PropertyDetailsClient({
                   disabled={
                     loadingContact
                   }
-                  className="w-full mt-6 bg-black text-white py-4 rounded-2xl font-semibold hover:bg-gray-900 transition"
+                  className="w-full mt-6 bg-black text-white py-4 rounded-2xl font-semibold hover:bg-gray-900 transition disabled:opacity-70"
                 >
                   {loadingContact
                     ? "Checking..."
@@ -390,6 +496,7 @@ export default function PropertyDetailsClient({
                 </p>
 
                 {error && (
+
                   <p className="text-red-500 text-sm mt-2">
                     {error}
                   </p>
@@ -397,9 +504,7 @@ export default function PropertyDetailsClient({
 
                 <button
                   onClick={() =>
-                    router.push(
-                      "/plans"
-                    )
+                    router.push("/plans")
                   }
                   className="w-full mt-6 bg-black text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition"
                 >
@@ -414,6 +519,7 @@ export default function PropertyDetailsClient({
               <div className="mt-6 space-y-4">
 
                 <div className="bg-gray-50 rounded-2xl p-4">
+
                   <p className="text-sm text-gray-500">
                     Name
                   </p>
@@ -424,6 +530,7 @@ export default function PropertyDetailsClient({
                 </div>
 
                 <div className="bg-gray-50 rounded-2xl p-4">
+
                   <p className="text-sm text-gray-500">
                     Phone
                   </p>
@@ -434,6 +541,7 @@ export default function PropertyDetailsClient({
                 </div>
 
                 <div className="bg-gray-50 rounded-2xl p-4">
+
                   <p className="text-sm text-gray-500">
                     Email
                   </p>
@@ -446,9 +554,7 @@ export default function PropertyDetailsClient({
                 <p className="text-sm text-center text-gray-500 pt-2">
                   Remaining contacts:
                   {" "}
-                  {
-                    contact.contactsRemaining
-                  }
+                  {contact.contactsRemaining}
                 </p>
               </div>
             )}
