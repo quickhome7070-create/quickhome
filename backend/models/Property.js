@@ -19,6 +19,32 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
+    // NEW
+    bhkType: {
+      type: String,
+      default: "",
+    },
+
+    // NEW
+    plotType: {
+      type: String,
+      enum: ["Residential", "Commercial", ""],
+      default: "",
+    },
+
+    // NEW
+    furnishing: {
+      type: String,
+      enum: ["Furnished", "Unfurnished", ""],
+      default: "",
+    },
+
+    // NEW
+    shopType: {
+      type: String,
+      default: "",
+    },
+
     price: {
       type: Number,
       required: true,
@@ -40,10 +66,10 @@ const propertySchema = new mongoose.Schema(
       default: "buy",
     },
 
-    seller:{
+    seller: {
       type: String,
-      enum:["owner", "agent"],
-      default:""
+      enum: ["owner", "agent"],
+      default: "",
     },
 
     status: {

@@ -3,6 +3,30 @@
 import Loader from "@/src/components/Loader";
 import { useState } from "react";
 
+const PROPERTY_TYPES = [
+  "Flat",
+  "House",
+  "Plot",
+  "Office Space",
+  "Shop",
+];
+
+const BHK_TYPES = [
+  "1 BHK",
+  "2 BHK",
+  "3 BHK",
+  "4 BHK",
+];
+
+const SHOP_TYPES = [
+  "Hotel",
+  "Saloon",
+  "Grocery",
+  "Medical",
+  "Clothing",
+  "Mobile Shop",
+];
+
 export default function AddProperty() {
   const [loading, setLoading] =
     useState(false);
@@ -14,20 +38,18 @@ export default function AddProperty() {
     description: "",
     listingType: "buy",
     propertyType: "",
-    seller:""
+    seller: "",
+
+    // NEW
+    bhkType: "",
+    plotType: "",
+    furnishing: "",
+    shopType: "",
   });
 
   const [images, setImages] = useState<
     File[]
   >([]);
-
-  const propertyTypes = [
-    "Flat",
-    "House",
-    "Plot",
-    "Office Space",
-    "Shop",
-  ];
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -39,6 +61,21 @@ export default function AddProperty() {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handlePropertyType = (
+    type: string
+  ) => {
+    setForm({
+      ...form,
+      propertyType: type,
+
+      // reset dynamic fields
+      bhkType: "",
+      plotType: "",
+      furnishing: "",
+      shopType: "",
     });
   };
 
@@ -57,9 +94,6 @@ export default function AddProperty() {
 
     try {
       setLoading(true);
-      if (loading){
-        return <Loader/>
-      }
 
       const formData = new FormData();
 
@@ -70,7 +104,10 @@ export default function AddProperty() {
       );
 
       images.forEach((image) => {
-        formData.append("images", image);
+        formData.append(
+          "images",
+          image
+        );
       });
 
       const res = await fetch(
@@ -97,7 +134,12 @@ export default function AddProperty() {
         description: "",
         listingType: "buy",
         propertyType: "",
-        seller:""
+        seller: "",
+
+        bhkType: "",
+        plotType: "",
+        furnishing: "",
+        shopType: "",
       });
 
       setImages([]);
@@ -110,27 +152,33 @@ export default function AddProperty() {
     }
   };
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 flex justify-center p-4">
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white w-full max-w-xl p-6 rounded-2xl shadow-lg space-y-4"
+        className="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-6 space-y-5"
       >
         <h1 className="text-2xl font-bold">
           Add Property
         </h1>
 
+        {/* TITLE */}
         <input
           type="text"
           name="title"
-          placeholder="Title"
+          placeholder="Property Title"
           value={form.title}
           onChange={handleChange}
           required
-          className="w-full border p-3 rounded-xl"
+          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
         />
 
+        {/* PRICE */}
         <input
           type="number"
           name="price"
@@ -138,9 +186,10 @@ export default function AddProperty() {
           value={form.price}
           onChange={handleChange}
           required
-          className="w-full border p-3 rounded-xl"
+          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
         />
 
+        {/* LOCATION */}
         <input
           type="text"
           name="location"
@@ -148,43 +197,45 @@ export default function AddProperty() {
           value={form.location}
           onChange={handleChange}
           required
-          className="w-full border p-3 rounded-xl"
+          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
         />
 
-        {/* Seeler */}
-         <div>
+        {/* SELLER */}
+        <div>
           <p className="font-medium mb-3">
             Seller
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 gap-3">
 
-        {["owner", "agent"].map((type) => (
+            {["owner", "agent"].map(
+              (type) => (
 
-    <button
-      key={type}
-      type="button"
-     
-       onClick={() =>
-                  setForm({
-                    ...form,
-                    seller: type,
-                  })
-                }
-                 className={`rounded-2xl border p-3 text-sm font-medium transition ${
-                  form.seller === type
-                    ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                    : "bg-white text-gray-700"
-                }`}
-    >
-      {type === "owner"
-        ? "Owner"
-        : "Agent"}
-    </button>
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() =>
+                    setForm({
+                      ...form,
+                      seller: type,
+                    })
+                  }
+                  className={`h-12 rounded-xl border text-sm font-medium transition ${
+                    form.seller === type
+                      ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                      : "bg-white text-gray-700"
+                  }`}
+                >
+                  {type === "owner"
+                    ? "Owner"
+                    : "Agent"}
+                </button>
 
-  ))}
+              )
+            )}
 
-  </div></div>
+          </div>
+        </div>
 
         {/* PROPERTY TYPE */}
         <div>
@@ -194,34 +245,144 @@ export default function AddProperty() {
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
 
-            {propertyTypes.map((type) => (
+            {PROPERTY_TYPES.map((type) => (
 
               <button
-                type="button"
                 key={type}
+                type="button"
                 onClick={() =>
-                  setForm({
-                    ...form,
-                    propertyType: type,
-                  })
+                  handlePropertyType(type)
                 }
-                className={`rounded-2xl border p-3 text-sm font-medium transition ${
-                  form.propertyType === type
+                className={`rounded-xl border p-3 text-sm font-medium transition ${
+                  form.propertyType ===
+                  type
                     ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
                     : "bg-white text-gray-700"
                 }`}
               >
                 {type}
               </button>
+
             ))}
+
           </div>
         </div>
 
+        {/* DYNAMIC DROPDOWN */}
+        {[
+          "Flat",
+          "House",
+        ].includes(form.propertyType) && (
+
+          <select
+            name="bhkType"
+            value={form.bhkType}
+            onChange={handleChange}
+            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+          >
+            <option value="">
+              Select BHK
+            </option>
+
+            {BHK_TYPES.map((type) => (
+
+              <option
+                key={type}
+                value={type}
+              >
+                {type}
+              </option>
+
+            ))}
+
+          </select>
+
+        )}
+
+        {form.propertyType ===
+          "Plot" && (
+
+          <select
+            name="plotType"
+            value={form.plotType}
+            onChange={handleChange}
+            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+          >
+            <option value="">
+              Plot Type
+            </option>
+
+            <option value="Residential">
+              Residential
+            </option>
+
+            <option value="Commercial">
+              Commercial
+            </option>
+
+          </select>
+
+        )}
+
+        {form.propertyType ===
+          "Office Space" && (
+
+          <select
+            name="furnishing"
+            value={form.furnishing}
+            onChange={handleChange}
+            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+          >
+            <option value="">
+              Furnishing
+            </option>
+
+            <option value="Furnished">
+              Furnished
+            </option>
+
+            <option value="Unfurnished">
+              Unfurnished
+            </option>
+
+          </select>
+
+        )}
+
+        {form.propertyType ===
+          "Shop" && (
+
+          <select
+            name="shopType"
+            value={form.shopType}
+            onChange={handleChange}
+            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+          >
+            <option value="">
+              Shop Type
+            </option>
+
+            {SHOP_TYPES.map((type) => (
+
+              <option
+                key={type}
+                value={type}
+              >
+                {type}
+              </option>
+
+            ))}
+
+          </select>
+
+        )}
+
+        {/* BUY / RENT */}
         <select
           name="listingType"
           value={form.listingType}
           onChange={handleChange}
-          className="w-full border p-3 rounded-xl"
+          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
         >
           <option value="buy">
             Buy
@@ -232,32 +393,39 @@ export default function AddProperty() {
           </option>
         </select>
 
+        {/* DESCRIPTION */}
         <textarea
           name="description"
           placeholder="Description"
           value={form.description}
           onChange={handleChange}
-          rows={4}
-          className="w-full border p-3 rounded-xl"
+          rows={5}
+          className="w-full border rounded-xl p-4 outline-none focus:ring-2 focus:ring-orange-400"
         />
 
+        {/* IMAGES */}
         <input
           type="file"
           multiple
           onChange={(e) =>
             handleImages(e.target.files)
           }
+          className="w-full"
         />
 
+        {/* BUTTON */}
         <button
+          type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white py-3 rounded-xl shadow-md"
+          className="w-full h-12 rounded-xl text-white font-medium bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 shadow-md"
         >
           {loading
             ? "Uploading..."
             : "Create Property"}
         </button>
+
       </form>
+
     </div>
   );
 }

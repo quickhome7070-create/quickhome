@@ -11,7 +11,11 @@ exports.createProperty = async (req, res) => {
       description,
       listingType,
       propertyType,
-      seller
+      seller,
+       bhkType,
+  plotType,
+  furnishing,
+  shopType,
     } = req.body;
 
     const images = req.files
@@ -27,6 +31,10 @@ exports.createProperty = async (req, res) => {
       images,
       propertyType,
       seller,
+      bhkType,
+plotType,
+furnishing,
+shopType,
       owner: req.user.userId,
     });
 
@@ -40,61 +48,6 @@ exports.createProperty = async (req, res) => {
     });
   }
 };
-
-
-// GET ALL PROPERTIES (Pagination + Filters)
-// exports.getAllProperties = async (req, res) => {
-//   try {
-//     const { page = 1, limit = 6, location, minPrice, maxPrice, sort = "latest", search } = req.query;
-
-
-//     let query = { status: "available" };
-
-
-//     if (search) {
-//   query.$text = { $search: search };
-// }    
-
-//     // Location filter
-//     if (location) {
-//       query.location = { $regex: location, $options: "i" };
-//     }
-
-//     // Price filter
-//     if (minPrice || maxPrice) {
-//       query.price = {};
-//       if (minPrice) query.price.$gte = Number(minPrice);
-//       if (maxPrice) query.price.$lte = Number(maxPrice);
-//     }
-
-//     const skip = (page - 1) * limit;
-
-//     // Sorting logic
-//     let sortOption = { createdAt: -1 }; // latest default
-
-//     if (sort === "oldest") sortOption = { createdAt: 1 };
-//     if (sort === "priceLow") sortOption = { price: 1 };
-//     if (sort === "priceHigh") sortOption = { price: -1 };
-
-//     const properties = await Property.find(query)
-//       .populate("owner", "name email")
-//       .sort(sortOption)
-//       .skip(skip)
-//       .limit(Number(limit));
-
-//     const total = await Property.countDocuments(query);
-
-//     res.json({
-//       total,
-//       page: Number(page),
-//       pages: Math.ceil(total / limit),
-//       properties,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
 
 
 // GET MY PROPERTIES (Logged-in user)
@@ -248,6 +201,21 @@ exports.updateProperty = async (req, res) => {
     property.description = req.body.description || property.description;
     property.propertyType = req.body.propertyType || property.propertyType;
     property.seller = req.body.seller || property.seller;
+    property.bhkType =
+  req.body.bhkType ||
+  property.bhkType;
+
+property.plotType =
+  req.body.plotType ||
+  property.plotType;
+
+property.furnishing =
+  req.body.furnishing ||
+  property.furnishing;
+
+property.shopType =
+  req.body.shopType ||
+  property.shopType;
 
     // Images (append new images)
     if (req.files && req.files.length > 0) {
@@ -538,7 +506,11 @@ exports.getAllProperties = async (req, res) => {
       sort = "",
       page = 1,
       limit = 6,
-      seller =""
+      seller ="",
+      bhkType = "",
+plotType = "",
+furnishing = "",
+shopType = "",
     } = req.query;
 
     const query = {
@@ -585,6 +557,26 @@ exports.getAllProperties = async (req, res) => {
   //Seller
     if (seller.trim()) {
   query.seller = seller;
+}
+
+// BHK
+if (bhkType.trim()) {
+  query.bhkType = bhkType;
+}
+
+// Plot Type
+if (plotType.trim()) {
+  query.plotType = plotType;
+}
+
+// Furnishing
+if (furnishing.trim()) {
+  query.furnishing = furnishing;
+}
+
+// Shop Type
+if (shopType.trim()) {
+  query.shopType = shopType;
 }
 
     // Price Filter

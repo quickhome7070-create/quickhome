@@ -11,10 +11,39 @@ import {
   Store,
 } from "lucide-react";
 
+const BHK_TYPES = [
+  "1 BHK",
+  "2 BHK",
+  "3 BHK",
+  "4 BHK",
+];
+
+const SHOP_TYPES = [
+  "Hotel",
+  "Saloon",
+  "Grocery",
+  "Medical",
+  "Clothing",
+  "Mobile Shop",
+];
+
 export default function PropertyFiltersPage() {
+
   const router = useRouter();
 
   const [propertyType, setPropertyType] =
+    useState("");
+
+  const [bhkType, setBhkType] =
+    useState("");
+
+  const [plotType, setPlotType] =
+    useState("");
+
+  const [furnishing, setFurnishing] =
+    useState("");
+
+  const [shopType, setShopType] =
     useState("");
 
   const [location, setLocation] =
@@ -58,7 +87,21 @@ export default function PropertyFiltersPage() {
     },
   ];
 
+  const handlePropertyType = (
+    type: string
+  ) => {
+
+    setPropertyType(type);
+
+    // reset dynamic filters
+    setBhkType("");
+    setPlotType("");
+    setFurnishing("");
+    setShopType("");
+  };
+
   const applyFilters = () => {
+
     const params =
       new URLSearchParams();
 
@@ -66,6 +109,34 @@ export default function PropertyFiltersPage() {
       params.append(
         "propertyType",
         propertyType
+      );
+    }
+
+    if (bhkType) {
+      params.append(
+        "bhkType",
+        bhkType
+      );
+    }
+
+    if (plotType) {
+      params.append(
+        "plotType",
+        plotType
+      );
+    }
+
+    if (furnishing) {
+      params.append(
+        "furnishing",
+        furnishing
+      );
+    }
+
+    if (shopType) {
+      params.append(
+        "shopType",
+        shopType
       );
     }
 
@@ -117,7 +188,12 @@ export default function PropertyFiltersPage() {
   };
 
   const clearFilters = () => {
+
     setPropertyType("");
+    setBhkType("");
+    setPlotType("");
+    setFurnishing("");
+    setShopType("");
     setLocation("");
     setMinPrice("");
     setMaxPrice("");
@@ -127,7 +203,8 @@ export default function PropertyFiltersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 space-y-4">
+
+    <div className="min-h-screen bg-gray-50 p-4 space-y-5">
 
       {/* CITY */}
       <input
@@ -137,11 +214,11 @@ export default function PropertyFiltersPage() {
         onChange={(e) =>
           setLocation(e.target.value)
         }
-        className="w-full border rounded-xl px-4 py-3"
+        className="w-full h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
       />
 
       {/* BUY / RENT */}
-      <div className="flex gap-3">
+      <div className="grid grid-cols-2 gap-3">
 
         {["buy", "rent"].map((type) => (
 
@@ -151,7 +228,7 @@ export default function PropertyFiltersPage() {
             onClick={() =>
               setListingType(type)
             }
-            className={`flex-1 py-3 rounded-xl text-sm font-medium border transition ${
+            className={`h-12 rounded-2xl text-sm font-medium border transition ${
               listingType === type
                 ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
                 : "bg-white text-gray-700 border-gray-200"
@@ -166,7 +243,7 @@ export default function PropertyFiltersPage() {
 
       </div>
 
-      {/* PROPERTY TYPE */}
+      {/* PROPERTY TYPES */}
       <div
         className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
         style={{
@@ -185,9 +262,11 @@ export default function PropertyFiltersPage() {
               key={item.name}
               type="button"
               onClick={() =>
-                setPropertyType(item.name)
+                handlePropertyType(
+                  item.name
+                )
               }
-              className={`flex flex-col items-center justify-center min-w-[90px] h-20 px-4 py-3 rounded-2xl border transition ${
+              className={`flex flex-col items-center justify-center min-w-[100px] h-24 px-4 rounded-2xl border transition ${
                 propertyType === item.name
                   ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
                   : "bg-white text-gray-700 border-gray-200"
@@ -195,7 +274,7 @@ export default function PropertyFiltersPage() {
             >
               <Icon size={22} />
 
-              <span className="mt-2 text-xs">
+              <span className="mt-2 text-xs text-center">
                 {item.name}
               </span>
             </button>
@@ -204,6 +283,130 @@ export default function PropertyFiltersPage() {
         })}
 
       </div>
+
+      {/* DYNAMIC FILTERS */}
+      {["Flat", "House"].includes(
+        propertyType
+      ) && (
+
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+
+          {BHK_TYPES.map((bhk) => (
+
+            <button
+              key={bhk}
+              type="button"
+              onClick={() =>
+                setBhkType(bhk)
+              }
+              className={`px-5 h-12 rounded-2xl text-sm font-medium border whitespace-nowrap transition ${
+                bhkType === bhk
+                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                  : "bg-white text-gray-700 border-gray-200"
+              }`}
+            >
+              {bhk}
+            </button>
+
+          ))}
+
+        </div>
+
+      )}
+
+      {propertyType === "Plot" && (
+
+        <div className="grid grid-cols-2 gap-3">
+
+          {[
+            "Residential",
+            "Commercial",
+          ].map((type) => (
+
+            <button
+              key={type}
+              type="button"
+              onClick={() =>
+                setPlotType(type)
+              }
+              className={`h-12 rounded-2xl text-sm font-medium border transition ${
+                plotType === type
+                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                  : "bg-white text-gray-700 border-gray-200"
+              }`}
+            >
+              {type}
+            </button>
+
+          ))}
+
+        </div>
+
+      )}
+
+      {propertyType ===
+        "Office Space" && (
+
+        <div className="grid grid-cols-2 gap-3">
+
+          {[
+            "Furnished",
+            "Unfurnished",
+          ].map((type) => (
+
+            <button
+              key={type}
+              type="button"
+              onClick={() =>
+                setFurnishing(type)
+              }
+              className={`h-12 rounded-2xl text-sm font-medium border transition ${
+                furnishing === type
+                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                  : "bg-white text-gray-700 border-gray-200"
+              }`}
+            >
+              {type}
+            </button>
+
+          ))}
+
+        </div>
+
+      )}
+
+      {propertyType === "Shop" && (
+
+        <div
+          className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
+
+          {SHOP_TYPES.map((type) => (
+
+            <button
+              key={type}
+              type="button"
+              onClick={() =>
+                setShopType(type)
+              }
+              className={`px-5 h-12 rounded-2xl text-sm font-medium border whitespace-nowrap transition ${
+                shopType === type
+                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                  : "bg-white text-gray-700 border-gray-200"
+              }`}
+            >
+              {type}
+            </button>
+
+          ))}
+
+        </div>
+
+      )}
 
       {/* PRICE */}
       <div className="grid grid-cols-2 gap-3">
@@ -215,7 +418,7 @@ export default function PropertyFiltersPage() {
           onChange={(e) =>
             setMinPrice(e.target.value)
           }
-          className="border rounded-xl px-4 py-3"
+          className="h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
         />
 
         <input
@@ -225,36 +428,36 @@ export default function PropertyFiltersPage() {
           onChange={(e) =>
             setMaxPrice(e.target.value)
           }
-          className="border rounded-xl px-4 py-3"
+          className="h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
         />
 
       </div>
 
       {/* SELLER */}
-     <div className="flex gap-3">
+      <div className="grid grid-cols-2 gap-3">
 
-  {["owner", "agent"].map((type) => (
+        {["owner", "agent"].map((type) => (
 
-    <button
-      key={type}
-      type="button"
-      onClick={() =>
-        setSeller(type)
-      }
-      className={`flex-1 py-3 rounded-xl text-sm font-medium border transition ${
-        seller === type
-          ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-          : "bg-white text-gray-700 border-gray-200"
-      }`}
-    >
-      {type === "owner"
-        ? "Owner"
-        : "Agent"}
-    </button>
+          <button
+            key={type}
+            type="button"
+            onClick={() =>
+              setSeller(type)
+            }
+            className={`h-12 rounded-2xl text-sm font-medium border transition ${
+              seller === type
+                ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
+                : "bg-white text-gray-700 border-gray-200"
+            }`}
+          >
+            {type === "owner"
+              ? "Owner"
+              : "Agent"}
+          </button>
 
-  ))}
+        ))}
 
-</div>
+      </div>
 
       {/* SORT */}
       <select
@@ -262,7 +465,7 @@ export default function PropertyFiltersPage() {
         onChange={(e) =>
           setSort(e.target.value)
         }
-        className="w-full border rounded-xl px-4 py-3"
+        className="w-full h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
       >
         <option value="">
           Latest
@@ -275,21 +478,22 @@ export default function PropertyFiltersPage() {
         <option value="priceHigh">
           Price High → Low
         </option>
+
       </select>
 
       {/* BUTTONS */}
-      <div className="flex gap-3">
+      <div className="grid grid-cols-2 gap-3 pt-2">
 
         <button
           onClick={clearFilters}
-          className="w-1/2 border rounded-xl py-3"
+          className="h-12 border border-gray-300 rounded-2xl font-medium bg-white"
         >
           Reset
         </button>
 
         <button
           onClick={applyFilters}
-          className="w-1/2 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-xl py-3 shadow-md"
+          className="h-12 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-2xl font-medium shadow-md"
         >
           Search
         </button>
