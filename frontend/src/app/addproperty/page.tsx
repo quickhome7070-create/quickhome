@@ -27,25 +27,43 @@ const SHOP_TYPES = [
   "Mobile Shop",
 ];
 
+const initialForm = {
+  title: "",
+  price: "",
+  location: "",
+  description: "",
+  listingType: "buy",
+  propertyType: "",
+  seller: "",
+  bhkType: "",
+  plotType: "",
+  furnishing: "",
+  shopType: "",
+};
+
+const initialErrors = {
+  title: "",
+  price: "",
+  location: "",
+  description: "",
+  seller: "",
+  propertyType: "",
+  bhkType: "",
+  plotType: "",
+  furnishing: "",
+  shopType: "",
+  images: "",
+};
+
 export default function AddProperty() {
   const [loading, setLoading] =
     useState(false);
 
-  const [form, setForm] = useState({
-    title: "",
-    price: "",
-    location: "",
-    description: "",
-    listingType: "buy",
-    propertyType: "",
-    seller: "",
+  const [form, setForm] =
+    useState(initialForm);
 
-    // NEW
-    bhkType: "",
-    plotType: "",
-    furnishing: "",
-    shopType: "",
-  });
+  const [errors, setErrors] =
+    useState(initialErrors);
 
   const [images, setImages] = useState<
     File[]
@@ -58,25 +76,39 @@ export default function AddProperty() {
       HTMLSelectElement
     >
   ) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
   };
 
   const handlePropertyType = (
     type: string
   ) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       propertyType: type,
-
-      // reset dynamic fields
       bhkType: "",
       plotType: "",
       furnishing: "",
       shopType: "",
-    });
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      propertyType: "",
+      bhkType: "",
+      plotType: "",
+      furnishing: "",
+      shopType: "",
+    }));
   };
 
   const handleImages = (
@@ -85,12 +117,114 @@ export default function AddProperty() {
     if (!files) return;
 
     setImages(Array.from(files));
+
+    setErrors((prev) => ({
+      ...prev,
+      images: "",
+    }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      ...initialErrors,
+    };
+
+    let isValid = true;
+
+    if (!form.title.trim()) {
+      newErrors.title =
+        "Title is required";
+      isValid = false;
+    }
+
+    if (!form.price) {
+      newErrors.price =
+        "Price is required";
+      isValid = false;
+    }
+
+    if (!form.location.trim()) {
+      newErrors.location =
+        "Location is required";
+      isValid = false;
+    }
+
+    if (!form.description.trim()) {
+      newErrors.description =
+        "Description is required";
+      isValid = false;
+    }
+
+    if (!form.seller) {
+      newErrors.seller =
+        "Select seller";
+      isValid = false;
+    }
+
+    if (!form.propertyType) {
+      newErrors.propertyType =
+        "Select property type";
+      isValid = false;
+    }
+
+    if (
+      ["Flat", "House"].includes(
+        form.propertyType
+      ) &&
+      !form.bhkType
+    ) {
+      newErrors.bhkType =
+        "Select BHK type";
+      isValid = false;
+    }
+
+    if (
+      form.propertyType === "Plot" &&
+      !form.plotType
+    ) {
+      newErrors.plotType =
+        "Select plot type";
+      isValid = false;
+    }
+
+    if (
+      form.propertyType ===
+        "Office Space" &&
+      !form.furnishing
+    ) {
+      newErrors.furnishing =
+        "Select furnishing";
+      isValid = false;
+    }
+
+    if (
+      form.propertyType === "Shop" &&
+      !form.shopType
+    ) {
+      newErrors.shopType =
+        "Select shop type";
+      isValid = false;
+    }
+
+    if (images.length === 0) {
+      newErrors.images =
+        "Upload at least one image";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+
+    return isValid;
   };
 
   const handleSubmit = async (
     e: React.FormEvent
   ) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       setLoading(true);
@@ -127,20 +261,9 @@ export default function AddProperty() {
 
       alert("Property Added");
 
-      setForm({
-        title: "",
-        price: "",
-        location: "",
-        description: "",
-        listingType: "buy",
-        propertyType: "",
-        seller: "",
+      setForm(initialForm);
 
-        bhkType: "",
-        plotType: "",
-        furnishing: "",
-        shopType: "",
-      });
+      setErrors(initialErrors);
 
       setImages([]);
 
@@ -168,37 +291,58 @@ export default function AddProperty() {
         </h1>
 
         {/* TITLE */}
-        <input
-          type="text"
-          name="title"
-          placeholder="Property Title"
-          value={form.title}
-          onChange={handleChange}
-          required
-          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-        />
+        <div>
+          <input
+            type="text"
+            name="title"
+            placeholder="Property Title"
+            value={form.title}
+            onChange={handleChange}
+            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+          />
+
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.title}
+            </p>
+          )}
+        </div>
 
         {/* PRICE */}
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={form.price}
-          onChange={handleChange}
-          required
-          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-        />
+        <div>
+          <input
+            type="number"
+            name="price"
+            placeholder="Price"
+            value={form.price}
+            onChange={handleChange}
+            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+          />
+
+          {errors.price && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.price}
+            </p>
+          )}
+        </div>
 
         {/* LOCATION */}
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          value={form.location}
-          onChange={handleChange}
-          required
-          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-        />
+        <div>
+          <input
+            type="text"
+            name="location"
+            placeholder="Location"
+            value={form.location}
+            onChange={handleChange}
+            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+          />
+
+          {errors.location && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.location}
+            </p>
+          )}
+        </div>
 
         {/* SELLER */}
         <div>
@@ -215,10 +359,10 @@ export default function AddProperty() {
                   key={type}
                   type="button"
                   onClick={() =>
-                    setForm({
-                      ...form,
+                    setForm((prev) => ({
+                      ...prev,
                       seller: type,
-                    })
+                    }))
                   }
                   className={`h-12 rounded-xl border text-sm font-medium transition ${
                     form.seller === type
@@ -235,6 +379,12 @@ export default function AddProperty() {
             )}
 
           </div>
+
+          {errors.seller && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.seller}
+            </p>
+          )}
         </div>
 
         {/* PROPERTY TYPE */}
@@ -266,118 +416,157 @@ export default function AddProperty() {
             ))}
 
           </div>
+
+          {errors.propertyType && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.propertyType}
+            </p>
+          )}
         </div>
 
-        {/* DYNAMIC DROPDOWN */}
+        {/* BHK */}
         {[
           "Flat",
           "House",
         ].includes(form.propertyType) && (
 
-          <select
-            name="bhkType"
-            value={form.bhkType}
-            onChange={handleChange}
-            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-          >
-            <option value="">
-              Select BHK
-            </option>
-
-            {BHK_TYPES.map((type) => (
-
-              <option
-                key={type}
-                value={type}
-              >
-                {type}
+          <div>
+            <select
+              name="bhkType"
+              value={form.bhkType}
+              onChange={handleChange}
+              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+            >
+              <option value="">
+                Select BHK
               </option>
 
-            ))}
+              {BHK_TYPES.map((type) => (
 
-          </select>
+                <option
+                  key={type}
+                  value={type}
+                >
+                  {type}
+                </option>
+
+              ))}
+
+            </select>
+
+            {errors.bhkType && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.bhkType}
+              </p>
+            )}
+          </div>
 
         )}
 
+        {/* PLOT */}
         {form.propertyType ===
           "Plot" && (
 
-          <select
-            name="plotType"
-            value={form.plotType}
-            onChange={handleChange}
-            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-          >
-            <option value="">
-              Plot Type
-            </option>
+          <div>
+            <select
+              name="plotType"
+              value={form.plotType}
+              onChange={handleChange}
+              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+            >
+              <option value="">
+                Plot Type
+              </option>
 
-            <option value="Residential">
-              Residential
-            </option>
+              <option value="Residential">
+                Residential
+              </option>
 
-            <option value="Commercial">
-              Commercial
-            </option>
+              <option value="Commercial">
+                Commercial
+              </option>
+            </select>
 
-          </select>
+            {errors.plotType && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.plotType}
+              </p>
+            )}
+          </div>
 
         )}
 
+        {/* FURNISHING */}
         {form.propertyType ===
           "Office Space" && (
 
-          <select
-            name="furnishing"
-            value={form.furnishing}
-            onChange={handleChange}
-            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-          >
-            <option value="">
-              Furnishing
-            </option>
+          <div>
+            <select
+              name="furnishing"
+              value={form.furnishing}
+              onChange={handleChange}
+              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+            >
+              <option value="">
+                Furnishing
+              </option>
 
-            <option value="Furnished">
-              Furnished
-            </option>
+              <option value="Furnished">
+                Furnished
+              </option>
 
-            <option value="Unfurnished">
-              Unfurnished
-            </option>
+              <option value="Unfurnished">
+                Unfurnished
+              </option>
+            </select>
 
-          </select>
+            {errors.furnishing && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.furnishing}
+              </p>
+            )}
+          </div>
 
         )}
 
+        {/* SHOP */}
         {form.propertyType ===
           "Shop" && (
 
-          <select
-            name="shopType"
-            value={form.shopType}
-            onChange={handleChange}
-            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-          >
-            <option value="">
-              Shop Type
-            </option>
-
-            {SHOP_TYPES.map((type) => (
-
-              <option
-                key={type}
-                value={type}
-              >
-                {type}
+          <div>
+            <select
+              name="shopType"
+              value={form.shopType}
+              onChange={handleChange}
+              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
+            >
+              <option value="">
+                Shop Type
               </option>
 
-            ))}
+              {SHOP_TYPES.map((type) => (
 
-          </select>
+                <option
+                  key={type}
+                  value={type}
+                >
+                  {type}
+                </option>
+
+              ))}
+
+            </select>
+
+            {errors.shopType && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.shopType}
+              </p>
+            )}
+          </div>
 
         )}
 
-        {/* BUY / RENT */}
+        {/* BUY RENT */}
         <select
           name="listingType"
           value={form.listingType}
@@ -394,26 +583,44 @@ export default function AddProperty() {
         </select>
 
         {/* DESCRIPTION */}
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          rows={5}
-          className="w-full border rounded-xl p-4 outline-none focus:ring-2 focus:ring-orange-400"
-        />
+        <div>
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={form.description}
+            onChange={handleChange}
+            rows={5}
+            className="w-full border rounded-xl p-4 outline-none focus:ring-2 focus:ring-orange-400"
+          />
+
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description}
+            </p>
+          )}
+        </div>
 
         {/* IMAGES */}
-        <input
-          type="file"
-          multiple
-          onChange={(e) =>
-            handleImages(e.target.files)
-          }
-          className="w-full"
-        />
+        <div>
+          <input
+            type="file"
+            multiple
+            onChange={(e) =>
+              handleImages(
+                e.target.files
+              )
+            }
+            className="w-full"
+          />
 
-        {/* BUTTON */}
+          {errors.images && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.images}
+            </p>
+          )}
+        </div>
+
+        {/* SUBMIT */}
         <button
           type="submit"
           disabled={loading}
