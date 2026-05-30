@@ -12,10 +12,10 @@ const PROPERTY_TYPES = [
 ];
 
 const BHK_TYPES = [
-  "1 BHK",
-  "2 BHK",
-  "3 BHK",
-  "4 BHK",
+  "1BHK",
+  "2BHK",
+  "3BHK",
+  "4BHK",
 ];
 
 const SHOP_TYPES = [

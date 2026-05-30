@@ -1,82 +1,125 @@
-require('win-ca');
+require("win-ca");
+
 const express = require("express");
 const app = express();
+
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
-app.use(cookieParser());
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-  })
-);
-app.use(helmet());
-app.use(express.urlencoded({ extended: true })); 
-app.use(express.json());
+
 const http = require("http");
 const { Server } = require("socket.io");
+
 require("dotenv").config();
+
 const cors = require("cors");
+
 const connectDB = require("./config/db");
+
 const razorpayRoutes = require("./routes/razorpayRoutes");
+
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const authRoutes = require("./routes/authRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
 const userRoutes = require("./routes/userRoutes");
 
 
-const server = http.createServer(app);
+// ✅ IMPORT WEBHOOK
+const {
+  razorpayWebhook,
+} = require("./controllers/razorpayController");
 
-const io = new Server(server, {
-  cors: {
-    // origin: ["https://ghardestiny.com","https://gharDestiny-liart.vercel.app","http://localhost:3000"],
-    origin: ["https://ghardestiny.com","https://www.ghardestiny.com", "http://localhost:3000"],
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-});
+const paymentRoutes =
+  require("./routes/paymentRoutes");
+app.use(cookieParser());
+
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  })
+);
+
+app.use(helmet());
+
+app.use(express.urlencoded({ extended: true }));
 
 
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
-});
-
-// Connect DB
-connectDB();
-
-
+// ✅ WEBHOOK ROUTE FIRST
+app.post(
+  "/api/razorpay/webhook",
+  express.raw({ type: "application/json" }),
+  razorpayWebhook
+);
 
 
+// ✅ JSON middleware AFTER webhook
+app.use(express.json());
+
+
+// ✅ CORS
 app.use(
   cors({
     origin: [
       "https://ghardestiny.com",
       "https://www.ghardestiny.com",
-      "http://localhost:3000"
+      "http://localhost:3000",
     ],
     credentials: true,
   })
 );
-app.use("/api/razorpay/webhook", express.raw({ type: "application/json" }));
+
+
+// Connect DB
+connectDB();
+
+
 // Routes
 app.use("/api/auth", authRoutes);
+app.use(
+  "/api/payment",
+  paymentRoutes
+);
 app.use("/api/property", propertyRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/otp", require("./routes/otpRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/razorpay", razorpayRoutes);
 app.use("/api/subscription", subscriptionRoutes);
+
+
 const path = require("path");
+
 app.use(express.static(path.join(__dirname, "public")));
 
 
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
 
 
+const server = http.createServer(app);
 
-// 🔥 ADD THIS LINE
+const io = new Server(server, {
+  cors: {
+    origin: [
+      "https://ghardestiny.com",
+      "https://www.ghardestiny.com",
+      "http://localhost:3000",
+    ],
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+});
+
+
+// Socket
 require("./sockets/chatSocket")(io);
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+server.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);

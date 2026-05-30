@@ -47,10 +47,10 @@ const PROPERTY_TYPES = [
 ];
 
 const BHK_TYPES = [
-  "1 BHK",
-  "2 BHK",
-  "3 BHK",
-  "4 BHK",
+  "1BHK",
+  "2BHK",
+  "3BHK",
+  "4BHK",
 ];
 
 const SHOP_TYPES = [
@@ -71,11 +71,15 @@ export default function PropertiesClient({
 
   const properties = initialProperties;
 
-  const [propertyType, setPropertyType] =
-    useState("");
+ const [propertyType, setPropertyType] =
+  useState(
+    searchParams.propertyType || "Flat"
+  );
 
-  const [bhkType, setBhkType] =
-    useState("");
+const [bhkType, setBhkType] =
+  useState(
+    searchParams.bhkType || ""
+  );
 
   const [plotType, setPlotType] =
     useState("");
@@ -106,51 +110,43 @@ export default function PropertiesClient({
 
   useEffect(() => {
 
-    setPropertyType(
-      searchParams.propertyType || ""
-    );
+  setPlotType(
+    searchParams.plotType || ""
+  );
 
-    setBhkType(
-      searchParams.bhkType || ""
-    );
+  setFurnishing(
+    searchParams.furnishing || ""
+  );
 
-    setPlotType(
-      searchParams.plotType || ""
-    );
+  setShopType(
+    searchParams.shopType || ""
+  );
 
-    setFurnishing(
-      searchParams.furnishing || ""
-    );
+  setLocation(
+    searchParams.location || ""
+  );
 
-    setShopType(
-      searchParams.shopType || ""
-    );
+  setMinPrice(
+    searchParams.minPrice || ""
+  );
 
-    setLocation(
-      searchParams.location || ""
-    );
+  setMaxPrice(
+    searchParams.maxPrice || ""
+  );
 
-    setMinPrice(
-      searchParams.minPrice || ""
-    );
+  setListingType(
+    searchParams.listingType || ""
+  );
 
-    setMaxPrice(
-      searchParams.maxPrice || ""
-    );
+  setSeller(
+    searchParams.seller || ""
+  );
 
-    setListingType(
-      searchParams.listingType || ""
-    );
+  setSort(
+    searchParams.sort || ""
+  );
 
-    setSeller(
-      searchParams.seller || ""
-    );
-
-    setSort(
-      searchParams.sort || ""
-    );
-
-  }, [searchParams]);
+}, [searchParams]);
 
   const handlePropertyTypeChange = (
     value: string

@@ -1,7 +1,8 @@
 "use client";
 
 
-import SubscribeButton from "@/src/components/SubscribeButton";
+
+import CashfreePaymentButton from "@/src/components/CashfreePaymentButton";
 import UpiPaymentButton from "@/src/components/UpiPaymentButton";
 import { useAuth } from "@/src/context/AuthContext";
 
@@ -57,18 +58,19 @@ const startTrial = async () => {
 
             
 
-         {/* <SubscribeButton planId="plan_SI15zUEV1tQsNr" /> */}
-          <UpiPaymentButton/>
+       
+          {/* <UpiPaymentButton/> */}
+          <CashfreePaymentButton/>
         </div>
 
         {/* Yearly */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-center border-2 border-blue-600 hover:shadow-2xl transition">
+        {/* <div className="bg-white rounded-2xl shadow-xl p-8 text-center border-2 border-blue-600 hover:shadow-2xl transition">
           <h2 className="text-xl font-bold">Pro Yearly</h2>
           <p className="text-4xl font-extrabold my-6">₹999</p>
 
-          {/* <SubscribeButton planId="plan_SI15zUEV1tQsNr" /> */}
+       
           <UpiPaymentButton/>
-        </div>
+        </div> */}
 
       </div>
     </div>

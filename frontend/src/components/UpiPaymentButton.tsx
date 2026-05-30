@@ -4,26 +4,29 @@ import { useState } from "react";
 import Script from "next/script";
 
 export default function UpiPaymentButton() {
-  const [loading, setLoading] = useState(false);
+
+  const [loading, setLoading] =
+    useState(false);
 
   const payNow = async () => {
+
     try {
+
       setLoading(true);
 
-       
-
-      // 🔹 Step 1: Create Razorpay order
+      // =========================
+      // CREATE ORDER
+      // =========================
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/razorpay/order/create`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            
           },
           credentials: "include",
           body: JSON.stringify({
-            amount: 500,
+            amount: 99,
           }),
         }
       );
@@ -31,68 +34,126 @@ export default function UpiPaymentButton() {
       const order = await res.json();
 
       if (!order?.id) {
+
         alert("Order creation failed");
-        setLoading(false);
+
         return;
       }
 
-      // 🔹 Step 2: Open Razorpay Checkout
+      // =========================
+      // RAZORPAY OPTIONS
+      // =========================
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+
+        key:
+          process.env
+            .NEXT_PUBLIC_RAZORPAY_KEY_ID,
+
         amount: order.amount,
+
         currency: order.currency,
+
         order_id: order.id,
+
         name: "gharDestiny Premium",
+
+        description:
+          "Premium Subscription",
 
         method: {
           upi: true,
         },
 
-        // 🔥 Step 3: Handle payment success
-        handler: async function (response: any) {
-          try {
-            const verifyRes = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/subscription/activate-paid`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  
-                },
-                credentials: "include",
-                body: JSON.stringify(response), // ✅ VERY IMPORTANT
-              }
-            );
+        theme: {
+          color: "#16a34a",
+        },
 
-            const data = await verifyRes.json();
+        // =========================
+        // PAYMENT SUCCESS
+        // =========================
+        handler: async function (
+          response: any
+        ) {
+
+          try {
+
+            const verifyRes =
+              await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/razorpay/verify`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                  },
+                  credentials: "include",
+                  body: JSON.stringify(
+                    response
+                  ),
+                }
+              );
+
+            const data =
+              await verifyRes.json();
 
             if (!data.success) {
-              alert("Payment verification failed");
+
+              alert(
+                data.message ||
+                "Payment verification failed"
+              );
+
               return;
             }
 
-            // ✅ Success → redirect
+            alert(
+              "Payment successful!"
+            );
+
             window.location.href = "/";
+
           } catch (err) {
+
             console.error(err);
-            alert("Something went wrong after payment");
+
+            alert(
+              "Something went wrong after payment"
+            );
           }
         },
 
-        // 🔥 Optional: Handle failure
+        // =========================
+        // PAYMENT MODAL CLOSE
+        // =========================
         modal: {
+
           ondismiss: function () {
-          
+
+            console.log(
+              "Payment popup closed"
+            );
           },
         },
       };
 
-      const paymentObject = new (window as any).Razorpay(options);
+      // =========================
+      // OPEN RAZORPAY
+      // =========================
+      const paymentObject =
+        new (window as any).Razorpay(
+          options
+        );
+
       paymentObject.open();
+
     } catch (err) {
+
       console.error(err);
+
       alert("Payment failed");
+
     } finally {
+
       setLoading(false);
     }
   };
@@ -107,9 +168,11 @@ export default function UpiPaymentButton() {
       <button
         onClick={payNow}
         disabled={loading}
-        className="bg-green-600 text-white px-6 py-3 rounded-xl"
+        className="bg-green-600 hover:bg-green-700 transition text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-70"
       >
-        {loading ? "Processing..." : "Pay via UPI"}
+        {loading
+          ? "Processing..."
+          : "Pay via UPI"}
       </button>
     </>
   );
