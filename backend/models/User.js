@@ -6,18 +6,26 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 
-  subscription: {
+subscription: {
   status: {
     type: String,
-    enum: ["trial", "active", "expired", "inactive"],
-    default: "inactive",
+    enum: ["free", "premium"],
+    default: "free",
   },
-  isActive: { type: Boolean, default: false },
-  trialEndsAt: Date,
-  freeContactsRemaining: { type: Number, default: 0 },
+
+  freeContactsRemaining: {
+    type: Number,
+    default: 3,
+  },
+
   viewedProperties: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Property" }
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Property",
+    },
   ],
+
+  expiresAt: Date,
 },
 
   phone: {

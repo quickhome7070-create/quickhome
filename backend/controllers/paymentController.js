@@ -85,13 +85,6 @@ exports.verifyPayment = async (req, res) => {
   try {
     const { orderId } = req.body;
 
-    if (!orderId) {
-      return res.status(400).json({
-        success: false,
-        message: "Order ID required",
-      });
-    }
-
     const response =
       await cashfree.PGFetchOrder(
         "2023-08-01",
@@ -100,28 +93,36 @@ exports.verifyPayment = async (req, res) => {
 
     const order = response.data;
 
-    if (order.order_status === "PAID") {
+    if (order.order_status !== "PAID") {
       return res.json({
-        success: true,
-        paymentStatus: "PAID",
+        success: false,
       });
     }
 
+    const user = await User.findById(
+      req.user.userId
+    );
+
+    user.subscription = {
+      ...user.subscription,
+      status: "premium",
+      expiresAt: new Date(
+        Date.now() +
+        30 * 24 * 60 * 60 * 1000
+      ),
+    };
+
+    await user.save();
+
     return res.json({
-      success: false,
-      paymentStatus:
-        order.order_status,
+      success: true,
     });
 
   } catch (error) {
-    console.error(
-      "Cashfree Verify Error:",
-      error.response?.data || error.message
-    );
+    console.log(error);
 
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: "Verification failed",
     });
   }
 };
