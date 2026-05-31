@@ -110,55 +110,53 @@ const [showGallery, setShowGallery] =
 
   }, []);
 
-  const handleViewContact =
-    async () => {
+  const handleViewContact = async () => {
+  if (!user) {
+    router.push("/login");
+    return;
+  }
 
-      if (!user) {
+  setLoadingContact(true);
+  setError("");
 
-        router.push("/login");
-
-        return;
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
+      {
+        method: "GET",
+        credentials: "include",
       }
+    );
 
-      setLoadingContact(true);
+    const data = await response.json();
 
-      try {
+    // Free contacts exhausted
+    if (response.status === 403) {
+      router.push("/plans");
+      return;
+    }
 
-        const response =
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/property/contact/${id}`,
-            {
-              credentials: "include",
-            }
-          );
+    // Unauthorized
+    if (response.status === 401) {
+      router.push("/login");
+      return;
+    }
 
-        const data =
-          await response.json();
+    // Other errors
+    if (!response.ok) {
+      setError(data.message || "Something went wrong");
+      return;
+    }
 
-        if (response.status === 403) {
+    setContact(data);
 
-          setLocked(true);
-
-          setError(data.message);
-
-          return;
-        }
-
-        setContact(data);
-
-      } catch (error) {
-
-        console.log(error);
-
-        setError(
-          "Something went wrong"
-        );
-
-      } finally {
-
-        setLoadingContact(false);
-      }
-    };
+  } catch (error) {
+    console.error(error);
+    setError("Something went wrong");
+  } finally {
+    setLoadingContact(false);
+  }
+};
 
   const toggleFavorite =
     async () => {

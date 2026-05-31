@@ -3,7 +3,9 @@ const User = require("../models/User");
 
 exports.viewContact = async (req, res) => {
   try {
-
+ console.log("req.user =", req.user);
+    console.log("propertyId =", req.params.id);
+    
     const user =
       await User.findById(
         req.user.userId
@@ -14,7 +16,10 @@ exports.viewContact = async (req, res) => {
         req.params.id
       ).populate("owner");
 
-    if (!user || !property) {
+    if (!user || !property) {   
+
+const owner = await User.findById(property.owner);
+
       return res.status(404).json({
         message: "Not found",
       });
@@ -40,8 +45,7 @@ exports.viewContact = async (req, res) => {
           property.owner.phone,
         email:
           property.owner.email,
-        contactsRemaining:
-          "Unlimited",
+        contactsRemaining:10
       });
     }
 
