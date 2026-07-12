@@ -36,7 +36,8 @@ exports.createOrder = async (req, res) => {
 
     const response = await cashfree.PGCreateOrder({
       order_id: orderId,
-      order_amount: 99,
+      // order_amount: 99,
+      order_amount: 10,
       order_currency: "INR",
 
       customer_details: {
