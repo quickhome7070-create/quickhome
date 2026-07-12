@@ -16,14 +16,23 @@ exports.viewContact = async (req, res) => {
         req.params.id
       ).populate("owner");
 
-    if (!user || !property) {   
+   if (!user) {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
 
-const owner = await User.findById(property.owner);
+if (!property) {
+  return res.status(404).json({
+    message: "Property not found",
+  });
+}
 
-      return res.status(404).json({
-        message: "Not found",
-      });
-    }
+if (!property.owner) {
+  return res.status(404).json({
+    message: "Property owner not found",
+  });
+}
 
     const alreadyViewed =
       user.subscription.viewedProperties.some(

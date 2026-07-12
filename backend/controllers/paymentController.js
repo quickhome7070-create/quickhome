@@ -165,15 +165,23 @@ exports.cashfreeWebhook = async (req, res) => {
         return res.json({ received: true });
       }
 
-      await User.findByIdAndUpdate(userId, {
-        "subscription.status": "premium",
-        "subscription.freeContactsRemaining": 10,
-        "subscription.expiresAt": new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000
-        ),
-      });
+    const updatedUser = await User.findByIdAndUpdate(
+  userId,
+  {
+    "subscription.status": "premium",
+    "subscription.freeContactsRemaining": 10,
+    "subscription.expiresAt": new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000
+    ),
+  },
+  { new: true }
+);
 
       console.log("✅ Subscription Activated:", userId);
+      console.log(
+  "Updated Subscription:",
+  updatedUser.subscription
+);
     }
 
     return res.json({ received: true });

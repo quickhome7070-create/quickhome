@@ -19,6 +19,7 @@ export default function CashfreePaymentButton() {
       );
 
       const data = await res.json();
+      console.log("Create Order Response:", data);
 
       if (!data.success || !data.paymentSessionId) {
         alert("Unable to create payment order");
