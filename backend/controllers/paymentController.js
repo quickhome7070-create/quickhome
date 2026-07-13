@@ -251,7 +251,7 @@ crypto
 
 "sha256",
 
-process.env.CASHFREE_WEBHOOK_SECRET
+process.env.CASHFREE_SECRET_KEY
 
 )
 
