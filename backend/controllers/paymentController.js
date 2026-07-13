@@ -7,9 +7,7 @@ const User = require("../models/User");
 // =========================
 
 const cashfree = new Cashfree(
-  process.env.CASHFREE_ENV === "production"
-    ? CFEnvironment.PRODUCTION
-    : CFEnvironment.SANDBOX
+  CFEnvironment.PRODUCTION
 );
 
 cashfree.XClientId = process.env.CASHFREE_APP_ID;
@@ -66,6 +64,7 @@ message:"User not found"
 
       order_meta: {
         return_url: `https://ghardestiny.com/payment-success?order_id=${orderId}`,
+         notify_url:  "https://api.ghardestiny.com/api/payment/cashfree-webhook",
       },
   //      order_meta: {
   //   return_url:
@@ -96,112 +95,83 @@ message:"User not found"
 // VERIFY PAYMENT (OPTIONAL ONLY)
 // =========================
 
-exports.verifyPayment = async (req, res) => {
-  try {
+exports.verifyPayment = async(req,res)=>{
+try{
 
-    const { orderId } = req.body;
+const {orderId}=req.body;
 
-    console.log("VERIFY ORDER ID:", orderId);
-
-    if (!orderId) {
-      return res.status(400).json({
-        success:false,
-        message:"Order ID missing"
-      });
-    }
+console.log("VERIFY ORDER:",orderId);
 
 
-    const response = await cashfree.PGFetchOrder(
-      "2023-08-01",
-      orderId
-    );
+const response =
+ await cashfree.PGFetchOrder(
+ "2023-08-01",
+ orderId
+ );
 
 
-    console.log(
-      "CASHFREE ORDER:",
-      response.data
-    );
+const order=response.data;
 
 
-    if (
-      response.data.order_status !== "PAID"
-    ) {
-
-      return res.json({
-        success:false,
-        status:response.data.order_status
-      });
-
-    }
+console.log(order);
 
 
-
-    // customer id was saved during create order
-    const userId =
-      response.data.customer_details.customer_id;
-
-
-
-    const updatedUser =
-      await User.findByIdAndUpdate(
-
-        userId,
-
-        {
-          "subscription.status":"premium",
-
-          "subscription.freeContactsRemaining":10,
-
-          "subscription.expiresAt":
-            new Date(
-              Date.now() +
-              30 * 24 * 60 * 60 * 1000
-            )
-        },
-
-        {
-          new:true
-        }
-
-      );
+if(order.order_status !== "PAID"){
+ return res.json({
+  success:false,
+  status:order.order_status
+ });
+}
 
 
-
-    console.log(
-      "PREMIUM ACTIVATED:",
-      updatedUser.subscription
-    );
+const userId =
+order.customer_details.customer_id;
 
 
-
-    return res.json({
-
-      success:true,
-
-      message:"Premium activated"
-
-    });
-
-
-
-  } catch(error){
-
-    console.log(
-      "VERIFY ERROR:",
-      error.response?.data ||
-      error.message
-    );
+const user =
+await User.findByIdAndUpdate(
+ userId,
+ {
+  "subscription.status":"premium",
+  "subscription.freeContactsRemaining":10,
+  "subscription.expiresAt":
+   new Date(
+    Date.now()+30*24*60*60*1000
+   )
+ },
+ {
+  new:true
+ }
+);
 
 
-    return res.status(500).json({
+console.log(
+"UPDATED USER:",
+user.subscription
+);
 
-      success:false,
 
-      message:"Verification failed"
+return res.json({
+ success:true
+});
 
-    });
 
-  }
+}
+catch(err){
+
+console.log(
+"VERIFY ERROR:",
+err.response?.data || err.message
+);
+
+
+return res.status(500).json({
+ success:false,
+ message:"Verification failed"
+});
+
+}
+
 };
 
 // =========================
