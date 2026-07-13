@@ -7,11 +7,21 @@ const User = require("../models/User");
 // =========================
 
 const cashfree = new Cashfree(
-  CFEnvironment.PRODUCTION
+  process.env.CASHFREE_ENV === "production"
+    ? CFEnvironment.PRODUCTION
+    : CFEnvironment.SANDBOX
 );
 
 cashfree.XClientId = process.env.CASHFREE_APP_ID;
 cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY;
+
+// ADD THESE LOGS HERE
+console.log("Cashfree App ID:", process.env.CASHFREE_APP_ID);
+console.log("Cashfree Env:", process.env.CASHFREE_ENV);
+console.log(
+  "Secret Prefix:",
+  process.env.CASHFREE_SECRET_KEY?.substring(0, 15)
+);
 
 
 
