@@ -21,6 +21,13 @@ export default function PaymentSuccessClient() {
         const orderId =
           params.get("order_id");
 
+          console.log("URL:", window.location.href);
+console.log("ORDER ID:", orderId);
+
+const body = { orderId };
+
+console.log("REQUEST BODY:", body);
+
         if (!orderId) return;
 
         const res =

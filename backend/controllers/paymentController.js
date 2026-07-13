@@ -81,6 +81,8 @@ exports.createOrder = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("HEADERS:", req.headers["content-type"]);
     const { orderId } = req.body;
 
     console.log("ORDER ID:", orderId);
