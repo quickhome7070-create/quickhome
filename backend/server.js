@@ -145,7 +145,11 @@ app.use(
  require("./routes/authRoutes")
 );
 
-
+// OTP routes
+app.use(
+ "/api/auth",
+ require("./routes/otpRoutes")
+);
 
 app.use(
  "/api/payment",

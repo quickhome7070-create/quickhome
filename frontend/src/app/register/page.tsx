@@ -159,20 +159,22 @@ export default function RegisterPage() {
 
       setOtpLoading(true);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/otp/send-otp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            phone: form.phone,
-          }),
-        }
-      );
+     const res = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/auth/send-otp`,
+  {
+    method: "POST",
 
+    credentials: "include",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      phone: form.phone,
+    }),
+  }
+);
       const data =
         await res.json();
 
