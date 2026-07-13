@@ -15,13 +15,12 @@ const cashfree = new Cashfree(
   CFEnvironment.PRODUCTION
 );
 
-
 cashfree.XClientId =
   process.env.CASHFREE_APP_ID;
 
-
 cashfree.XClientSecret =
   process.env.CASHFREE_SECRET_KEY;
+
 
 
 console.log("Cashfree Production Loaded");
@@ -124,8 +123,8 @@ exports.createOrder = async (req, res) => {
 
 
 
-  }
-  catch(error){
+  } catch(error) {
+
 
     console.log(
       "CREATE ORDER ERROR:",
@@ -141,6 +140,7 @@ exports.createOrder = async (req, res) => {
 
     });
 
+
   }
 
 };
@@ -149,239 +149,270 @@ exports.createOrder = async (req, res) => {
 
 
 
-// =================================
+// ===============================
 // CASHFREE WEBHOOK
-// =================================
+// ===============================
 
-exports.cashfreeWebhook = async (req, res) => {
+exports.cashfreeWebhook = async (req,res)=>{
 
-  console.log("========== CASHFREE WEBHOOK HIT ==========");
 
-  try {
+console.log(
+  "========== CASHFREE WEBHOOK HIT =========="
+);
 
-    const signature =
-      req.headers["x-webhook-signature"];
 
-    const timestamp =
-      req.headers["x-webhook-timestamp"];
+try {
 
 
-    if (!signature || !timestamp) {
+const signature =
+  req.headers["x-webhook-signature"];
 
-      console.log("Missing webhook headers");
 
-      return res.status(400).send(
-        "Missing headers"
-      );
+const timestamp =
+  req.headers["x-webhook-timestamp"];
 
-    }
 
 
-    const body =
-      req.body.toString("utf8");
+if(!signature || !timestamp){
 
+  console.log(
+    "Missing webhook headers"
+  );
 
-    // ===============================
-    // VERIFY SIGNATURE
-    // ===============================
+  return res.status(400).send(
+    "Missing headers"
+  );
 
-    const expectedSignature =
-      crypto
-        .createHmac(
-          "sha256",
-          process.env.CASHFREE_SECRET_KEY
-        )
-        .update(timestamp + body)
-        .digest("base64");
+}
 
 
-    if (signature !== expectedSignature) {
 
-      console.log(
-        "Invalid webhook signature"
-      );
+const body =
+  req.body.toString("utf8");
 
-      return res.status(401).send(
-        "Invalid signature"
-      );
 
-    }
 
+// Signature verification
 
+const expectedSignature =
+crypto
+.createHmac(
+  "sha256",
+  process.env.CASHFREE_SECRET_KEY
+)
+.update(
+  timestamp + body
+)
+.digest("base64");
 
-    const event =
-      JSON.parse(body);
 
 
+if(signature !== expectedSignature){
 
-    console.log(
-      "CASHFREE PAYLOAD:",
-      JSON.stringify(event, null, 2)
-    );
+ console.log(
+   "Invalid signature"
+ );
 
+ return res.status(401).send(
+   "Invalid signature"
+ );
 
+}
 
-    const order =
-      event?.data?.order;
 
 
+const event =
+JSON.parse(body);
 
-    if (!order) {
 
-      console.log(
-        "Order data missing"
-      );
 
-      return res.json({
-        received:true
-      });
+console.log(
+ "EVENT TYPE:",
+ event.type
+);
 
-    }
 
 
+console.log(
+ "WEBHOOK DATA:",
+ JSON.stringify(event,null,2)
+);
 
-    console.log(
-      "ORDER STATUS:",
-      order.order_status
-    );
 
 
+// Payment details
 
-    if (
-      order.order_status !== "PAID"
-    ) {
+const payment =
+event?.data?.payment;
 
-      return res.json({
-        received:true
-      });
 
-    }
 
+if(!payment){
 
+ console.log(
+  "Payment data missing"
+ );
 
-    const userId =
-      order.customer_details?.customer_id;
+ return res.json({
+  received:true
+ });
 
+}
 
 
-    if (!userId) {
 
-      console.log(
-        "Customer ID missing"
-      );
+console.log(
+ "PAYMENT STATUS:",
+ payment.payment_status
+);
 
-      return res.json({
-        received:true
-      });
 
-    }
 
+if(
+ payment.payment_status !== "SUCCESS"
+){
 
+ return res.json({
+  received:true
+ });
 
-    const user =
-      await User.findById(userId);
+}
 
 
 
-    if (!user) {
+// Get customer
 
-      console.log(
-        "User not found:",
-        userId
-      );
+const order =
+event?.data?.order;
 
-      return res.json({
-        received:true
-      });
 
-    }
 
+const userId =
+order?.customer_details?.customer_id;
 
 
-    // Prevent duplicate activation
 
-    if(
-      user.subscription.status === "premium" &&
-      user.subscription.expiresAt > new Date()
-    ){
+if(!userId){
 
-      console.log(
-        "Already premium"
-      );
+ console.log(
+  "Customer ID missing"
+ );
 
-      return res.json({
-        received:true
-      });
+ return res.json({
+  received:true
+ });
 
-    }
+}
 
 
 
-    const updatedUser =
-      await User.findByIdAndUpdate(
+const user =
+await User.findById(userId);
 
-        userId,
 
-        {
 
-          "subscription.status":
-            "premium",
+if(!user){
 
+ console.log(
+  "User not found:",
+  userId
+ );
 
-          "subscription.freeContactsRemaining":
-            10,
+ return res.json({
+  received:true
+ });
 
+}
 
-          "subscription.expiresAt":
-            new Date(
-              Date.now() +
-              30 * 24 * 60 * 60 * 1000
-            )
 
-        },
 
-        {
-          new:true
-        }
+// Avoid duplicate activation
 
-      );
+if(
+ user.subscription.status === "premium" &&
+ user.subscription.expiresAt > new Date()
+){
 
+ console.log(
+  "Already premium"
+ );
 
+ return res.json({
+  received:true
+ });
 
-    console.log(
-      "✅ PREMIUM ACTIVATED"
-    );
+}
 
 
-    console.log(
-      updatedUser.subscription
-    );
 
 
+const updatedUser =
+await User.findByIdAndUpdate(
 
-    return res.json({
+userId,
 
-      received:true
+{
 
-    });
+"subscription.status":
+"premium",
 
+"subscription.freeContactsRemaining":
+10,
 
+"subscription.expiresAt":
+new Date(
+ Date.now() +
+ 30 *
+ 24 *
+ 60 *
+ 60 *
+ 1000
+)
 
-  }
-  catch(error){
+},
 
+{
+ new:true
+}
 
-    console.log(
-      "WEBHOOK ERROR:",
-      error
-    );
+);
 
 
-    return res.status(500).send(
-      "Webhook error"
-    );
 
+console.log(
+"✅ PREMIUM ACTIVATED"
+);
 
-  }
+
+console.log(
+updatedUser.subscription
+);
+
+
+
+return res.json({
+
+received:true
+
+});
+
+
+
+}
+catch(error){
+
+
+console.log(
+ "WEBHOOK ERROR:",
+ error
+);
+
+
+return res.status(500).send(
+ "Webhook error"
+);
+
+
+}
 
 };
