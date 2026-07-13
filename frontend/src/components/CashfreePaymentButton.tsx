@@ -1,61 +1,143 @@
 "use client";
 
-import { useState } from "react";
 
-export default function CashfreePaymentButton() {
-  const [loading, setLoading] = useState(false);
+import {
+useState
+} from "react";
 
-  const payNow = async () => {
-    try {
-      setLoading(true);
 
-      // Create Order
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/payment/create-order`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
 
-      const data = await res.json();
-      console.log("Create Order Response:", data);
+export default function CashfreePaymentButton(){
 
-      if (!data.success || !data.paymentSessionId) {
-        alert("Unable to create payment order");
-        return;
-      }
 
-      // Load Cashfree SDK
-      const { load } = await import(
-        "@cashfreepayments/cashfree-js"
-      );
+const [loading,setLoading]=useState(false);
 
-      const cf = await load({
-        mode: "production", // use "sandbox" while testing
-      });
 
-      // Open Checkout
-      await cf.checkout({
-        paymentSessionId: data.paymentSessionId,
-        redirectTarget: "_self",
-      });
 
-    } catch (error) {
-      console.error(error);
-      alert("Payment failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+const payNow=async()=>{
 
-  return (
-    <button
-      onClick={payNow}
-      disabled={loading}
-      className="bg-green-600 text-white px-6 py-3 rounded-xl disabled:opacity-50"
-    >
-      {loading ? "Processing..." : "Pay Now"}
-    </button>
-  );
+
+try{
+
+
+setLoading(true);
+
+
+
+const res =
+await fetch(
+
+`${process.env.NEXT_PUBLIC_API_URL}/payment/create-order`,
+
+{
+
+method:"POST",
+
+credentials:"include"
+
+}
+
+);
+
+
+
+const data =
+await res.json();
+
+
+
+if(!data.success){
+
+alert(data.message);
+
+return;
+
+}
+
+
+
+const {
+load
+}=await import(
+"@cashfreepayments/cashfree-js"
+);
+
+
+
+const cashfree =
+await load({
+
+mode:"production"
+
+});
+
+
+
+await cashfree.checkout({
+
+paymentSessionId:
+data.paymentSessionId,
+
+
+redirectTarget:"_self"
+
+});
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+alert(
+"Payment failed"
+);
+
+}
+
+finally{
+
+setLoading(false);
+
+}
+
+
+};
+
+
+
+return(
+
+<button
+
+onClick={payNow}
+
+disabled={loading}
+
+className="
+bg-green-600
+text-white
+px-6
+py-3
+rounded-xl
+"
+
+>
+
+
+{
+loading
+?
+"Processing..."
+:
+"Pay Now"
+}
+
+
+</button>
+
+);
+
+
 }

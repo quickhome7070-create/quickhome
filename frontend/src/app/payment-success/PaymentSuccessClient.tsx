@@ -5,109 +5,33 @@ useEffect
 } from "react";
 
 import {
-useRouter,
-useSearchParams
+useRouter
 } from "next/navigation";
+
 
 
 export default function PaymentSuccessClient(){
 
 
-const router = useRouter();
-
-const params = useSearchParams();
+const router=useRouter();
 
 
 
 useEffect(()=>{
 
 
-const verifyPayment = async()=>{
+setTimeout(()=>{
 
-
-const orderId =
-params.get("order_id");
-
-console.log("VERIFY ORDER ID:", orderId);
-
-if(!orderId)
-return;
-
-
-
-const res =
-await fetch(
-
-`${process.env.NEXT_PUBLIC_API_URL}/payment/verify`,
-
-{
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-credentials:"include",
-
-body:JSON.stringify({
-
-orderId
-
-})
-
-}
-
-);
-
-
-
-const data =
-await res.json();
-
-
-
-console.log(
-"VERIFY RESPONSE",
-data
-);
-
-
-
-if(data.success){
-console.log("VERIFY RESPONSE:", data);
 
 alert(
-"Premium Activated 🎉"
+"Payment successful 🎉 Premium activation in progress"
 );
 
-
-// reload user session
 
 router.push("/");
 
-router.refresh();
 
-
-}
-
-else{
-
-
-alert(
-"Payment not completed"
-);
-
-
-}
-
-
-
-};
-
-
-
-verifyPayment();
+},2000);
 
 
 
@@ -124,12 +48,9 @@ items-center
 justify-center
 ">
 
-<h1 className="
-text-2xl
-font-bold
-">
+<h1 className="text-2xl font-bold">
 
-Verifying payment...
+Payment Successful...
 
 </h1>
 
@@ -137,5 +58,6 @@ Verifying payment...
 </div>
 
 );
+
 
 }

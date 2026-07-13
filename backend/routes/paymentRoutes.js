@@ -1,31 +1,24 @@
 const express = require("express");
 const router = express.Router();
 
-const { protect } = require("../middleware/authMiddleware");
-
 const {
   createOrder,
-  verifyPayment,
-  cashfreeWebhook,
 } = require("../controllers/paymentController");
 
-// =========================
-// CREATE ORDER (frontend calls this)
-// =========================
-router.post("/create-order", protect, createOrder);
+const {
+  protect,
+} = require("../middleware/authMiddleware");
 
-// =========================
-// OPTIONAL: manual verification (for fallback/debug only)
-// =========================
-router.post("/verify", protect, verifyPayment);
 
-// =========================
-// WEBHOOK (NO AUTH MIDDLEWARE)
-// =========================
+// =================================
+// CREATE CASHFREE ORDER
+// =================================
+
 router.post(
-  "/cashfree-webhook",
-  express.raw({ type: "application/json" }),
-  cashfreeWebhook
+  "/create-order",
+  protect,
+  createOrder
 );
+
 
 module.exports = router;

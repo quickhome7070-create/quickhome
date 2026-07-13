@@ -2,124 +2,134 @@ require("win-ca");
 
 const express = require("express");
 const app = express();
-app.set("trust proxy", 1);
 
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
-
-const http = require("http");
-const { Server } = require("socket.io");
-
-require("dotenv").config();
-
 const cors = require("cors");
 
 const connectDB = require("./config/db");
 
-
-
-
-const authRoutes = require("./routes/authRoutes");
-const propertyRoutes = require("./routes/propertyRoutes");
-const userRoutes = require("./routes/userRoutes");
-
-
-// ✅ IMPORT WEBHOOK
 const {
   cashfreeWebhook,
 } = require("./controllers/paymentController");
 
-const paymentRoutes =
-  require("./routes/paymentRoutes");
+
+require("dotenv").config();
+
+
+app.set("trust proxy", 1);
+
+
+// ===============================
+// BASIC MIDDLEWARE
+// ===============================
+
 app.use(cookieParser());
 
+
 app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+  cors({
+    origin:[
+      "https://ghardestiny.com",
+      "https://www.ghardestiny.com",
+      "http://localhost:3000"
+    ],
+    credentials:true,
   })
 );
+
+
+app.use(
+ rateLimit({
+   windowMs:15*60*1000,
+   max:100,
+ })
+);
+
 
 app.use(helmet());
 
-app.use(express.urlencoded({ extended: true }));
 
 
-// ✅ WEBHOOK ROUTE FIRST
+// ===============================
+// CASHFREE WEBHOOK FIRST
+// ===============================
+
 app.post(
-  "/api/payment/cashfree-webhook",
-  express.raw({ type: "application/json" }),
-  cashfreeWebhook
+ "/api/payment/cashfree-webhook",
+ express.raw({
+   type:"application/json"
+ }),
+ cashfreeWebhook
 );
 
 
-// ✅ JSON middleware AFTER webhook
+
+// ===============================
+// JSON AFTER WEBHOOK
+// ===============================
+
 app.use(express.json());
 
-
-// ✅ CORS
 app.use(
-  cors({
-    origin: [
-      "https://ghardestiny.com",
-      "https://www.ghardestiny.com",
-      "http://localhost:3000",
-    ],
-    credentials: true,
-  })
+ express.urlencoded({
+   extended:true
+ })
 );
 
 
-// Connect DB
+// ===============================
+// DATABASE
+// ===============================
+
 connectDB();
 
 
-// Routes
-app.use("/api/auth", authRoutes);
+
+// ===============================
+// ROUTES
+// ===============================
+
 app.use(
-  "/api/payment",
-  paymentRoutes
+ "/api/auth",
+ require("./routes/authRoutes")
 );
-app.use("/api/property", propertyRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/otp", require("./routes/otpRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
+
+
+app.use(
+ "/api/payment",
+ require("./routes/paymentRoutes")
+);
+
+
+app.use(
+ "/api/property",
+ require("./routes/propertyRoutes")
+);
+
+
+app.use(
+ "/api/user",
+ require("./routes/userRoutes")
+);
 
 
 
-const path = require("path");
-
-app.use(express.static(path.join(__dirname, "public")));
 
 
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+app.get("/",(req,res)=>{
+ res.send("Backend running");
 });
 
 
-const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    origin: [
-      "https://ghardestiny.com",
-      "https://www.ghardestiny.com",
-      "http://localhost:3000",
-    ],
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
+const PORT =
+process.env.PORT || 5000;
+
+
+app.listen(PORT,()=>{
+ console.log(
+  `Server running on ${PORT}`
+ );
 });
-
-
-// Socket
-require("./sockets/chatSocket")(io);
-
-
-// Start server
-const PORT = process.env.PORT || 5000;
-
-server.listen(PORT, () =>
-  console.log(`Server running on port ${PORT}`)
-);
