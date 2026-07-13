@@ -83,31 +83,38 @@ exports.verifyPayment = async (req, res) => {
   try {
     const { orderId } = req.body;
 
+    console.log("ORDER ID:", orderId);
+    console.log("ENV:", process.env.CASHFREE_ENV);
+
     const response = await cashfree.PGFetchOrder(
       "2023-08-01",
       orderId
     );
 
-    const order = response.data;
+    console.log("CASHFREE RESPONSE:", response.data);
 
-    if (order.order_status !== "PAID") {
+    if (response.data.order_status === "PAID") {
       return res.json({
-        success: false,
-        message: "Payment not completed",
+        success: true,
       });
     }
 
     return res.json({
-      success: true,
-      message: "Payment verified",
+      success: false,
+      status: response.data.order_status,
     });
 
   } catch (error) {
-    console.error("Verify Payment Error:", error);
+    console.log("=========== VERIFY ERROR ===========");
+    console.log(error);
+    console.log(error.response?.data);
+    console.log(error.response?.status);
+    console.log(error.message);
+    console.log("====================================");
 
     return res.status(500).json({
       success: false,
-      message: "Verification failed",
+      message: error.response?.data || error.message,
     });
   }
 };
