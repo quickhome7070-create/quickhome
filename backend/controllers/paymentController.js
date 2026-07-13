@@ -107,7 +107,7 @@ orderId,
 
 userId:user._id,
 
-amount:99
+amount:10
 
 });
 
@@ -122,7 +122,7 @@ await cashfree.PGCreateOrder({
 order_id:orderId,
 
 
-order_amount:99,
+order_amount:10,
 
 
 order_currency:"INR",

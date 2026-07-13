@@ -21,7 +21,7 @@ const paymentSchema = new mongoose.Schema(
 
   amount:{
     type:Number,
-    default:99,
+    default:10,
   },
 
 
