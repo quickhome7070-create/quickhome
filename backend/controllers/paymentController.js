@@ -149,251 +149,239 @@ exports.createOrder = async (req, res) => {
 
 
 
-// ===============================
+// =================================
 // CASHFREE WEBHOOK
-// ===============================
+// =================================
 
+exports.cashfreeWebhook = async (req, res) => {
 
-exports.cashfreeWebhook = async (req,res)=>{
+  console.log("========== CASHFREE WEBHOOK HIT ==========");
 
+  try {
 
-console.log(
-  "========== CASHFREE WEBHOOK HIT =========="
-);
+    const signature =
+      req.headers["x-webhook-signature"];
 
+    const timestamp =
+      req.headers["x-webhook-timestamp"];
 
-try{
 
+    if (!signature || !timestamp) {
 
-const signature =
-  req.headers["x-webhook-signature"];
+      console.log("Missing webhook headers");
 
+      return res.status(400).send(
+        "Missing headers"
+      );
 
-const timestamp =
-  req.headers["x-webhook-timestamp"];
+    }
 
 
+    const body =
+      req.body.toString("utf8");
 
-if(
- !signature ||
- !timestamp
-){
 
- console.log(
-  "Missing webhook headers"
- );
+    // ===============================
+    // VERIFY SIGNATURE
+    // ===============================
 
- return res.status(400).send(
-  "Missing headers"
- );
+    const expectedSignature =
+      crypto
+        .createHmac(
+          "sha256",
+          process.env.CASHFREE_SECRET_KEY
+        )
+        .update(timestamp + body)
+        .digest("base64");
 
-}
 
+    if (signature !== expectedSignature) {
 
+      console.log(
+        "Invalid webhook signature"
+      );
 
+      return res.status(401).send(
+        "Invalid signature"
+      );
 
-const body =
- req.body.toString("utf8");
+    }
 
 
 
-// Signature verification
+    const event =
+      JSON.parse(body);
 
-const expectedSignature =
-crypto
-.createHmac(
- "sha256",
- process.env.CASHFREE_SECRET_KEY
-)
-.update(
- timestamp + body
-)
-.digest("base64");
 
 
+    console.log(
+      "CASHFREE PAYLOAD:",
+      JSON.stringify(event, null, 2)
+    );
 
 
-if(signature !== expectedSignature){
 
- console.log(
-  "Invalid webhook signature"
- );
+    const order =
+      event?.data?.order;
 
- return res.status(401).send(
-  "Invalid signature"
- );
 
-}
 
+    if (!order) {
 
+      console.log(
+        "Order data missing"
+      );
 
+      return res.json({
+        received:true
+      });
 
-const event =
-JSON.parse(body);
+    }
 
 
 
-console.log(
- "CASHFREE EVENT:",
- event.event
-);
+    console.log(
+      "ORDER STATUS:",
+      order.order_status
+    );
 
 
 
-const order =
-event?.data?.order;
+    if (
+      order.order_status !== "PAID"
+    ) {
 
+      return res.json({
+        received:true
+      });
 
+    }
 
-if(!order){
 
- console.log(
-  "Order data missing"
- );
 
- return res.json({
-  received:true
- });
+    const userId =
+      order.customer_details?.customer_id;
 
-}
 
 
+    if (!userId) {
 
+      console.log(
+        "Customer ID missing"
+      );
 
-if(
- order.order_status === "PAID"
-){
+      return res.json({
+        received:true
+      });
 
+    }
 
-const userId =
- order.customer_details?.customer_id;
 
 
+    const user =
+      await User.findById(userId);
 
-if(!userId){
 
- console.log(
-  "User ID missing"
- );
 
- return res.json({
-  received:true
- });
+    if (!user) {
 
-}
+      console.log(
+        "User not found:",
+        userId
+      );
 
+      return res.json({
+        received:true
+      });
 
+    }
 
-const user =
-await User.findById(userId);
 
 
+    // Prevent duplicate activation
 
-if(!user){
+    if(
+      user.subscription.status === "premium" &&
+      user.subscription.expiresAt > new Date()
+    ){
 
- console.log(
-  "User not found:",
-  userId
- );
+      console.log(
+        "Already premium"
+      );
 
- return res.json({
-  received:true
- });
+      return res.json({
+        received:true
+      });
 
-}
+    }
 
 
 
-// prevent duplicate activation
+    const updatedUser =
+      await User.findByIdAndUpdate(
 
-if(
- user.subscription.status === "premium" &&
- user.subscription.expiresAt > new Date()
-){
+        userId,
 
- console.log(
-  "Already premium"
- );
+        {
 
- return res.json({
-  received:true
- });
+          "subscription.status":
+            "premium",
 
-}
 
+          "subscription.freeContactsRemaining":
+            10,
 
 
+          "subscription.expiresAt":
+            new Date(
+              Date.now() +
+              30 * 24 * 60 * 60 * 1000
+            )
 
-const updatedUser =
-await User.findByIdAndUpdate(
+        },
 
-userId,
+        {
+          new:true
+        }
 
-{
+      );
 
-"subscription.status":
-"premium",
 
 
-"subscription.freeContactsRemaining":
-10,
+    console.log(
+      "✅ PREMIUM ACTIVATED"
+    );
 
 
-"subscription.expiresAt":
-new Date(
- Date.now()
- +
- 30 *
- 24 *
- 60 *
- 60 *
- 1000
-)
+    console.log(
+      updatedUser.subscription
+    );
 
-},
 
-{
- new:true
-}
 
-);
+    return res.json({
 
+      received:true
 
+    });
 
-console.log(
- "PREMIUM ACTIVATED:",
- updatedUser.subscription
-);
 
 
+  }
+  catch(error){
 
-}
 
+    console.log(
+      "WEBHOOK ERROR:",
+      error
+    );
 
 
-return res.json({
+    return res.status(500).send(
+      "Webhook error"
+    );
 
-received:true
 
-});
-
-
-
-}
-catch(error){
-
-
-console.log(
- "WEBHOOK ERROR:",
- error
-);
-
-
-return res.status(500).send(
- "Webhook error"
-);
-
-
-}
+  }
 
 };
