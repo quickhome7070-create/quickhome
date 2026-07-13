@@ -1,80 +1,154 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
 
-subscription: {
-  status: {
-    type: String,
-    enum: ["free", "premium"],
-    default: "free",
-  },
+const userSchema =
+new mongoose.Schema(
 
-  freeContactsRemaining: {
-    type: Number,
-    default: 3,
-  },
+{
 
-  viewedProperties: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Property",
-    },
-  ],
-
-  expiresAt: Date,
+name:{
+ type:String,
+ required:true,
+ trim:true
 },
 
-  phone: {
-    type: String,
-    unique: true,
-  },
 
-  email: {
-    type: String,
-  },
+phone:{
+ type:String,
+ unique:true,
+ sparse:true
+},
 
-  isPhoneVerified: {
-    type: Boolean,
-    default: false,
-  },
 
-  isEmailVerified: {
-    type: Boolean,
-    default: false,
-  },
+email:{
+ type:String,
+ lowercase:true
+},
 
-  resetPasswordToken: {type:String},
 
-  resetPasswordExpire:{type:Date} ,
 
-  authMethods: {
-    type: [String],
-    enum: ["otp", "password", "google"],
-    default: ["otp"],
-  },
+subscription:{
 
-  password: {
-    type: String, // only if using password login
-  },
 
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user",
-  },
-
-  favorites: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Property" },
+ status:{
+  type:String,
+  enum:[
+   "free",
+   "premium"
   ],
+  default:"free"
+ },
 
-  recentlyViewed: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Property" },
-  ],
 
-}, { timestamps: true });
+ freeContactsRemaining:{
+  type:Number,
+  default:3
+ },
 
-module.exports = mongoose.model("User", userSchema);
+
+ viewedProperties:[
+  {
+   type:mongoose.Schema.Types.ObjectId,
+   ref:"Property"
+  }
+ ],
+
+
+ expiresAt:{
+  type:Date,
+  default:null
+ }
+
+
+},
+
+
+
+isPhoneVerified:{
+ type:Boolean,
+ default:false
+},
+
+
+isEmailVerified:{
+ type:Boolean,
+ default:false
+},
+
+
+
+authMethods:{
+ type:[String],
+ enum:[
+  "otp",
+  "password",
+  "google"
+ ],
+ default:[
+  "otp"
+ ]
+},
+
+
+
+password:{
+ type:String
+},
+
+
+
+resetPasswordToken:{
+ type:String
+},
+
+
+
+resetPasswordExpire:{
+ type:Date
+},
+
+
+
+role:{
+ type:String,
+ enum:[
+  "user",
+  "admin"
+ ],
+ default:"user"
+},
+
+
+
+favorites:[
+ {
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"Property"
+ }
+],
+
+
+
+recentlyViewed:[
+ {
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"Property"
+ }
+]
+
+
+},
+
+{
+ timestamps:true
+}
+
+
+);
+
+
+module.exports =
+mongoose.model(
+ "User",
+ userSchema
+);

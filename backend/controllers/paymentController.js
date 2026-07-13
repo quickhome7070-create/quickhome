@@ -1,221 +1,279 @@
 const {
-  Cashfree,
-  CFEnvironment
-} = require("cashfree-pg");
-
-const crypto = require("crypto");
-const User = require("../models/User");
+ Cashfree,
+ CFEnvironment
+}=require("cashfree-pg");
 
 
-// ===============================
-// CASHFREE PRODUCTION INIT
-// ===============================
+const User =
+require("../models/User");
 
-const cashfree = new Cashfree(
-  CFEnvironment.PRODUCTION
+
+const Payment =
+require("../models/Payment");
+
+
+const crypto =
+require("crypto");
+
+
+
+const cashfree =
+new Cashfree(
+ CFEnvironment.PRODUCTION
 );
 
+
+
 cashfree.XClientId =
-  process.env.CASHFREE_APP_ID;
+process.env.CASHFREE_APP_ID;
+
 
 cashfree.XClientSecret =
-  process.env.CASHFREE_SECRET_KEY;
+process.env.CASHFREE_SECRET_KEY;
 
 
 
-console.log("Cashfree Production Loaded");
+console.log(
+"Cashfree Production Loaded"
+);
 
 
 
-// ===============================
+// =================================
 // CREATE ORDER
-// ===============================
-
-exports.createOrder = async (req, res) => {
-
-  try {
-
-    const user =
-      await User.findById(req.user.userId);
+// =================================
 
 
-    if (!user) {
+exports.createOrder =
+async(req,res)=>{
 
-      return res.status(404).json({
-        success:false,
-        message:"User not found"
-      });
 
-    }
+try{
+
+
+const user =
+await User.findById(
+ req.user.userId
+);
 
 
 
-    // Already premium
+if(!user){
 
-    if (
-      user.subscription.status === "premium" &&
-      user.subscription.expiresAt > new Date()
-    ) {
+return res.status(404).json({
 
-      return res.status(400).json({
-        success:false,
-        message:"Premium already active"
-      });
+success:false,
 
-    }
+message:"User not found"
+
+});
+
+}
 
 
 
-    const orderId =
-      `order_${Date.now()}`;
+if(
+
+user.subscription.status==="premium" &&
+
+user.subscription.expiresAt > new Date()
+
+){
+
+
+return res.status(400).json({
+
+success:false,
+
+message:"Premium already active"
+
+});
+
+
+}
 
 
 
-    const response =
-      await cashfree.PGCreateOrder({
-
-        order_id: orderId,
-
-        order_amount: 99,
-
-        order_currency:"INR",
-
-
-        customer_details: {
-
-          customer_id:
-            user._id.toString(),
-
-          customer_name:
-            user.name || "Customer",
-
-          customer_email:
-            user.email || "customer@example.com",
-
-          customer_phone:
-            user.phone || "9999999999"
-
-        },
-
-
-        order_meta: {
-
-          return_url:
-            `https://ghardestiny.com/payment-success?order_id=${orderId}`,
-
-          notify_url:
-            "https://api.ghardestiny.com/api/payment/cashfree-webhook"
-
-        }
-
-      });
+const orderId =
+`order_${Date.now()}`;
 
 
 
-    return res.json({
+// SAVE PAYMENT FIRST
 
-      success:true,
+await Payment.create({
 
-      paymentSessionId:
-        response.data.payment_session_id
+orderId,
 
-    });
+userId:user._id,
 
+amount:99
 
-
-  } catch(error) {
-
-
-    console.log(
-      "CREATE ORDER ERROR:",
-      error.response?.data || error.message
-    );
+});
 
 
-    return res.status(500).json({
-
-      success:false,
-
-      message:"Unable to create order"
-
-    });
 
 
-  }
+
+const response =
+await cashfree.PGCreateOrder({
+
+
+order_id:orderId,
+
+
+order_amount:99,
+
+
+order_currency:"INR",
+
+
+
+customer_details:{
+
+
+customer_id:
+user._id.toString(),
+
+
+customer_name:
+user.name,
+
+
+customer_email:
+user.email || "test@test.com",
+
+
+customer_phone:
+user.phone || "9999999999"
+
+
+},
+
+
+
+order_meta:{
+
+
+return_url:
+`https://ghardestiny.com/payment-success?order_id=${orderId}`,
+
+
+notify_url:
+"https://api.ghardestiny.com/api/payment/cashfree-webhook"
+
+
+}
+
+
+
+});
+
+
+
+
+return res.json({
+
+success:true,
+
+paymentSessionId:
+response.data.payment_session_id
+
+});
+
+
+
+
+}
+catch(error){
+
+
+console.log(
+"CREATE ORDER ERROR",
+error.response?.data ||
+error.message
+);
+
+
+
+return res.status(500).json({
+
+success:false,
+
+message:"Unable to create order"
+
+});
+
+
+}
+
 
 };
 
 
 
 
-
-// ===============================
+// =================================
 // CASHFREE WEBHOOK
-// ===============================
+// =================================
 
-exports.cashfreeWebhook = async (req,res)=>{
+
+exports.cashfreeWebhook =
+async(req,res)=>{
+
+
+try{
 
 
 console.log(
-  "========== CASHFREE WEBHOOK HIT =========="
+"========== CASHFREE WEBHOOK HIT =========="
 );
 
 
-try {
-
 
 const signature =
-  req.headers["x-webhook-signature"];
+req.headers["x-webhook-signature"];
 
 
 const timestamp =
-  req.headers["x-webhook-timestamp"];
-
-
-
-if(!signature || !timestamp){
-
-  console.log(
-    "Missing webhook headers"
-  );
-
-  return res.status(400).send(
-    "Missing headers"
-  );
-
-}
+req.headers["x-webhook-timestamp"];
 
 
 
 const body =
-  req.body.toString("utf8");
+req.body.toString("utf8");
 
 
 
-// Signature verification
-
-const expectedSignature =
+const expected =
 crypto
 .createHmac(
-  "sha256",
-  process.env.CASHFREE_SECRET_KEY
+
+"sha256",
+
+process.env.CASHFREE_WEBHOOK_SECRET
+
 )
+
 .update(
-  timestamp + body
+timestamp + body
 )
+
 .digest("base64");
 
 
 
-if(signature !== expectedSignature){
+if(signature!==expected){
 
- console.log(
-   "Invalid signature"
- );
+console.log(
+"Invalid signature"
+);
 
- return res.status(401).send(
-   "Invalid signature"
- );
+
+return res.status(401).send(
+"Invalid"
+);
+
 
 }
 
@@ -227,122 +285,62 @@ JSON.parse(body);
 
 
 console.log(
- "EVENT TYPE:",
- event.type
+"EVENT:",
+event.type
 );
 
 
 
-console.log(
- "WEBHOOK DATA:",
- JSON.stringify(event,null,2)
-);
-
-
-
-// Payment details
 
 const payment =
 event?.data?.payment;
 
 
 
-if(!payment){
+if(
+!payment ||
+payment.payment_status!=="SUCCESS"
+){
 
- console.log(
-  "Payment data missing"
- );
-
- return res.json({
-  received:true
- });
+return res.json({
+received:true
+});
 
 }
 
 
 
+const orderId =
+event.data.order.order_id;
+
+
+
+const paymentRecord =
+await Payment.findOne({
+
+orderId
+
+});
+
+
+
+if(!paymentRecord){
+
 console.log(
- "PAYMENT STATUS:",
- payment.payment_status
+"Payment record missing"
 );
 
 
-
-if(
- payment.payment_status !== "SUCCESS"
-){
-
- return res.json({
-  received:true
- });
+return res.json({
+received:true
+});
 
 }
-
-
-
-// Get customer
-
-const order =
-event?.data?.order;
 
 
 
 const userId =
-order?.customer_details?.customer_id;
-
-
-
-if(!userId){
-
- console.log(
-  "Customer ID missing"
- );
-
- return res.json({
-  received:true
- });
-
-}
-
-
-
-const user =
-await User.findById(userId);
-
-
-
-if(!user){
-
- console.log(
-  "User not found:",
-  userId
- );
-
- return res.json({
-  received:true
- });
-
-}
-
-
-
-// Avoid duplicate activation
-
-if(
- user.subscription.status === "premium" &&
- user.subscription.expiresAt > new Date()
-){
-
- console.log(
-  "Already premium"
- );
-
- return res.json({
-  received:true
- });
-
-}
-
+paymentRecord.userId;
 
 
 
@@ -351,40 +349,56 @@ await User.findByIdAndUpdate(
 
 userId,
 
+
 {
 
 "subscription.status":
 "premium",
 
+
 "subscription.freeContactsRemaining":
 10,
 
+
 "subscription.expiresAt":
+
 new Date(
- Date.now() +
- 30 *
- 24 *
- 60 *
- 60 *
- 1000
+
+Date.now()
++
+30*24*60*60*1000
+
 )
 
 },
 
+
 {
- new:true
+new:true
 }
 
 );
 
 
 
-console.log(
-"✅ PREMIUM ACTIVATED"
+
+await Payment.findOneAndUpdate(
+
+{
+orderId
+},
+
+{
+status:"PAID"
+}
+
 );
 
 
+
+
 console.log(
+"PREMIUM ACTIVATED",
 updatedUser.subscription
 );
 
@@ -403,16 +417,17 @@ catch(error){
 
 
 console.log(
- "WEBHOOK ERROR:",
- error
+"WEBHOOK ERROR",
+error
 );
 
 
 return res.status(500).send(
- "Webhook error"
+"Webhook error"
 );
 
 
 }
+
 
 };
