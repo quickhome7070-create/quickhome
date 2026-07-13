@@ -157,21 +157,25 @@ return res.json({
 
 
 }
-catch(err){
+catch (error) {
 
-console.log(
-"VERIFY ERROR:",
-err.response?.data || err.message
-);
+  console.log("========== VERIFY ERROR ==========");
+  console.log("Order ID:", req.body.orderId);
+  console.log("Status:", error.response?.status);
+  console.log("Data:", error.response?.data);
+  console.log("Message:", error.message);
+  console.log(
+    "Full Error:",
+    JSON.stringify(error.response?.data, null, 2)
+  );
+  console.log("==================================");
 
-
-return res.status(500).json({
- success:false,
- message:"Verification failed"
-});
+  return res.status(500).json({
+    success: false,
+    message: "Verification failed",
+  });
 
 }
-
 };
 
 // =========================
