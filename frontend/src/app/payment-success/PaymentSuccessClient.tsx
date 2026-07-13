@@ -28,7 +28,7 @@ const verifyPayment = async()=>{
 const orderId =
 params.get("order_id");
 
-
+console.log("VERIFY ORDER ID:", orderId);
 
 if(!orderId)
 return;
@@ -75,7 +75,7 @@ data
 
 
 if(data.success){
-
+console.log("VERIFY RESPONSE:", data);
 
 alert(
 "Premium Activated 🎉"
