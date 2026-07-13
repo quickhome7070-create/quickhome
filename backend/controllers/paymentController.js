@@ -24,6 +24,15 @@ cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY;
 exports.createOrder = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
+    if(
+ user.subscription.status === "premium" &&
+ user.subscription.expiresAt > new Date()
+){
+ return res.status(400).json({
+   success:false,
+   message:"Premium already active"
+ });
+}
 
     if (!user) {
       return res.status(404).json({

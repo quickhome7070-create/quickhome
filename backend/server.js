@@ -17,9 +17,9 @@ const cors = require("cors");
 
 const connectDB = require("./config/db");
 
-const razorpayRoutes = require("./routes/razorpayRoutes");
 
-const subscriptionRoutes = require("./routes/subscriptionRoutes");
+
+
 const authRoutes = require("./routes/authRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -85,8 +85,7 @@ app.use("/api/property", propertyRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/otp", require("./routes/otpRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
-app.use("/api/razorpay", razorpayRoutes);
-app.use("/api/subscription", subscriptionRoutes);
+
 
 
 const path = require("path");
