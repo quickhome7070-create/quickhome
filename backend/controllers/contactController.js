@@ -49,10 +49,22 @@ exports.viewContact = async (req, res) => {
       user.subscription.expiresAt &&
       user.subscription.expiresAt < new Date()
     ) {
+      return res.json({
 
-      user.subscription.status = "free";
-      user.subscription.freeContactsRemaining = 3;
-      user.subscription.expiresAt = null;
+name:property.owner.name,
+
+phone:property.owner.phone,
+
+email:property.owner.email,
+
+contactsRemaining:
+user.subscription.freeContactsRemaining
+
+});
+
+      // user.subscription.status = "free";
+      // user.subscription.freeContactsRemaining = 3;
+      // user.subscription.expiresAt = null;
 
       await user.save();
 

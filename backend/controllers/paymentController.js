@@ -24,6 +24,14 @@ cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY;
 exports.createOrder = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
+    if(!user){
+
+return res.status(404).json({
+success:false,
+message:"User not found"
+});
+
+}
     if(
  user.subscription.status === "premium" &&
  user.subscription.expiresAt > new Date()
@@ -90,43 +98,109 @@ exports.createOrder = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("HEADERS:", req.headers["content-type"]);
+
     const { orderId } = req.body;
 
-    console.log("ORDER ID:", orderId);
-    console.log("ENV:", process.env.CASHFREE_ENV);
+    console.log("VERIFY ORDER ID:", orderId);
+
+    if (!orderId) {
+      return res.status(400).json({
+        success:false,
+        message:"Order ID missing"
+      });
+    }
+
 
     const response = await cashfree.PGFetchOrder(
       "2023-08-01",
       orderId
     );
 
-    console.log("CASHFREE RESPONSE:", response.data);
 
-    if (response.data.order_status === "PAID") {
+    console.log(
+      "CASHFREE ORDER:",
+      response.data
+    );
+
+
+    if (
+      response.data.order_status !== "PAID"
+    ) {
+
       return res.json({
-        success: true,
+        success:false,
+        status:response.data.order_status
       });
+
     }
 
+
+
+    // customer id was saved during create order
+    const userId =
+      response.data.customer_details.customer_id;
+
+
+
+    const updatedUser =
+      await User.findByIdAndUpdate(
+
+        userId,
+
+        {
+          "subscription.status":"premium",
+
+          "subscription.freeContactsRemaining":10,
+
+          "subscription.expiresAt":
+            new Date(
+              Date.now() +
+              30 * 24 * 60 * 60 * 1000
+            )
+        },
+
+        {
+          new:true
+        }
+
+      );
+
+
+
+    console.log(
+      "PREMIUM ACTIVATED:",
+      updatedUser.subscription
+    );
+
+
+
     return res.json({
-      success: false,
-      status: response.data.order_status,
+
+      success:true,
+
+      message:"Premium activated"
+
     });
 
-  } catch (error) {
-    console.log("=========== VERIFY ERROR ===========");
-    console.log(error);
-    console.log(error.response?.data);
-    console.log(error.response?.status);
-    console.log(error.message);
-    console.log("====================================");
+
+
+  } catch(error){
+
+    console.log(
+      "VERIFY ERROR:",
+      error.response?.data ||
+      error.message
+    );
+
 
     return res.status(500).json({
-      success: false,
-      message: error.response?.data || error.message,
+
+      success:false,
+
+      message:"Verification failed"
+
     });
+
   }
 };
 
@@ -180,7 +254,8 @@ exports.cashfreeWebhook = async (req, res) => {
       if (!user) return res.json({ received: true });
 
       // idempotency
-      if (user.subscription?.status === "premium") {
+      if (user.subscription?.status === "premium" &&
+         user.subscription.expiresAt > new Date()) {
         return res.json({ received: true });
       }
 

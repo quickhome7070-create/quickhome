@@ -1,73 +1,141 @@
 "use client";
 
-import { useEffect } from "react";
 import {
-  useRouter,
-  useSearchParams,
+useEffect
+} from "react";
+
+import {
+useRouter,
+useSearchParams
 } from "next/navigation";
 
-export default function PaymentSuccessClient() {
 
-  const router = useRouter();
+export default function PaymentSuccessClient(){
 
-  const params =
-    useSearchParams();
 
-  useEffect(() => {
+const router = useRouter();
 
-    const verify =
-      async () => {
+const params = useSearchParams();
 
-        const orderId =
-          params.get("order_id");
 
-          console.log("URL:", window.location.href);
-console.log("ORDER ID:", orderId);
 
-const body = { orderId };
+useEffect(()=>{
 
-console.log("REQUEST BODY:", body);
 
-        if (!orderId) return;
+const verifyPayment = async()=>{
 
-        const res =
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/payment/verify`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                orderId,
-              }),
-            }
-          );
 
-        const data =
-          await res.json();
+const orderId =
+params.get("order_id");
 
-        if (data.success) {
 
-          alert(
-            "Premium Activated 🎉"
-          );
 
-          router.push("/");
-        }
-      };
+if(!orderId)
+return;
 
-    verify();
 
-  }, [params, router]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-2xl font-bold">
-        Verifying payment...
-      </h1>
-    </div>
-  );
+const res =
+await fetch(
+
+`${process.env.NEXT_PUBLIC_API_URL}/payment/verify`,
+
+{
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+credentials:"include",
+
+body:JSON.stringify({
+
+orderId
+
+})
+
+}
+
+);
+
+
+
+const data =
+await res.json();
+
+
+
+console.log(
+"VERIFY RESPONSE",
+data
+);
+
+
+
+if(data.success){
+
+
+alert(
+"Premium Activated 🎉"
+);
+
+
+// reload user session
+
+router.push("/");
+
+router.refresh();
+
+
+}
+
+else{
+
+
+alert(
+"Payment not completed"
+);
+
+
+}
+
+
+
+};
+
+
+
+verifyPayment();
+
+
+
+},[]);
+
+
+
+return(
+
+<div className="
+min-h-screen
+flex
+items-center
+justify-center
+">
+
+<h1 className="
+text-2xl
+font-bold
+">
+
+Verifying payment...
+
+</h1>
+
+
+</div>
+
+);
+
 }
