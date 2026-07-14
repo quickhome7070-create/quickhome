@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+
 import {
   createContext,
   useContext,
@@ -7,85 +7,183 @@ import {
   useState,
 } from "react";
 
+import { useRouter } from "next/navigation";
+
+
 const AuthContext = createContext<any>(null);
 
-const API = process.env.NEXT_PUBLIC_API_URL;
 
-export const AuthProvider = ({ children }: any) => {
-const router = useRouter();
-  const [user, setUser] = useState(null);
+const API =
+process.env.NEXT_PUBLIC_API_URL;
 
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
 
-    const loadUser = async () => {
+export const AuthProvider = ({
+children
+}:any)=>{
 
-      try {
 
-        const res = await fetch(
-          `${API}/auth/me`,
-          {
-            credentials: "include",
-          }
-        );
+const router =
+useRouter();
 
-        if (res.ok) {
 
-          const data = await res.json();
 
-          setUser(data.user);
-        }
+const [user,setUser] =
+useState<any>(null);
 
-         
 
-      } catch (error) {
-       
-        console.log(error);
-      }
 
-      setLoading(false);
-      
-    };
+const [loading,setLoading] =
+useState(true);
 
-    loadUser();
 
-  }, []);
 
-  // ✅ LOGOUT FUNCTION
-  const logout = async () => {
 
-    try {
 
-      await fetch(
-        `${API}/auth/logout`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+useEffect(()=>{
 
-      // ✅ CLEAR USER
-      setUser(null);
-      router.push("/login")
 
-    } catch (error) {
-      console.log(error);
-    }
-  };
+const loadUser = async()=>{
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        setUser,
-        loading,
-        logout, // ✅ expose logout
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+
+try{
+
+
+const res =
+await fetch(
+`${API}/auth/me`,
+{
+credentials:"include",
+}
+);
+
+
+
+const data =
+await res.json();
+
+
+
+console.log(
+"AUTH ME RESPONSE:",
+data
+);
+
+
+
+if(res.ok){
+
+setUser(data.user);
+
+}
+else{
+
+setUser(null);
+
+}
+
+
+
+}
+catch(error){
+
+console.log(
+"AUTH ERROR:",
+error
+);
+
+setUser(null);
+
+}
+
+
+finally{
+
+setLoading(false);
+
+}
+
+
 };
 
-export const useAuth = () => useContext(AuthContext);
+
+
+loadUser();
+
+
+
+},[]);
+
+
+
+
+
+
+const logout = async()=>{
+
+
+try{
+
+
+await fetch(
+`${API}/auth/logout`,
+{
+method:"POST",
+credentials:"include",
+}
+);
+
+
+
+setUser(null);
+
+
+router.push("/login");
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+}
+
+
+
+};
+
+
+
+
+
+return (
+
+<AuthContext.Provider
+value={{
+
+user,
+
+setUser,
+
+loading,
+
+logout
+
+}}
+>
+
+{children}
+
+</AuthContext.Provider>
+
+);
+
+
+};
+
+
+
+
+export const useAuth =
+()=>useContext(AuthContext);
