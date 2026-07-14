@@ -13,13 +13,11 @@ const connectDB = require("./config/db");
 require("dotenv").config();
 
 
-// Controllers
 const {
   cashfreeWebhook
 } = require("./controllers/paymentController");
 
 
-// Routes
 const paymentRoutes =
 require("./routes/paymentRoutes");
 
@@ -28,54 +26,58 @@ require("./routes/paymentRoutes");
 // Trust Render proxy
 
 app.set(
- "trust proxy",
- 1
+  "trust proxy",
+  1
 );
 
 
 
 // ===============================
-// BASIC MIDDLEWARE
+// MIDDLEWARE
 // ===============================
 
 app.use(
- cookieParser()
+  cookieParser()
 );
 
 
 
 app.use(
- cors({
+  cors({
 
-  origin:[
-   "https://ghardestiny.com",
-   "https://www.ghardestiny.com",
-   "http://localhost:3000"
-  ],
+    origin:[
 
-  credentials:true
+      "https://ghardestiny.com",
 
- })
+      "https://www.ghardestiny.com",
+
+      "http://localhost:3000"
+
+    ],
+
+    credentials:true
+
+  })
 );
 
 
 
 app.use(
- rateLimit({
+  rateLimit({
 
-  windowMs:
-   15 * 60 * 1000,
+    windowMs:
+      15 * 60 * 1000,
 
-  max:
-   100
+    max:
+      100
 
- })
+  })
 );
 
 
 
 app.use(
- helmet()
+  helmet()
 );
 
 
@@ -84,19 +86,18 @@ app.use(
 
 // ===============================
 // CASHFREE WEBHOOK
-// MUST BE BEFORE JSON
+// BEFORE JSON
 // ===============================
-
 
 app.post(
 
- "/api/payment/cashfree-webhook",
+  "/api/payment/cashfree-webhook",
 
- express.raw({
-   type:"application/json"
- }),
+  express.raw({
+    type:"application/json"
+  }),
 
- cashfreeWebhook
+  cashfreeWebhook
 
 );
 
@@ -106,19 +107,18 @@ app.post(
 
 // ===============================
 // BODY PARSER
-// AFTER WEBHOOK
 // ===============================
 
 
 app.use(
- express.json()
+  express.json()
 );
 
 
 app.use(
- express.urlencoded({
-  extended:true
- })
+  express.urlencoded({
+    extended:true
+  })
 );
 
 
@@ -141,48 +141,49 @@ connectDB();
 
 
 app.use(
- "/api/auth",
- require("./routes/authRoutes")
-);
-
-// OTP routes
-app.use(
- "/api/auth",
- require("./routes/otpRoutes")
-);
-
-app.use(
- "/api/payment",
- paymentRoutes
+  "/api/auth",
+  require("./routes/authRoutes")
 );
 
 
 
 app.use(
- "/api/property",
- require("./routes/propertyRoutes")
+  "/api/payment",
+  paymentRoutes
 );
 
 
 
 app.use(
- "/api/user",
- require("./routes/userRoutes")
+  "/api/property",
+  require("./routes/propertyRoutes")
+);
+
+
+
+app.use(
+  "/api/user",
+  require("./routes/userRoutes")
 );
 
 
 
 
 
-// Health check
+
+// ===============================
+// HEALTH CHECK
+// ===============================
 
 app.get(
- "/",
- (req,res)=>{
-  res.send(
-   "Backend running 🚀"
-  );
- }
+  "/",
+  (req,res)=>{
+
+    res.send(
+      "Backend running 🚀"
+    );
+
+  }
 );
 
 
@@ -193,17 +194,17 @@ app.get(
 // SERVER
 // ===============================
 
-
 const PORT =
 process.env.PORT || 5000;
 
 
-
 app.listen(
- PORT,
- ()=>{
-  console.log(
-   `Server running on ${PORT}`
-  );
- }
+  PORT,
+  ()=>{
+
+    console.log(
+      `Server running on ${PORT}`
+    );
+
+  }
 );
