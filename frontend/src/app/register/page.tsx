@@ -31,8 +31,7 @@ export default function RegisterPage() {
   const [otp, setOtp] =
     useState("");
 
-  const [step, setStep] =
-    useState(1);
+ 
 
   const [timer, setTimer] =
     useState(0);
@@ -151,54 +150,7 @@ export default function RegisterPage() {
   };
 
   // SEND OTP
-  const sendOTP = async () => {
-
-    if (!validateForm()) return;
-
-    try {
-
-      setOtpLoading(true);
-
-     const res = await fetch(
-  `${process.env.NEXT_PUBLIC_API_URL}/auth/send-otp`,
-  {
-    method: "POST",
-
-    credentials: "include",
-
-    headers: {
-      "Content-Type": "application/json",
-    },
-
-    body: JSON.stringify({
-      phone: form.phone,
-    }),
-  }
-);
-      const data =
-        await res.json();
-
-      if (!res.ok) {
-        throw new Error(
-          data.message
-        );
-      }
-
-      setStep(2);
-
-      setTimer(30);
-
-      alert("OTP Sent");
-
-    } catch (error: any) {
-
-      alert(error.message);
-
-    } finally {
-
-      setOtpLoading(false);
-    }
-  };
+ 
 
   // REGISTER
   const handleRegister = async () => {
@@ -435,82 +387,9 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* OTP SECTION */}
-          {step === 2 && (
+      
 
-            <div>
-
-              <input
-                type="text"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) =>
-                  setOtp(
-                    e.target.value
-                  )
-                }
-                className={`w-full border rounded-xl p-3 outline-none ${
-                  errors.otp
-                    ? "border-red-500"
-                    : "focus:ring-2 focus:ring-orange-400"
-                }`}
-              />
-
-              {errors.otp && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.otp}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* SEND OTP */}
-          {step === 1 ? (
-
-            <button
-              onClick={sendOTP}
-              disabled={
-                otpLoading ||
-                timer > 0
-              }
-              className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-black shadow-md"
-            >
-              {otpLoading
-                ? "Sending..."
-                : "Send OTP"}
-            </button>
-
-          ) : (
-
-            <>
-              {/* REGISTER */}
-              <button
-                onClick={
-                  handleRegister
-                }
-                disabled={loading}
-                className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-black shadow-md"
-              >
-                {loading
-                  ? "Creating..."
-                  : "Register"}
-              </button>
-
-              {/* RESEND */}
-              <button
-                type="button"
-                disabled={
-                  timer > 0
-                }
-                onClick={sendOTP}
-                className="w-full border rounded-xl py-3"
-              >
-                {timer > 0
-                  ? `Resend OTP in ${timer}s`
-                  : "Resend OTP"}
-              </button>
-            </>
-          )}
+        
         </div>
 
         <p className="text-center text-sm text-gray-600 mt-5">
