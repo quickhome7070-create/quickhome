@@ -4,16 +4,22 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    await resend.emails.send({
-      from: "QuickHome <onboarding@resend.dev>",
+    const response = await resend.emails.send({
+      from: "QuickHome <noreply@ghardestiny.com>",
       to,
       subject,
       html,
     });
 
-    console.log("Email sent");
+    console.log("Resend Response:", response);
+
+    return response;
+
   } catch (error) {
-    console.log(error);
+
+    console.error("Resend Error:", error);
+
+    throw error; // IMPORTANT
   }
 };
 

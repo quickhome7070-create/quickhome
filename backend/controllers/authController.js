@@ -190,18 +190,20 @@ exports.forgotPassword = async (req, res) => {
  `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
  
 
-    await sendEmail({
+ await sendEmail({
   to: user.email,
   subject: "Password Reset",
   html: `
     <h2>Password Reset</h2>
-
-    <p>Click below link:</p>
-
+    <p>Click below:</p>
     <a href="${resetUrl}">
       Reset Password
     </a>
   `,
+});
+
+return res.json({
+  message: "Reset link sent successfully"
 });
 
     // Later send email here
