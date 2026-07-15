@@ -80,7 +80,10 @@ app.use(
   helmet()
 );
 
-
+app.use(
+  "/api/admin",
+  require("./routes/adminRoutes")
+);
 
 
 
