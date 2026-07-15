@@ -46,12 +46,6 @@ subscription:{
  },
 
 
- premiumContactsRemaining:{
-  type:Number,
-  default:0
- },
-
-
  viewedProperties:[
   {
    type:mongoose.Schema.Types.ObjectId,

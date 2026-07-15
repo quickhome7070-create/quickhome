@@ -356,7 +356,7 @@ userId,
 "premium",
 
 
-"subscription.premiumContactsRemaining":
+"subscription.freeContactsRemaining":
 10,
 
 
