@@ -1,36 +1,79 @@
 const User = require("../models/User");
-
 const jwt = require("jsonwebtoken");
 
-
-
-
-const MAX_ATTEMPTS = 5;
-const BLOCK_WINDOW_MINUTES = 10;
-const MAX_BLOCKED_OTPS = 3;
-
-exports.loginWithMSG91 = async (req,res)=>{
-
+exports.loginWithMSG91 = async (req, res) => {
   try {
-
     const { phone } = req.body;
 
-    console.log("MSG91 LOGIN PHONE:", phone);
+    if (!phone) {
+      return res.status(400).json({
+        message: "Phone number is required",
+      });
+    }
 
+    const normalizedPhone = phone.replace(/\D/g, "");
 
-    res.json({
-      message:"Login successful"
+    // Find existing user
+    let user = await User.findOne({
+      phone: normalizedPhone,
     });
 
+    // Create user if not found
+    if (!user) {
+      user = await User.create({
+        name: "User",
+        phone: normalizedPhone,
+        isPhoneVerified: true,
+        authMethods: ["otp"],
+      });
 
-  } catch(error){
+      console.log("New user created:", user.phone);
+    } else {
+      user.isPhoneVerified = true;
 
-    res.status(500).json({
-      message:error.message
+      if (!user.authMethods.includes("otp")) {
+        user.authMethods.push("otp");
+      }
+
+      await user.save();
+
+      console.log("Existing user updated:", user.phone);
+    }
+
+    // Generate JWT
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    const isProd = process.env.NODE_ENV === "production";
+
+    // Set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      ...(isProd && {
+        domain: ".ghardestiny.com",
+      }),
     });
 
+    return res.json({
+      message: "Login successful",
+      user,
+    });
+  } catch (error) {
+    console.error("MSG91 Login Error:", error);
+
+    return res.status(500).json({
+      message: error.message,
+    });
   }
-
 };
-
-
