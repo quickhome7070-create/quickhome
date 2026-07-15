@@ -156,7 +156,6 @@ console.log(error);
 
 
 
-
 return (
 
 <AuthContext.Provider
@@ -168,7 +167,9 @@ setUser,
 
 loading,
 
-logout
+logout,
+
+
 
 }}
 >

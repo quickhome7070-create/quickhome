@@ -1,11 +1,11 @@
 const Property = require("../models/Property");
 const User = require("../models/User");
 
-exports.viewContact = async (req, res) => {
-  try {
 
-    console.log("req.user =", req.user);
-    console.log("propertyId =", req.params.id);
+
+exports.viewContact = async (req, res) => {
+
+  try {
 
 
     const user = await User.findById(
@@ -13,127 +13,211 @@ exports.viewContact = async (req, res) => {
     );
 
 
-    const property = await Property.findById(
-      req.params.id
-    ).populate("owner");
-
-
     if (!user) {
       return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-
-    if (!property) {
-      return res.status(404).json({
-        message: "Property not found",
-      });
-    }
-
-
-    if (!property.owner) {
-      return res.status(404).json({
-        message: "Property owner not found",
+        message: "User not found"
       });
     }
 
 
 
-    // =========================
-    // CHECK PREMIUM EXPIRY
-    // =========================
+    // Safety check for old users
+    if (!user.subscription) {
 
-    if (
-      user.subscription.status === "premium" &&
-      user.subscription.expiresAt &&
-      user.subscription.expiresAt < new Date()
-    ) {
-      return res.json({
-
-name:property.owner.name,
-
-phone:property.owner.phone,
-
-email:property.owner.email,
-
-contactsRemaining:
-user.subscription.freeContactsRemaining
-
-});
-
-      // user.subscription.status = "free";
-      // user.subscription.freeContactsRemaining = 3;
-      // user.subscription.expiresAt = null;
+      user.subscription = {
+        status: "free",
+        freeContactsRemaining: 3,        
+        viewedProperties: [],
+        expiresAt: null
+      };
 
       await user.save();
 
-      console.log(
-        "Premium expired. Downgraded:",
-        user._id
-      );
     }
 
 
 
-    // =========================
-    // PREMIUM USER
-    // =========================
+    const property = await Property.findById(
+      req.params.id
+    )
+    .populate(
+      "owner",
+      "name phone email"
+    );
+
+
+
+    if (!property) {
+
+      return res.status(404).json({
+        message: "Property not found"
+      });
+
+    }
+
+
+
+    if (!property.owner) {
+
+      return res.status(404).json({
+        message: "Owner details not found"
+      });
+
+    }
+
+
+
+    // =================================
+    // CHECK PREMIUM EXPIRY
+    // =================================
+
 
     if (
-      user.subscription.status === "premium"
+
+      user.subscription.status === "premium" &&
+
+      user.subscription.expiresAt &&
+
+      user.subscription.expiresAt < new Date()
+
     ) {
 
-      return res.json({
 
-        name: property.owner.name,
+      user.subscription.status = "free";
 
-        phone: property.owner.phone,
+     
 
-        email: property.owner.email,
+      user.subscription.freeContactsRemaining = 3;
 
-        contactsRemaining:
-          user.subscription.freeContactsRemaining,
+      user.subscription.expiresAt = null;
 
-        premium: true,
 
-      });
+      await user.save();
+
     }
 
 
 
-    // =========================
+
+    // =================================
+    // PREMIUM USER
+    // =================================
+
+
+if (user.subscription.status === "premium") {
+
+
+  // check already viewed
+  const alreadyViewed =
+    user.subscription.viewedProperties.some(
+      (id) =>
+        id.toString() === property._id.toString()
+    );
+
+
+  // deduct only first time
+  if (!alreadyViewed) {
+
+
+    if (
+      user.subscription.freeContactsRemaining <= 0
+    ) {
+
+      return res.status(403).json({
+        message:
+        "Premium contacts finished. Please renew your plan."
+      });
+
+    }
+
+
+    user.subscription.freeContactsRemaining -= 1;
+
+
+    user.subscription.viewedProperties.push(
+      property._id
+    );
+
+
+    await user.save();
+
+  }
+
+
+
+  return res.json({
+
+    name: property.owner.name,
+
+    phone: property.owner.phone,
+
+    email: property.owner.email,
+
+
+    contactsRemaining:
+    user.subscription.freeContactsRemaining,
+
+
+    premium:true
+
+  });
+
+}
+
+
+
+    // =================================
     // FREE USER
-    // =========================
+    // =================================
+
+
+
+    if (
+      !user.subscription.viewedProperties
+    ) {
+
+      user.subscription.viewedProperties = [];
+
+    }
+
 
 
     const alreadyViewed =
-      user.subscription.viewedProperties.some(
-        (id) =>
-          id.toString() ===
-          property._id.toString()
-      );
+    user.subscription.viewedProperties.some(
+
+      (id) =>
+      id.toString() ===
+      property._id.toString()
+
+    );
+
 
 
 
     if (!alreadyViewed) {
 
 
+
       if (
         user.subscription.freeContactsRemaining <= 0
       ) {
 
+
         return res.status(403).json({
 
           message:
-            "Your free contacts are finished. Please upgrade.",
+          "Free contacts finished. Please upgrade."
 
         });
+
       }
 
 
 
+      // deduct free contact
+
       user.subscription.freeContactsRemaining -= 1;
+
 
 
       user.subscription.viewedProperties.push(
@@ -141,9 +225,11 @@ user.subscription.freeContactsRemaining
       );
 
 
+
       await user.save();
 
     }
+
 
 
 
@@ -155,18 +241,22 @@ user.subscription.freeContactsRemaining
 
       email: property.owner.email,
 
-      contactsRemaining:
-        user.subscription.freeContactsRemaining,
 
-      premium: false,
+      contactsRemaining:
+      user.subscription.freeContactsRemaining,
+
+
+      premium:false
 
     });
 
 
 
-  } catch (error) {
+  }
+  catch(error) {
 
-    console.error(
+
+    console.log(
       "View Contact Error:",
       error
     );
@@ -174,9 +264,12 @@ user.subscription.freeContactsRemaining
 
     return res.status(500).json({
 
-      message: "Server error",
+      message:
+      "Server error"
 
     });
 
+
   }
+
 };

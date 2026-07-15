@@ -26,39 +26,30 @@ email:{
 },
 
 
+subscription: {
 
-subscription:{
+  status:{
+    type:String,
+    enum:["free","premium"],
+    default:"free"
+  },
 
+  freeContactsRemaining:{
+    type:Number,
+    default:3
+  },
 
- status:{
-  type:String,
-  enum:[
-   "free",
-   "premium"
+  viewedProperties:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Property"
+    }
   ],
-  default:"free"
- },
 
-
- freeContactsRemaining:{
-  type:Number,
-  default:3
- },
-
-
- viewedProperties:[
-  {
-   type:mongoose.Schema.Types.ObjectId,
-   ref:"Property"
+  expiresAt:{
+    type:Date,
+    default:null
   }
- ],
-
-
- expiresAt:{
-  type:Date,
-  default:null
- }
-
 
 },
 

@@ -75,7 +75,7 @@ message:"User not found"
 if(
 
 user.subscription.status==="premium" &&
-
+user.subscription.freeContactsRemaining > 0 &&
 user.subscription.expiresAt > new Date()
 
 ){
@@ -357,7 +357,7 @@ userId,
 
 
 "subscription.freeContactsRemaining":
-10,
+4,
 
 
 "subscription.expiresAt":
