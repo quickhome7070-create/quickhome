@@ -23,16 +23,6 @@ import { useAuth } from "@/src/context/AuthContext";
 
 
 
-declare global {
-
-  interface Window {
-
-    initSendOTP:
-    (config:any)=>void;
-
-  }
-
-}
 
 
 
@@ -388,7 +378,7 @@ return;
 
 
 
-window.initSendOTP({
+window.initSendOTP?.({
 
 widgetId:
 
