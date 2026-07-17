@@ -7,7 +7,8 @@ new mongoose.Schema(
 
 phone:{
     type:String,
-    required:true
+    required:true,
+    index:true
 },
 
 
@@ -19,8 +20,8 @@ verified:{
 
 expiresAt:{
     type:Date,
-    expires:300,
-    default:Date.now
+    default: () => Date.now() + 5 * 60 * 1000,
+    expires: 0
 }
 
 },
@@ -29,7 +30,6 @@ timestamps:true
 }
 
 );
-
 
 
 module.exports =

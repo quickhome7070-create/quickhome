@@ -34,6 +34,21 @@ phone.replace(/\D/g,"");
 
 
 // MSG91 verification succeeded
+
+await OTPVerification.findOneAndUpdate(
+{
+ phone: normalizedPhone
+},
+{
+ verified:true,
+ expiresAt:
+ Date.now() + 5 * 60 * 1000
+},
+{
+ upsert:true,
+ new:true
+}
+);
 // Create or find user
 
 let user =
@@ -156,7 +171,10 @@ res.status(500).json({
 message:error.message
 
 });
-
+console.log(
+"OTP SAVING:",
+normalizedPhone
+);
 
 }
 

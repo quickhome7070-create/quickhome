@@ -22,190 +22,190 @@ const isProd = process.env.NODE_ENV === "production";
 
 
 exports.register =
-async(req,res)=>{
+  async (req, res) => {
 
 
-try{
+    try {
 
 
-const {
-name,
-email,
-phone,
-password
-}=req.body;
+      const {
+        name,
+        email,
+        phone,
+        password
+      } = req.body;
 
 
 
 
-if(
-!name ||
-!email ||
-!phone ||
-!password
-){
+      if (
+        !name ||
+        !email ||
+        !phone ||
+        !password
+      ) {
 
-return res.status(400).json({
+        return res.status(400).json({
 
-message:
-"All fields required"
+          message:
+            "All fields required"
 
-});
+        });
 
-}
+      }
 
 
 
 
 
-const normalizedPhone =
-phone.replace(/\D/g,"");
+      const normalizedPhone =
+        phone.replace(/\D/g, "");
 
 
 
 
 
-// Check OTP
+      // Check OTP
 
-const otpVerified =
-await OTPVerification.findOne({
+      const otpVerified =
+        await OTPVerification.findOne({
 
-phone:normalizedPhone,
+          phone: normalizedPhone,
 
-verified:true
+          verified: true
 
-});
+        });
 
 
 
 
 
-if(!otpVerified){
+      if (!otpVerified) {
 
 
-return res.status(403).json({
+        return res.status(403).json({
 
-message:
-"Verify phone first"
+          message:
+            "Verify phone first"
 
-});
+        });
 
 
-}
+      }
 
 
 
 
 
-// Check existing user
+      // Check existing user
 
 
-const exists =
-await User.findOne({
+      const exists =
+        await User.findOne({
 
-$or:[
+          $or: [
 
-{
-email
-},
+            {
+              email
+            },
 
-{
-phone:normalizedPhone
-}
+            {
+              phone: normalizedPhone
+            }
 
-]
+          ]
 
-});
+        });
 
 
 
-if(exists){
+      if (exists) {
 
-return res.status(400).json({
+        return res.status(400).json({
 
-message:
-"User already exists"
+          message:
+            "User already exists"
 
-});
+        });
 
-}
+      }
 
 
 
 
 
-const hash =
-await bcrypt.hash(
-password,
-12
-);
+      const hash =
+        await bcrypt.hash(
+          password,
+          12
+        );
 
 
 
 
 
-const user =
-await User.create({
+      const user =
+        await User.create({
 
-name,
+          name,
 
-email,
+          email,
 
-phone:normalizedPhone,
+          phone: normalizedPhone,
 
-password:hash,
+          password: hash,
 
 
-isPhoneVerified:true,
+          isPhoneVerified: true,
 
 
-authMethods:[
-"otp",
-"password"
-]
+          authMethods: [
+            "otp",
+            "password"
+          ]
 
-});
+        });
 
 
 
 
 
-// delete OTP session
+      // delete OTP session
 
-await OTPVerification.deleteOne({
+      await OTPVerification.deleteOne({
 
-_id:
-otpVerified._id
+        _id:
+          otpVerified._id
 
-});
+      });
 
 
 
 
 
-// JWT
+      // JWT
 
 
-const token =
-jwt.sign(
+      const token =
+        jwt.sign(
 
-{
+          {
 
-userId:user._id,
+            userId: user._id,
 
-role:user.role
+            role: user.role
 
-},
+          },
 
-process.env.JWT_SECRET,
+          process.env.JWT_SECRET,
 
-{
+          {
 
-expiresIn:"7d"
+            expiresIn: "7d"
 
-}
+          }
 
-);
+        );
 
 
 
@@ -216,74 +216,74 @@ expiresIn:"7d"
 
 
 
-res.cookie(
-"token",
-token,
-{
+      res.cookie(
+        "token",
+        token,
+        {
 
-httpOnly:true,
+          httpOnly: true,
 
-secure:isProd,
+          secure: isProd,
 
-sameSite:
-isProd
-?
-"none"
-:
-"lax",
+          sameSite:
+            isProd
+              ?
+              "none"
+              :
+              "lax",
 
-maxAge:
-7*24*60*60*1000
+          maxAge:
+            7 * 24 * 60 * 60 * 1000
 
-}
+        }
 
-);
+      );
 
 
 
 
 
-return res.status(201).json({
+      return res.status(201).json({
 
-message:
-"Registration successful",
+        message:
+          "Registration successful",
 
 
-user:{
+        user: {
 
-id:user._id,
+          id: user._id,
 
-name:user.name,
+          name: user.name,
 
-phone:user.phone,
+          phone: user.phone,
 
-email:user.email,
+          email: user.email,
 
-role:user.role
+          role: user.role
 
-}
+        }
 
-});
+      });
 
 
-}
-catch(error){
+    }
+    catch (error) {
 
 
-console.log(error);
+      console.log(error);
 
 
-return res.status(500).json({
+      return res.status(500).json({
 
-message:error.message
+        message: error.message
 
-});
+      });
 
 
-}
+    }
 
 
-};
+  };
 
 
 
