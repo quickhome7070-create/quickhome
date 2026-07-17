@@ -28,41 +28,41 @@ useEffect(()=>{
   }
 
 
- if (
-  user.subscription?.status === "premium" &&
-  user.subscription?.freeContactsRemaining > 0 &&
-  new Date(user.subscription.expiresAt) > new Date()
-) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-green-100 p-8 rounded-xl text-center">
+//  if (
+//   user.subscription?.status === "premium" &&
+//   user.subscription?.freeContactsRemaining > 0 &&
+//   new Date(user.subscription.expiresAt) > new Date()
+// ) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         <div className="bg-green-100 p-8 rounded-xl text-center">
 
-          <h1 className="text-2xl font-bold text-green-700">
-            🎉 Premium Active
-          </h1>
+//           <h1 className="text-2xl font-bold text-green-700">
+//             🎉 Premium Active
+//           </h1>
 
-          <p className="mt-3">
-            You already have premium access.
-          </p>
+//           <p className="mt-3">
+//             You already have premium access.
+//           </p>
 
-          <p>
-            Contacts Remaining:
-            {" "}
-            {user.subscription.premiumContactsRemaining}
-          </p>
+//           <p>
+//             Contacts Remaining:
+//             {" "}
+//             {user.subscription.premiumContactsRemaining}
+//           </p>
 
-          <p>
-            Valid Till:
-            {" "}
-            {new Date(
-              user.subscription.expiresAt
-            ).toLocaleDateString()}
-          </p>
+//           <p>
+//             Valid Till:
+//             {" "}
+//             {new Date(
+//               user.subscription.expiresAt
+//             ).toLocaleDateString()}
+//           </p>
 
-        </div>
-      </div>
-    );
-  }
+//         </div>
+//       </div>
+//     );
+//   }
 
 if (
   user.subscription?.status === "premium" &&
