@@ -4,46 +4,33 @@ import {
   createContext,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
 
-import { useRouter } from "next/navigation";
+import { API } from "@/src/lib/api";
 
 
-const AuthContext = createContext<any>(null);
-
-
-const API =
-process.env.NEXT_PUBLIC_API_URL;
+const AuthContext =
+createContext<any>(null);
 
 
 
-export const AuthProvider = ({
+export function AuthProvider({
 children
-}:any)=>{
+}:{
+children:React.ReactNode
+}){
 
 
-const router =
-useRouter();
+const [user,setUser]=useState(null);
 
-
-
-const [user,setUser] =
-useState<any>(null);
-
-
-
-const [loading,setLoading] =
-useState(true);
+const [loading,setLoading]=useState(true);
 
 
 
 
 
-useEffect(()=>{
-
-
-const loadUser = async()=>{
+const fetchUser = async()=>{
 
 
 try{
@@ -51,23 +38,15 @@ try{
 
 const res =
 await fetch(
-`${API}/auth/me`,
+API.me,
 {
-credentials:"include",
+credentials:"include"
 }
 );
 
 
-
 const data =
 await res.json();
-
-
-
-console.log(
-"AUTH ME RESPONSE:",
-data
-);
 
 
 
@@ -83,19 +62,14 @@ setUser(null);
 }
 
 
-
 }
 catch(error){
 
-console.log(
-"AUTH ERROR:",
-error
-);
+console.log(error);
 
 setUser(null);
 
 }
-
 
 finally{
 
@@ -108,12 +82,13 @@ setLoading(false);
 
 
 
-loadUser();
 
 
+useEffect(()=>{
+
+fetchUser();
 
 },[]);
-
 
 
 
@@ -122,33 +97,22 @@ loadUser();
 const logout = async()=>{
 
 
-try{
-
-
 await fetch(
-`${API}/auth/logout`,
+
+API.logout,
+
 {
+
 method:"POST",
-credentials:"include",
+
+credentials:"include"
+
 }
+
 );
 
 
-
 setUser(null);
-
-
-router.push("/login");
-
-
-
-}
-catch(error){
-
-console.log(error);
-
-}
-
 
 
 };
@@ -159,32 +123,41 @@ console.log(error);
 return (
 
 <AuthContext.Provider
+
 value={{
 
 user,
 
 setUser,
 
-loading,
+fetchUser,
 
 logout,
 
-
+loading
 
 }}
+
 >
+
 
 {children}
 
+
 </AuthContext.Provider>
+
 
 );
 
 
-};
+}
 
 
 
 
-export const useAuth =
-()=>useContext(AuthContext);
+
+export function useAuth(){
+
+return useContext(AuthContext);
+
+}

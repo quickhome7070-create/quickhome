@@ -1,79 +1,291 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
+
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
+
+
+const User =
+require("../models/User");
+
+
+const bcrypt =
+require("bcryptjs");
+
+
+const jwt =
+require("jsonwebtoken");
+
+
+const OTPVerification =
+require("../models/OTPVerification");
+
 const isProd = process.env.NODE_ENV === "production";
 
-// REGISTER
-exports.register = async (req, res) => {
-  try {
-    const { name, email, password, phone } = req.body;
 
-    // Check required fields
-   // Check required fields
-if (!name || !email || !password) {
-  return res.status(400).json({ message: "All fields required" });
+
+exports.register =
+async(req,res)=>{
+
+
+try{
+
+
+const {
+name,
+email,
+phone,
+password
+}=req.body;
+
+
+
+
+if(
+!name ||
+!email ||
+!phone ||
+!password
+){
+
+return res.status(400).json({
+
+message:
+"All fields required"
+
+});
+
 }
 
-// Empty password not allowed
-if (!password || password.trim() === "") {
-  return res.status(400).json({
-    message: "Password is required",
-  });
+
+
+
+
+const normalizedPhone =
+phone.replace(/\D/g,"");
+
+
+
+
+
+// Check OTP
+
+const otpVerified =
+await OTPVerification.findOne({
+
+phone:normalizedPhone,
+
+verified:true
+
+});
+
+
+
+
+
+if(!otpVerified){
+
+
+return res.status(403).json({
+
+message:
+"Verify phone first"
+
+});
+
+
 }
 
-// Password Rule
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-if (!passwordRegex.test(password)) {
-  return res.status(400).json({
-    message:
-      "Password must be at least 8 characters and include uppercase, lowercase, number and special character",
-  });
+
+
+
+// Check existing user
+
+
+const exists =
+await User.findOne({
+
+$or:[
+
+{
+email
+},
+
+{
+phone:normalizedPhone
 }
 
-    // Check existing user
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+]
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+});
 
-    // Create user
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      phone
-    });
 
-    // Generate JWT
-    const token = jwt.sign(
-      { userId: user._id,
-        role: user.role,
-       },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
 
-    res.status(201).json({
-      message: "User registered successfully",
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      },
-    });
+if(exists){
 
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+return res.status(400).json({
+
+message:
+"User already exists"
+
+});
+
+}
+
+
+
+
+
+const hash =
+await bcrypt.hash(
+password,
+12
+);
+
+
+
+
+
+const user =
+await User.create({
+
+name,
+
+email,
+
+phone:normalizedPhone,
+
+password:hash,
+
+
+isPhoneVerified:true,
+
+
+authMethods:[
+"otp",
+"password"
+]
+
+});
+
+
+
+
+
+// delete OTP session
+
+await OTPVerification.deleteOne({
+
+_id:
+otpVerified._id
+
+});
+
+
+
+
+
+// JWT
+
+
+const token =
+jwt.sign(
+
+{
+
+userId:user._id,
+
+role:user.role
+
+},
+
+process.env.JWT_SECRET,
+
+{
+
+expiresIn:"7d"
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+
+res.cookie(
+"token",
+token,
+{
+
+httpOnly:true,
+
+secure:isProd,
+
+sameSite:
+isProd
+?
+"none"
+:
+"lax",
+
+maxAge:
+7*24*60*60*1000
+
+}
+
+);
+
+
+
+
+
+return res.status(201).json({
+
+message:
+"Registration successful",
+
+
+user:{
+
+id:user._id,
+
+name:user.name,
+
+phone:user.phone,
+
+email:user.email,
+
+role:user.role
+
+}
+
+});
+
+
+}
+catch(error){
+
+
+console.log(error);
+
+
+return res.status(500).json({
+
+message:error.message
+
+});
+
+
+}
+
+
 };
+
+
 
 // LOGIN
 exports.login = async (req, res) => {
@@ -112,7 +324,13 @@ res.cookie("token", token, {
 });
 
 res.json({
-  user,
+  user:{
+    id:user._id,
+    name:user.name,
+    email:user.email,
+    phone:user.phone,
+    role:user.role
+  }
 });
   } catch (error) {
     res.status(500).json({ error: error.message });

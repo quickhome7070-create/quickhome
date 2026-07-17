@@ -1,43 +1,96 @@
 const express = require("express");
+
 const router = express.Router();
 
-const {protect} = require("../middleware/authMiddleware");   // ✅ default import
 
 const {
   register,
   login,
   getMe,
   logout,
-  resetPassword,
   forgotPassword,
-} = require("../controllers/authController");
+  resetPassword
+} =
+require("../controllers/authController");
+
 
 const {
-msg91Verify
-}=require("../controllers/msg91Controller");
+  verifyMSG91OTP
+}
+=
+require("../controllers/otpController");
+
+
 const {
- loginWithMSG91
-}=require("../controllers/otpController");
+  protect
+}
+=
+require("../middleware/authMiddleware");
 
 
 
-// ROUTES
-router.post("/register", register);
-router.post("/login", login);
-
-router.post(
-"/msg91-verify",
-msg91Verify
-);
+// OTP verification
 
 router.post(
- "/msg91-login",
- loginWithMSG91
+"/verify-otp",
+verifyMSG91OTP
 );
 
- router.get("/me", protect, getMe);   // protect must be FUNCTION
-router.post("/forgot-password", forgotPassword);
-router.put("/reset-password/:token", resetPassword);
-router.post("/logout", logout);
+
+
+// Register
+
+router.post(
+"/register",
+register
+);
+
+
+
+// Password login
+
+router.post(
+"/login",
+login
+);
+
+
+
+// Current user
+
+router.get(
+"/me",
+protect,
+getMe
+);
+
+
+
+// Logout
+
+router.post(
+"/logout",
+logout
+);
+
+
+
+// Forgot password
+
+router.post(
+"/forgot-password",
+forgotPassword
+);
+
+
+
+// Reset password
+
+router.put(
+"/reset-password/:token",
+resetPassword
+);
+
+
 
 module.exports = router;

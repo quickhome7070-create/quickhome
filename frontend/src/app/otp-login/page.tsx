@@ -4,17 +4,21 @@
 import {
 useEffect,
 useState
-} from "react";
+}
+from "react";
 
 
 import {
 useRouter
-} from "next/navigation";
+}
+from "next/navigation";
 
 
 import {
 useAuth
-} from "@/src/context/AuthContext";
+}
+from "@/src/context/AuthContext";
+import { API } from "@/src/lib/api";
 
 
 
@@ -27,9 +31,11 @@ const router =
 useRouter();
 
 
+
 const {
-setUser
+fetchUser
 }=useAuth();
+
 
 
 
@@ -45,19 +51,13 @@ useState(false);
 
 
 
-const API =
-process.env.NEXT_PUBLIC_API_URL;
+
 
 
 
 
 
 useEffect(()=>{
-
-
-if(!window)
-return;
-
 
 
 const script =
@@ -71,26 +71,18 @@ script.src =
 script.async=true;
 
 
-
-script.onload=()=>{
-
-
-console.log(
-"MSG91 loaded"
-);
-
-
-};
-
-
-
 document.body.appendChild(script);
 
 
 
+return ()=>{
+
+document.body.removeChild(script);
+
+};
+
+
 },[]);
-
-
 
 
 
@@ -112,34 +104,25 @@ return;
 
 
 
-
 window.initSendOTP({
 
-
 widgetId:
-
 process.env
 .NEXT_PUBLIC_MSG91_WIDGET_ID,
 
 
-
 tokenAuth:
-
 process.env
 .NEXT_PUBLIC_MSG91_TOKEN_AUTH,
 
 
 
 identifier:
-
 phone,
 
 
 
-success:
-
-async(data:any)=>{
-
+success: async(data:any)=>{
 
 console.log(
 "OTP Success",
@@ -147,26 +130,85 @@ data
 );
 
 
+try{
 
-loginUser();
 
+const res =
+await fetch(
+
+API.verifyOTP,
+
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+credentials:"include",
+
+body:JSON.stringify({
+
+phone,
+
+msg91Response:data
+
+})
+
+}
+
+);
+
+
+
+const result =
+await res.json();
+
+
+
+if(!res.ok){
+
+alert(result.message);
+
+return;
+
+}
+
+
+
+// refresh logged-in user
+
+await fetchUser();
+
+
+
+router.push("/");
+
+
+}
+catch(error:any){
+
+console.log(
+error
+);
+
+alert(
+"OTP login failed"
+);
+
+}
 
 
 },
 
+failure: (error: any) => {
 
+  console.log(error);
 
-
-failure:(error:any)=>{
-
-
-console.log(error);
-
-
-alert(
-"OTP verification failed"
-);
-
+  alert(
+    "OTP verification failed"
+  );
 
 }
 
@@ -175,7 +217,6 @@ alert(
 });
 
 
-
 };
 
 
@@ -183,109 +224,6 @@ alert(
 
 
 
-
-const loginUser =
-async()=>{
-
-
-try{
-
-
-setLoading(true);
-
-
-
-const res =
-await fetch(
-
-`${API}/auth/msg91-login`,
-
-{
-
-
-method:"POST",
-
-
-credentials:"include",
-
-
-headers:{
-
-
-"Content-Type":
-"application/json"
-
-},
-
-
-body:JSON.stringify({
-
-phone
-
-})
-
-
-}
-
-);
-
-
-
-
-const data =
-await res.json();
-
-
-
-if(res.ok){
-
-
-setUser(
-data.user
-);
-
-
-router.push("/");
-
-
-}
-
-else{
-
-
-alert(
-data.message
-);
-
-
-}
-
-
-
-
-}
-
-catch(error){
-
-
-alert(
-"Login failed"
-);
-
-
-}
-
-finally{
-
-
-setLoading(false);
-
-
-}
-
-
-
-};
 
 
 
@@ -308,7 +246,7 @@ bg-gray-100
 bg-white
 p-8
 rounded-xl
-shadow-lg
+shadow-xl
 w-full
 max-w-md
 ">
@@ -330,29 +268,23 @@ Login With OTP
 
 <input
 
+value={phone}
+
+onChange={
+e=>setPhone(e.target.value)
+}
+
+
+placeholder="Mobile number"
+
 
 className="
-border
 w-full
+border
 p-3
 rounded-lg
 mb-4
 "
-
-
-
-placeholder="Enter mobile number"
-
-
-value={phone}
-
-
-
-onChange={
-e=>
-setPhone(e.target.value)
-}
-
 
 />
 
@@ -360,12 +292,9 @@ setPhone(e.target.value)
 
 <button
 
-
-disabled={loading}
-
-
 onClick={startOTP}
 
+disabled={loading}
 
 
 className="
@@ -374,12 +303,10 @@ bg-orange-500
 text-white
 py-3
 rounded-lg
-font-semibold
 "
 
 
 >
-
 
 {
 loading
@@ -396,12 +323,9 @@ loading
 
 </div>
 
-
 </div>
 
-
 );
-
 
 
 }

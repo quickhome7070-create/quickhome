@@ -77,7 +77,7 @@ export default function Header() {
         href="/addproperty"
         className="hover:text-black transition-all duration-300"
       >
-        + Post Property
+        Post Property
       </Link>
 
       <Link
@@ -87,13 +87,19 @@ export default function Header() {
         My Property
       </Link>
 
-      <Link
-        href="/"
-        onClick={logout}
-        className="text-red-600 hover:text-red-700 transition-all duration-300"
-      >
-        Logout
-      </Link>
+      <button
+onClick={async()=>{
+
+await logout();
+
+window.location.href="/";
+
+}}
+
+className="text-red-600"
+>
+Logout
+</button>
     </>
   )}
 </nav>
