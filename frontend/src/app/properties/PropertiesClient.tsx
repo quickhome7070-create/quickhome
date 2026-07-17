@@ -4,7 +4,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Property = {
@@ -69,7 +69,19 @@ export default function PropertiesClient({
 
   const router = useRouter();
 
-  const properties = initialProperties;
+  const [properties, setProperties] =
+  useState<Property[]>(initialProperties);
+
+const [page, setPage] =
+  useState(1);
+
+const [loadingMore, setLoadingMore] =
+  useState(false);
+
+const [hasMore, setHasMore] =
+  useState(true);
+
+const loaderRef = useRef<HTMLDivElement | null>(null);
 
  const [propertyType, setPropertyType] =
   useState(
@@ -147,6 +159,57 @@ const [bhkType, setBhkType] =
   );
 
 }, [searchParams]);
+
+useEffect(()=>{
+
+
+const observer =
+new IntersectionObserver(
+(entries)=>{
+
+
+if(entries[0].isIntersecting){
+
+loadMoreProperties();
+
+}
+
+
+},
+{
+threshold:1
+}
+);
+
+
+
+if(loaderRef.current){
+
+observer.observe(
+loaderRef.current
+);
+
+}
+
+
+
+return ()=>{
+
+if(loaderRef.current){
+
+observer.unobserve(
+loaderRef.current
+);
+
+}
+
+};
+
+
+},[
+page,
+loadingMore
+]);
 
   const handlePropertyTypeChange = (
     value: string
@@ -246,6 +309,75 @@ const [bhkType, setBhkType] =
       `/properties?${query.toString()}`
     );
   };
+
+  const loadMoreProperties = async () => {
+
+  if(loadingMore || !hasMore)
+    return;
+
+
+  try {
+
+    setLoadingMore(true);
+
+
+    const nextPage = page + 1;
+
+
+    const res =
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/property?page=${nextPage}&limit=6`,
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    const data =
+      await res.json();
+
+
+    if(data.properties.length === 0){
+
+      setHasMore(false);
+
+      return;
+
+    }
+
+
+    setProperties(prev => [
+      ...prev,
+      ...data.properties
+    ]);
+
+
+    setPage(nextPage);
+
+
+    if(nextPage >= data.pages){
+
+      setHasMore(false);
+
+    }
+
+
+  }
+  catch(error){
+
+    console.log(
+      "LOAD MORE ERROR",
+      error
+    );
+
+  }
+  finally{
+
+    setLoadingMore(false);
+
+  }
+
+};
 
   return (
     <div>
@@ -642,6 +774,32 @@ const [bhkType, setBhkType] =
         ))}
 
       </div>
+
+      <div
+ref={loaderRef}
+className="py-10 text-center"
+>
+
+{
+loadingMore &&
+(
+<p>
+Loading more properties...
+</p>
+)
+}
+
+
+{
+!hasMore &&
+(
+<p>
+No more properties
+</p>
+)
+}
+
+</div>
 
     </div>
   );
