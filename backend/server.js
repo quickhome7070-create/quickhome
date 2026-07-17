@@ -113,6 +113,10 @@ require("./routes/authRoutes")
 );
 
 
+app.use(
+  "/api/payment",
+  require("./routes/paymentRoutes")
+);
 
 app.use(
 "/api/property",

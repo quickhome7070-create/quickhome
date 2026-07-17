@@ -8,7 +8,8 @@ express.Router();
 
 const {
 createOrder,
-cashfreeWebhook
+cashfreeWebhook,
+verifyPayment
 
 }=require("../controllers/paymentController");
 
@@ -28,6 +29,11 @@ protect,
 createOrder
 );
 
+router.post(
+"/verify",
+protect,
+verifyPayment
+);
 
 
 // Cashfree webhook
