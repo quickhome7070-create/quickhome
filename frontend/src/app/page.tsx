@@ -3,7 +3,6 @@
 import PropertiesClient from "./properties/PropertiesClient";
 
 async function getProperties() {
-
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/property`,
     {
@@ -13,16 +12,17 @@ async function getProperties() {
     }
   );
 
-  const data =
-    await res.json();
+  const data = await res.json();
 
-  return data.properties || [];
+  return {
+    properties: data.properties || [],
+    total: data.total || 0,
+  };
 }
 
 export default async function HomePage() {
 
-  const properties =
-    await getProperties();
+const { properties, total } = await getProperties();
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -35,6 +35,8 @@ export default async function HomePage() {
 
         <PropertiesClient
   initialProperties={properties}
+  totalProperties={total}
+
   searchParams={{}}
 />
 
