@@ -1,56 +1,24 @@
-const express =
-require("express");
+const express = require("express");
 
-
-const router =
-express.Router();
+const router = express.Router();
 
 
 const {
-createOrder,
-cashfreeWebhook,
-verifyPayment
-
-}=require("../controllers/paymentController");
+  protect
+} = require("../middleware/authMiddleware");
 
 
 const {
-protect
-}=require("../middleware/authMiddleware");
+  createOrder
+} = require("../controllers/paymentController");
 
 
-
-
-// Create payment
 
 router.post(
-"/create-order",
-protect,
-createOrder
-);
-
-router.post(
-"/verify",
-protect,
-verifyPayment
+  "/create-order",
+  protect,
+  createOrder
 );
 
 
-// Cashfree webhook
-
-router.post(
-
-"/cashfree-webhook",
-
-express.raw({
-type:"application/json"
-}),
-
-cashfreeWebhook
-
-);
-
-
-
-module.exports =
-router;
+module.exports = router;

@@ -10,6 +10,9 @@ require("express");
 const cors =
 require("cors");
 
+const {
+  cashfreeWebhook
+} = require("./controllers/paymentController");
 
 const helmet =
 require("helmet");
@@ -71,6 +74,14 @@ credentials:true
 );
 
 
+// CASHFREE WEBHOOK FIRST
+app.post(
+"/api/payment/cashfree-webhook",
+express.raw({
+ type:"application/json"
+}),
+cashfreeWebhook
+);
 
 app.use(
 helmet()
