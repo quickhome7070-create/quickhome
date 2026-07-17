@@ -22,7 +22,7 @@ type Property = {
 
 type Props = {
   initialProperties: Property[];
-
+totalProperties:number;
   searchParams: {
     location?: string;
     minPrice?: string;
@@ -64,6 +64,7 @@ const SHOP_TYPES = [
 
 export default function PropertiesClient({
   initialProperties,
+  totalProperties,
   searchParams,
 }: Props) {
 
@@ -646,6 +647,15 @@ loadingMore
 
   </div>
 
+</div>
+
+<div className="flex justify-end items-center flex-wrap gap-1 mb-5">
+  <span className="text-lg font-bold text-gray-800">
+    {totalProperties}
+  </span>
+  <span className="text-sm text-gray-500">
+    Properties Found
+  </span>
 </div>
 
       {/* PROPERTY GRID */}

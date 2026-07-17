@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import CashfreePaymentButton from "@/src/components/CashfreePaymentButton";
 import { useAuth } from "@/src/context/AuthContext";
-import { useRouter } from "next/navigation";
+
 
 export default function PlansPage() {
-const router = useRouter();
+
 
 const {
 user,
@@ -70,12 +70,6 @@ if (
 ) {
   return (
     <div className="min-h-screen flex items-center justify-center">
-       <button
-        onClick={() => router.back()}
-        className="mb-6 px-5 py-2 rounded-xl bg-white border shadow-sm hover:bg-gray-100 transition"
-      >
-        ← Back
-      </button>
       <div className="bg-red-100 p-8 rounded-xl text-center">
 
         <h1 className="text-2xl font-bold text-red-700">
@@ -100,12 +94,7 @@ if (
 }
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-6">
- <button
-        onClick={() => router.back()}
-        className="mb-6 px-5 py-2 rounded-xl bg-white border shadow-sm hover:bg-gray-100 transition"
-      >
-        ← Back
-      </button>
+
       <h1 className="text-3xl font-bold text-center mb-10">
         Upgrade to Premium 🚀
       </h1>

@@ -115,6 +115,9 @@ export default async function PropertiesPage({
           initialProperties={
             data.properties || []
           }
+            totalProperties={
+    data.total || 0
+  }
           searchParams={params}
         />
 
