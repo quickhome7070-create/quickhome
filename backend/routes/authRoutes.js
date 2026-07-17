@@ -12,7 +12,11 @@ const {
   resetPassword
 } =
 require("../controllers/authController");
-
+const {
+ loginWithOTP
+}
+=
+require("../controllers/otpLoginController");
 
 const {
   verifyMSG91OTP
@@ -54,7 +58,10 @@ router.post(
 login
 );
 
-
+router.post(
+"/otp-login",
+loginWithOTP
+);
 
 // Current user
 

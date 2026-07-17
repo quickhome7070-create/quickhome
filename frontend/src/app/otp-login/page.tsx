@@ -1,331 +1,420 @@
 "use client";
 
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
-useEffect,
-useState
-}
-from "react";
-
+  useRouter,
+} from "next/navigation";
 
 import {
-useRouter
-}
-from "next/navigation";
-
+  useAuth,
+} from "@/src/context/AuthContext";
 
 import {
-useAuth
-}
-from "@/src/context/AuthContext";
-import { API } from "@/src/lib/api";
+  API,
+} from "@/src/lib/api";
 
 
 
 
-export default function OTPLogin(){
+export default function OTPLogin() {
 
+  const router = useRouter();
 
+  const {
+    fetchUser,
+  } = useAuth();
 
-const router =
-useRouter();
 
+  const [phone, setPhone] =
+    useState("");
 
+  const [loading, setLoading] =
+    useState(false);
 
-const {
-fetchUser
-}=useAuth();
 
 
+  useEffect(() => {
 
+    const script =
+      document.createElement("script");
 
-const [phone,setPhone]
-=
-useState("");
 
+    script.src =
+      "https://verify.msg91.com/otp-provider.js";
 
 
-const [loading,setLoading]
-=
-useState(false);
+    script.async = true;
 
 
+    document.body.appendChild(script);
 
 
 
+    return () => {
 
+      document.body.removeChild(script);
 
+    };
 
 
-useEffect(()=>{
+  }, []);
 
 
-const script =
-document.createElement("script");
 
 
-script.src =
-"https://verify.msg91.com/otp-provider.js";
 
+  const loginUser = async () => {
 
-script.async=true;
+    try {
 
 
-document.body.appendChild(script);
+      const res =
+        await fetch(
+          API.otpLogin,
+          {
+            method:"POST",
 
+            credentials:"include",
 
+            headers:{
+              "Content-Type":
+              "application/json",
+            },
 
-return ()=>{
+            body:JSON.stringify({
+              phone,
+            }),
 
-document.body.removeChild(script);
+          }
+        );
 
-};
 
 
-},[]);
+      const data =
+        await res.json();
 
 
 
+      if(!res.ok){
 
+        alert(data.message);
 
-const startOTP = ()=>{
+        return false;
 
+      }
 
-if(phone.length!==10){
 
-alert(
-"Enter valid mobile number"
-);
 
-return;
+      // Update AuthContext
 
-}
+      await fetchUser();
 
 
+      return true;
 
 
-window.initSendOTP({
 
-widgetId:
-process.env
-.NEXT_PUBLIC_MSG91_WIDGET_ID,
+    }
+    catch(error){
 
+      console.log(
+        "OTP LOGIN ERROR",
+        error
+      );
 
-tokenAuth:
-process.env
-.NEXT_PUBLIC_MSG91_TOKEN_AUTH,
+      return false;
 
+    }
 
+  };
 
-identifier:
-phone,
 
 
 
-success: async(data:any)=>{
 
-console.log(
-"OTP Success",
-data
-);
 
 
-try{
+  const startOTP = () => {
 
 
-const res =
-await fetch(
+    if(phone.length !== 10){
 
-API.verifyOTP,
+      alert(
+        "Enter valid 10 digit mobile number"
+      );
 
-{
+      return;
 
-method:"POST",
+    }
 
-headers:{
-"Content-Type":"application/json"
-},
 
-credentials:"include",
 
-body:JSON.stringify({
+    if(!window.initSendOTP){
 
-phone,
+      alert(
+        "MSG91 not loaded"
+      );
 
-msg91Response:data
+      return;
 
-})
+    }
 
-}
 
-);
 
 
+    window.initSendOTP({
 
-const result =
-await res.json();
+      widgetId:
+      process.env.NEXT_PUBLIC_MSG91_WIDGET_ID,
 
 
+      tokenAuth:
+      process.env.NEXT_PUBLIC_MSG91_TOKEN_AUTH,
 
-if(!res.ok){
 
-alert(result.message);
+      identifier:
+      phone,
 
-return;
 
-}
 
+      success: async(data:any)=>{
 
 
-// refresh logged-in user
+        console.log(
+          "MSG91 Success",
+          data
+        );
 
-await fetchUser();
 
+        try{
 
 
-router.push("/");
+          setLoading(true);
 
 
-}
-catch(error:any){
 
-console.log(
-error
-);
+          // Step 1: Verify OTP
 
-alert(
-"OTP login failed"
-);
+          const verifyRes =
+            await fetch(
+              API.verifyOTP,
+              {
 
-}
+                method:"POST",
 
+                credentials:"include",
 
-},
+                headers:{
+                  "Content-Type":
+                  "application/json",
+                },
 
-failure: (error: any) => {
+                body:JSON.stringify({
 
-  console.log(error);
+                  phone,
 
-  alert(
-    "OTP verification failed"
+                  msg91Response:data,
+
+                }),
+
+              }
+            );
+
+
+
+          const verifyData =
+            await verifyRes.json();
+
+
+
+          if(!verifyRes.ok){
+
+            alert(
+              verifyData.message
+            );
+
+            return;
+
+          }
+
+
+
+
+
+          // Step 2: Login user
+
+          const loggedIn =
+            await loginUser();
+
+
+
+          if(loggedIn){
+
+            router.push("/");
+
+          }
+
+
+
+        }
+        catch(error){
+
+          console.log(
+            error
+          );
+
+          alert(
+            "Login failed"
+          );
+
+
+        }
+        finally{
+
+          setLoading(false);
+
+        }
+
+
+      },
+
+
+
+      failure:(error:any)=>{
+
+
+        console.log(
+          "MSG91 ERROR",
+          error
+        );
+
+
+        alert(
+          "OTP verification failed"
+        );
+
+
+      }
+
+
+    });
+
+
+  };
+
+
+
+
+
+
+
+  return (
+
+    <div className="
+    min-h-screen
+    flex
+    items-center
+    justify-center
+    bg-gray-100
+    px-4
+    ">
+
+
+      <div className="
+      bg-white
+      p-8
+      rounded-xl
+      shadow-xl
+      w-full
+      max-w-md
+      ">
+
+
+        <h1 className="
+        text-3xl
+        font-bold
+        text-center
+        mb-6
+        ">
+
+          Login With OTP
+
+        </h1>
+
+
+
+
+        <input
+
+          value={phone}
+
+          onChange={(e)=>
+            setPhone(e.target.value.replace(/\D/g,""))
+          }
+
+
+          maxLength={10}
+
+
+          placeholder="Enter mobile number"
+
+
+          className="
+          w-full
+          border
+          p-3
+          rounded-lg
+          mb-4
+          "
+
+        />
+
+
+
+
+
+        <button
+
+          onClick={startOTP}
+
+          disabled={loading}
+
+
+          className="
+          w-full
+          bg-orange-500
+          hover:bg-orange-600
+          text-white
+          py-3
+          rounded-lg
+          font-semibold
+          disabled:opacity-50
+          "
+
+        >
+
+          {
+            loading
+            ?
+            "Please wait..."
+            :
+            "Send OTP"
+          }
+
+
+        </button>
+
+
+
+      </div>
+
+
+    </div>
+
   );
-
-}
-
-
-
-});
-
-
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-return (
-
-<div className="
-min-h-screen
-flex
-items-center
-justify-center
-bg-gray-100
-">
-
-
-<div className="
-bg-white
-p-8
-rounded-xl
-shadow-xl
-w-full
-max-w-md
-">
-
-
-<h1 className="
-text-3xl
-font-bold
-text-center
-mb-6
-">
-
-Login With OTP
-
-</h1>
-
-
-
-
-<input
-
-value={phone}
-
-onChange={
-e=>setPhone(e.target.value)
-}
-
-
-placeholder="Mobile number"
-
-
-className="
-w-full
-border
-p-3
-rounded-lg
-mb-4
-"
-
-/>
-
-
-
-<button
-
-onClick={startOTP}
-
-disabled={loading}
-
-
-className="
-w-full
-bg-orange-500
-text-white
-py-3
-rounded-lg
-"
-
-
->
-
-{
-loading
-?
-"Please wait..."
-:
-"Send OTP"
-}
-
-
-</button>
-
-
-
-</div>
-
-</div>
-
-);
-
 
 }
