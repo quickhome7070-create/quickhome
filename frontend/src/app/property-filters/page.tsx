@@ -202,304 +202,172 @@ export default function PropertyFiltersPage() {
     setSort("");
   };
 
-  return (
+return (
+  <div className="min-h-screen bg-[#f8fafc] pb-28">
 
-    <div className="min-h-screen bg-gray-50 p-4 space-y-5">
-
-      {/* CITY */}
-      <input
-        type="text"
-        placeholder="Search City"
-        value={location}
-        onChange={(e) =>
-          setLocation(e.target.value)
-        }
-        className="w-full h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-      />
-
-      {/* BUY / RENT */}
-      <div className="grid grid-cols-2 gap-3">
-
-        {["buy", "rent"].map((type) => (
-
-          <button
-            key={type}
-            type="button"
-            onClick={() =>
-              setListingType(type)
-            }
-            className={`h-12 rounded-2xl text-sm font-medium border transition ${
-              listingType === type
-                ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                : "bg-white text-gray-700 border-gray-200"
-            }`}
-          >
-            {type === "buy"
-              ? "Buy"
-              : "Rent"}
-          </button>
-
-        ))}
-
-      </div>
-
-      {/* PROPERTY TYPES */}
-      <div
-        className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-      >
-
-        {propertyTabs.map((item) => {
-
-          const Icon = item.icon;
-
-          return (
-
-            <button
-              key={item.name}
-              type="button"
-              onClick={() =>
-                handlePropertyType(
-                  item.name
-                )
-              }
-              className={`flex flex-col items-center justify-center min-w-[100px] h-24 px-4 rounded-2xl border transition ${
-                propertyType === item.name
-                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                  : "bg-white text-gray-700 border-gray-200"
-              }`}
-            >
-              <Icon size={22} />
-
-              <span className="mt-2 text-xs text-center">
-                {item.name}
-              </span>
-            </button>
-
-          );
-        })}
-
-      </div>
-
-      {/* DYNAMIC FILTERS */}
-      {["Flat", "House"].includes(
-        propertyType
-      ) && (
-
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide">
-
-          {BHK_TYPES.map((bhk) => (
-
-            <button
-              key={bhk}
-              type="button"
-              onClick={() =>
-                setBhkType(bhk)
-              }
-              className={`px-5 h-12 rounded-2xl text-sm font-medium border whitespace-nowrap transition ${
-                bhkType === bhk
-                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                  : "bg-white text-gray-700 border-gray-200"
-              }`}
-            >
-              {bhk}
-            </button>
-
-          ))}
-
-        </div>
-
-      )}
-
-      {propertyType === "Plot" && (
-
-        <div className="grid grid-cols-2 gap-3">
-
-          {[
-            "Residential",
-            "Commercial",
-          ].map((type) => (
-
-            <button
-              key={type}
-              type="button"
-              onClick={() =>
-                setPlotType(type)
-              }
-              className={`h-12 rounded-2xl text-sm font-medium border transition ${
-                plotType === type
-                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                  : "bg-white text-gray-700 border-gray-200"
-              }`}
-            >
-              {type}
-            </button>
-
-          ))}
-
-        </div>
-
-      )}
-
-      {propertyType ===
-        "Office Space" && (
-
-        <div className="grid grid-cols-2 gap-3">
-
-          {[
-            "Furnished",
-            "Unfurnished",
-          ].map((type) => (
-
-            <button
-              key={type}
-              type="button"
-              onClick={() =>
-                setFurnishing(type)
-              }
-              className={`h-12 rounded-2xl text-sm font-medium border transition ${
-                furnishing === type
-                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                  : "bg-white text-gray-700 border-gray-200"
-              }`}
-            >
-              {type}
-            </button>
-
-          ))}
-
-        </div>
-
-      )}
-
-      {propertyType === "Shop" && (
-
-        <div
-          className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
+    {/* Header */}
+    <div className="sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-3">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => router.back()}
+          className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-white shadow-sm"
         >
+          ←
+        </button>
 
-          {SHOP_TYPES.map((type) => (
+        <div>
+          <h1 className="text-lg font-bold tracking-tight text-gray-900">
+            Filter Properties
+          </h1>
+          <p className="text-xs text-gray-500">
+            Find homes that match your needs
+          </p>
+        </div>
+      </div>
+    </div>
 
+    <div className="p-4 space-y-6">
+
+      {/* Search city */}
+      <div className="bg-white rounded-3xl border border-gray-200 p-4 shadow-sm">
+        <label className="text-sm font-semibold text-gray-800 mb-2 block">
+          City / Locality
+        </label>
+
+        <input
+          type="text"
+          placeholder="Search city or area"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-full h-12 rounded-2xl border border-gray-200 px-4 text-[15px] outline-none focus:ring-2 focus:ring-orange-400"
+        />
+      </div>
+
+      {/* Buy / Rent */}
+      <div className="bg-white rounded-3xl border border-gray-200 p-4 shadow-sm">
+        <label className="text-sm font-semibold text-gray-800 mb-3 block">
+          Listing Type
+        </label>
+
+        <div className="grid grid-cols-2 gap-3">
+          {["buy", "rent"].map((type) => (
             <button
               key={type}
               type="button"
-              onClick={() =>
-                setShopType(type)
-              }
-              className={`px-5 h-12 rounded-2xl text-sm font-medium border whitespace-nowrap transition ${
-                shopType === type
-                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                  : "bg-white text-gray-700 border-gray-200"
+              onClick={() => setListingType(type)}
+              className={`h-12 rounded-2xl text-sm font-semibold border transition-all ${
+                listingType === type
+                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400 shadow-md"
+                  : "bg-gray-50 text-gray-700 border-gray-200"
               }`}
             >
-              {type}
+              {type === "buy" ? "Buy" : "Rent"}
             </button>
-
           ))}
-
         </div>
-
-      )}
-
-      {/* PRICE */}
-      <div className="grid grid-cols-2 gap-3">
-
-        <input
-          type="number"
-          placeholder="Min Price"
-          value={minPrice}
-          onChange={(e) =>
-            setMinPrice(e.target.value)
-          }
-          className="h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-        />
-
-        <input
-          type="number"
-          placeholder="Max Price"
-          value={maxPrice}
-          onChange={(e) =>
-            setMaxPrice(e.target.value)
-          }
-          className="h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-        />
-
       </div>
 
-      {/* SELLER */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Property types */}
+      <div className="bg-white rounded-3xl border border-gray-200 p-4 shadow-sm">
+        <label className="text-sm font-semibold text-gray-800 mb-3 block">
+          Property Type
+        </label>
 
-        {["owner", "agent"].map((type) => (
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {propertyTabs.map((item) => {
+            const Icon = item.icon;
 
-          <button
-            key={type}
-            type="button"
-            onClick={() =>
-              setSeller(type)
-            }
-            className={`h-12 rounded-2xl text-sm font-medium border transition ${
-              seller === type
-                ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                : "bg-white text-gray-700 border-gray-200"
-            }`}
-          >
-            {type === "owner"
-              ? "Owner"
-              : "Agent"}
-          </button>
-
-        ))}
-
+            return (
+              <button
+                key={item.name}
+                type="button"
+                onClick={() => handlePropertyType(item.name)}
+                className={`flex flex-col items-center justify-center min-w-[96px] h-24 px-3 rounded-2xl border transition-all ${
+                  propertyType === item.name
+                    ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400 shadow-md"
+                    : "bg-gray-50 text-gray-700 border-gray-200"
+                }`}
+              >
+                <Icon size={22} />
+                <span className="mt-2 text-[11px] font-medium text-center leading-tight">
+                  {item.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* SORT */}
-      <select
-        value={sort}
-        onChange={(e) =>
-          setSort(e.target.value)
-        }
-        className="w-full h-12 border border-gray-200 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-      >
-        <option value="">
-          Latest
-        </option>
+      {/* Price */}
+      <div className="bg-white rounded-3xl border border-gray-200 p-4 shadow-sm">
+        <label className="text-sm font-semibold text-gray-800 mb-3 block">
+          Budget
+        </label>
 
-        <option value="priceLow">
-          Price Low → High
-        </option>
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            type="number"
+            placeholder="Min"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            className="h-12 rounded-2xl border border-gray-200 px-4 text-[15px] outline-none focus:ring-2 focus:ring-orange-400"
+          />
 
-        <option value="priceHigh">
-          Price High → Low
-        </option>
+          <input
+            type="number"
+            placeholder="Max"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            className="h-12 rounded-2xl border border-gray-200 px-4 text-[15px] outline-none focus:ring-2 focus:ring-orange-400"
+          />
+        </div>
+      </div>
 
-      </select>
+      {/* Seller */}
+      <div className="bg-white rounded-3xl border border-gray-200 p-4 shadow-sm">
+        <label className="text-sm font-semibold text-gray-800 mb-3 block">
+          Posted By
+        </label>
 
-      {/* BUTTONS */}
-      <div className="grid grid-cols-2 gap-3 pt-2">
+        <div className="grid grid-cols-2 gap-3">
+          {["owner", "agent"].map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setSeller(type)}
+              className={`h-12 rounded-2xl text-sm font-semibold border transition-all ${
+                seller === type
+                  ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400 shadow-md"
+                  : "bg-gray-50 text-gray-700 border-gray-200"
+              }`}
+            >
+              {type === "owner" ? "Owner" : "Agent"}
+            </button>
+          ))}
+        </div>
+      </div>
 
+    </div>
+
+    {/* Sticky bottom actions */}
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-area-pb shadow-[0_-6px_24px_rgba(15,23,42,0.08)]">
+      <div className="flex gap-3">
         <button
           onClick={clearFilters}
-          className="h-12 border border-gray-300 rounded-2xl font-medium bg-white"
+          className="flex-1 h-12 rounded-2xl border border-gray-300 bg-white text-gray-700 font-semibold active:scale-[0.98] transition"
         >
           Reset
         </button>
 
         <button
           onClick={applyFilters}
-          className="h-12 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white rounded-2xl font-medium shadow-md"
+          className="flex-1 h-12 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white font-semibold shadow-md active:scale-[0.98] transition"
         >
-          Search
+          Show Results
         </button>
-
       </div>
-
     </div>
-  );
+
+  </div>
+);
 }
