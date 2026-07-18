@@ -135,6 +135,10 @@ require("./routes/propertyRoutes")
 );
 
 
+app.use(
+  "/api/admin",
+  require("./routes/adminRoutes")
+);
 
 app.use(
 "/api/user",
