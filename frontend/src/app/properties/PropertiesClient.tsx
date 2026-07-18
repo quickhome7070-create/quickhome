@@ -311,68 +311,57 @@ loadingMore
     );
   };
 
-  const loadMoreProperties = async () => {
+ const loadMoreProperties = async () => {
 
-  if(loadingMore || !hasMore)
-    return;
-
+  if (loadingMore || !hasMore) return;
 
   try {
 
     setLoadingMore(true);
 
-
     const nextPage = page + 1;
 
+    const query = new URLSearchParams();
 
-    const res =
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/property?page=${nextPage}&limit=6`,
-        {
-          cache:"no-store"
-        }
-      );
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value) {
+        query.append(key, String(value));
+      }
+    });
 
+    query.set("page", String(nextPage));
+    query.set("limit", "6");
 
-    const data =
-      await res.json();
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`,
+      {
+        cache: "no-store",
+      }
+    );
 
+    const data = await res.json();
 
-    if(data.properties.length === 0){
-
+    if (data.properties.length === 0) {
       setHasMore(false);
-
       return;
-
     }
 
-
-    setProperties(prev => [
+    setProperties((prev) => [
       ...prev,
-      ...data.properties
+      ...data.properties,
     ]);
-
 
     setPage(nextPage);
 
-
-    if(nextPage >= data.pages){
-
+    if (nextPage >= data.pages) {
       setHasMore(false);
-
     }
 
+  } catch (error) {
 
-  }
-  catch(error){
+    console.log("LOAD MORE ERROR", error);
 
-    console.log(
-      "LOAD MORE ERROR",
-      error
-    );
-
-  }
-  finally{
+  } finally {
 
     setLoadingMore(false);
 
