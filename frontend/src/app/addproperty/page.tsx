@@ -1,6 +1,7 @@
 "use client";
 
 import Loader from "@/src/components/Loader";
+import LocationSearch from "@/src/components/LocationSearch";
 import { useState } from "react";
 
 const PROPERTY_TYPES = [
@@ -30,7 +31,11 @@ const SHOP_TYPES = [
 const initialForm = {
   title: "",
   price: "",
+
+  city: "",
+  locality: "",
   location: "",
+
   description: "",
   listingType: "buy",
   propertyType: "",
@@ -44,7 +49,11 @@ const initialForm = {
 const initialErrors = {
   title: "",
   price: "",
+
+  city: "",
+  locality: "",
   location: "",
+
   description: "",
   seller: "",
   propertyType: "",
@@ -143,12 +152,16 @@ export default function AddProperty() {
       isValid = false;
     }
 
-    if (!form.location.trim()) {
-      newErrors.location =
-        "Location is required";
-      isValid = false;
-    }
+   if (!form.city.trim()) {
+  newErrors.city="Select city";
+  isValid=false;
+}
 
+
+if (!form.locality.trim()) {
+  newErrors.locality="Select locality";
+  isValid=false;
+}
     if (!form.description.trim()) {
       newErrors.description =
         "Description is required";
@@ -218,6 +231,7 @@ export default function AddProperty() {
   };
 
   const handleSubmit = async (
+    
     e: React.FormEvent
   ) => {
     e.preventDefault();
@@ -258,6 +272,7 @@ export default function AddProperty() {
       if (!res.ok) {
         throw new Error(data.message);
       }
+      console.log(form);
 
       alert("Property Added");
 
@@ -328,14 +343,24 @@ export default function AddProperty() {
 
         {/* LOCATION */}
         <div>
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            value={form.location}
-            onChange={handleChange}
-            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-          />
+   <LocationSearch
+  city={form.city}
+  locality={form.locality}
+  onSelect={({ city, locality }) => {
+    setForm((prev) => ({
+      ...prev,
+      city,
+      locality,
+      location: `${locality}, ${city}`,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      location: "",
+    }));
+  }}
+/>
+
 
           {errors.location && (
             <p className="text-red-500 text-sm mt-1">

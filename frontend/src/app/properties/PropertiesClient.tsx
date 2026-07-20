@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import LocationSearch from "@/src/components/LocationSearch";
 
 type Property = {
   _id: string;
@@ -23,19 +24,21 @@ type Property = {
 type Props = {
   initialProperties: Property[];
 totalProperties:number;
-  searchParams: {
-    location?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    listingType?: string;
-    sort?: string;
-    propertyType?: string;
-    seller?: string;
-    bhkType?: string;
-    plotType?: string;
-    furnishing?: string;
-    shopType?: string;
-  };
+ searchParams: {
+  city?: string;
+  locality?: string;
+  location?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  listingType?: string;
+  sort?: string;
+  propertyType?: string;
+  seller?: string;
+  bhkType?: string;
+  plotType?: string;
+  furnishing?: string;
+  shopType?: string;
+};
 };
 
 const PROPERTY_TYPES = [
@@ -103,8 +106,14 @@ const [bhkType, setBhkType] =
   const [shopType, setShopType] =
     useState("");
 
-  const [location, setLocation] =
-    useState("");
+  const [city, setCity] = useState(
+  searchParams.city || ""
+);
+
+const [locality, setLocality] = useState(
+  searchParams.locality || ""
+);
+    
 
   const [minPrice, setMinPrice] =
     useState("");
@@ -135,9 +144,13 @@ const [bhkType, setBhkType] =
     searchParams.shopType || ""
   );
 
-  setLocation(
-    searchParams.location || ""
-  );
+ setCity(
+  searchParams.city || ""
+);
+
+setLocality(
+  searchParams.locality || ""
+);
 
   setMinPrice(
     searchParams.minPrice || ""
@@ -225,9 +238,11 @@ loadingMore
   };
 
   const handleSearch = () => {
+    
 
     const query =
       new URLSearchParams();
+      console.log(query.toString());
 
     if (propertyType) {
       query.append(
@@ -264,12 +279,13 @@ loadingMore
       );
     }
 
-    if (location) {
-      query.append(
-        "location",
-        location
-      );
-    }
+   if (city) {
+  query.append("city", city);
+}
+
+if (locality) {
+  query.append("locality", locality);
+}
 
     if (minPrice) {
       query.append(
@@ -540,17 +556,14 @@ loadingMore
     )}
 
     {/* CITY */}
-    <input
-      type="text"
-      placeholder="City"
-      value={location}
-      onChange={(e) =>
-        setLocation(
-          e.target.value
-        )
-      }
-      className="min-w-0 h-11 border rounded-xl px-4 text-sm outline-none focus:ring-2 focus:ring-orange-400"
-    />
+    <LocationSearch
+  city={city}
+  locality={locality}
+  onSelect={({ city, locality }) => {
+    setCity(city);
+    setLocality(locality);
+  }}
+/>
 
     {/* MIN PRICE */}
     <input

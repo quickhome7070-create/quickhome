@@ -5,6 +5,8 @@ import PropertiesClient from "./PropertiesClient";
 type Props = {
   searchParams: Promise<{
     keyword?: string;
+    city?: string;
+    locality?: string;
     location?: string;
     minPrice?: string;
     maxPrice?: string;
@@ -12,6 +14,10 @@ type Props = {
     sort?: string;
     propertyType?: string;
     seller?: string;
+    bhkType?: string;
+    plotType?: string;
+    furnishing?: string;
+    shopType?: string;
   }>;
 };
 
@@ -39,6 +45,46 @@ export default async function PropertiesPage({
     );
   }
 
+  if (params.city) {
+  query.append(
+    "city",
+    params.city
+  );
+}
+
+
+if (params.locality) {
+  query.append(
+    "locality",
+    params.locality
+  );
+}
+if (params.plotType) {
+  query.append(
+    "plotType",
+    params.plotType
+  );
+}
+if (params.bhkType) {
+  query.append(
+    "bhkType",
+    params.bhkType
+  );
+}
+
+if (params.furnishing) {
+  query.append(
+    "furnishing",
+    params.furnishing
+  );
+}
+
+if (params.shopType) {
+  query.append(
+    "shopType",
+    params.shopType
+  );
+}
   if (params.propertyType) {
     query.append(
       "propertyType",

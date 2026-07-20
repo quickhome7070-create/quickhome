@@ -4,19 +4,24 @@ const mongoose = require("mongoose");
 // CREATE PROPERTY
 exports.createProperty = async (req, res) => {
   try {
-    const {
-      title,
-      price,
-      location,
-      description,
-      listingType,
-      propertyType,
-      seller,
-       bhkType,
+ const {
+  title,
+  price,
+
+  city,
+  locality,
+  location,
+
+  description,
+  listingType,
+  propertyType,
+  seller,
+  bhkType,
   plotType,
   furnishing,
   shopType,
-    } = req.body;
+
+} = req.body;
 
     const images = req.files
       ? req.files.map((file) => file.path)
@@ -25,7 +30,9 @@ exports.createProperty = async (req, res) => {
     const property = await Property.create({
       title,
       price,
-      location,
+       city,
+  locality,
+  location,
       description,
       listingType,
       images,
@@ -493,12 +500,15 @@ exports.getTrendingProperties = async (req, res) => {
 // GET ALL PROPERTIES (Advanced Search + Filters + Sorting)
 // GET ALL PROPERTIES
 exports.getAllProperties = async (req, res) => {
+  console.log(req.query);
   try {
     
 
     const {
       keyword = "",
       location = "",
+      city="",
+ locality="",
       minPrice = "",
       maxPrice = "",
       listingType = "",
@@ -543,6 +553,25 @@ shopType = "",
         $options: "i",
       };
     }
+
+    if(city.trim()){
+
+query.city={
+$regex:city,
+$options:"i"
+};
+
+}
+
+
+if(locality.trim()){
+
+query.locality={
+$regex:locality,
+$options:"i"
+};
+
+}
 
     // Listing Type
     if (listingType.trim()) {

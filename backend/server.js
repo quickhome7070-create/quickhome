@@ -144,7 +144,10 @@ app.use(
 "/api/user",
 require("./routes/userRoutes")
 );
-
+app.use(
+"/api/location",
+require("./routes/locationRoutes")
+);
 
 
 

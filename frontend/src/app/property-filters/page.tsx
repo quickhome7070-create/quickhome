@@ -31,6 +31,18 @@ export default function PropertyFiltersPage() {
 
   const router = useRouter();
 
+  const [locationText,setLocationText] =
+useState("");
+
+const [locationResults,setLocationResults] =
+useState<any[]>([]);
+
+const [selectedCity,setSelectedCity] =
+useState("");
+
+const [selectedLocality,setSelectedLocality] =
+useState("");
+
   const [propertyType, setPropertyType] =
     useState("");
 
@@ -87,6 +99,60 @@ export default function PropertyFiltersPage() {
     },
   ];
 
+  const searchLocation = async(
+value:string
+)=>{
+
+
+setLocationText(value);
+
+
+if(value.length < 2){
+
+setLocationResults([]);
+
+return;
+
+}
+
+
+
+try{
+
+
+const res =
+await fetch(
+
+`${process.env.NEXT_PUBLIC_API_URL}/location/search?keyword=${value}`
+
+);
+
+
+
+const data =
+await res.json();
+
+
+
+setLocationResults(
+data.locations || []
+);
+
+
+
+}
+catch(error){
+
+console.log(
+"LOCATION SEARCH ERROR",
+error
+);
+
+}
+
+
+};
+
   const handlePropertyType = (
     type: string
   ) => {
@@ -140,12 +206,24 @@ export default function PropertyFiltersPage() {
       );
     }
 
-    if (location.trim()) {
-      params.append(
-        "location",
-        location
-      );
-    }
+   if(selectedCity){
+
+params.append(
+"city",
+selectedCity
+);
+
+}
+
+
+if(selectedLocality){
+
+params.append(
+"locality",
+selectedLocality
+);
+
+}
 
     if (minPrice) {
       params.append(
@@ -234,13 +312,123 @@ return (
           City / Locality
         </label>
 
-        <input
-          type="text"
-          placeholder="Search city or area"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full h-12 rounded-2xl border border-gray-200 px-4 text-[15px] outline-none focus:ring-2 focus:ring-orange-400"
-        />
+       <div className="relative">
+
+
+<input
+
+type="text"
+
+value={locationText}
+
+onChange={(e)=>
+searchLocation(
+e.target.value
+)
+}
+
+placeholder="Search city or locality"
+
+className="
+w-full
+h-12
+border
+rounded-2xl
+px-4
+outline-none
+focus:ring-2
+focus:ring-orange-400
+"
+
+/>
+
+
+
+{
+locationResults.length > 0 && (
+
+<div
+className="
+absolute
+top-14
+left-0
+right-0
+bg-white
+rounded-2xl
+shadow-xl
+border
+z-50
+overflow-hidden
+"
+>
+
+
+{
+locationResults.map((item)=>(
+
+
+<button
+
+key={item._id}
+
+type="button"
+
+onClick={()=>{
+
+
+setLocationText(
+`${item.locality}, ${item.city}`
+);
+
+
+setSelectedCity(
+item.city
+);
+
+
+setSelectedLocality(
+item.locality
+);
+
+
+setLocationResults([]);
+
+
+}}
+
+
+className="
+w-full
+text-left
+px-5
+py-3
+hover:bg-gray-100
+text-sm
+"
+
+>
+
+
+📍 {item.locality}, {item.city}
+
+
+</button>
+
+
+))
+
+}
+
+
+</div>
+
+)
+
+}
+
+
+
+</div>
       </div>
 
       {/* Buy / Rent */}

@@ -55,6 +55,20 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
+   city:{
+  type:String,
+  required:true,
+  index:true
+},
+
+locality:{
+  type:String,
+  required:true,
+  index:true
+},
+
+   
+
     description: {
       type: String,
       default: "",
