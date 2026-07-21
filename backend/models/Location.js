@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
-
 const locationSchema = new mongoose.Schema(
 {
-    type: {
-  type: String,
-  enum: ["city", "locality"],
-  required: true,
-},
+  type: {
+    type: String,
+    enum: ["city", "locality"],
+    required: true,
+  },
+
   country:{
     type:String,
     default:"India",
@@ -28,10 +28,10 @@ const locationSchema = new mongoose.Schema(
 
   locality:{
     type:String,
-    required:true,
+    default:"",
     index:true
   },
-  
+
 },
 {
   timestamps:true
@@ -39,15 +39,14 @@ const locationSchema = new mongoose.Schema(
 );
 
 
-// For autocomplete search
+// autocomplete search
 locationSchema.index({
   city:"text",
   locality:"text"
 });
 
 
-module.exports =
-mongoose.model(
+module.exports = mongoose.model(
 "Location",
 locationSchema
 );

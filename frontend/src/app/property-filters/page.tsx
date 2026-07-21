@@ -377,7 +377,7 @@ onClick={()=>{
 
 
 setLocationText(
-`${item.locality}, ${item.city}`
+`${item.locality} ${item.city}`
 );
 
 
@@ -409,7 +409,7 @@ text-sm
 >
 
 
-📍 {item.locality}, {item.city}
+ {item.locality} {item.city}
 
 
 </button>
