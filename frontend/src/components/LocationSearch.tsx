@@ -143,7 +143,7 @@ hover:bg-gray-100
 
 >
 
-📍 {item.locality}, {item.city}
+{item.locality}, {item.city}
 
 </button>
 

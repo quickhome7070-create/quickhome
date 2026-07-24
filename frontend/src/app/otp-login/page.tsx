@@ -176,8 +176,7 @@ export default function OTPLogin() {
       process.env.NEXT_PUBLIC_MSG91_TOKEN_AUTH,
 
 
-      identifier:
-      phone,
+     identifier: `91${phone}`,
 
 
 
