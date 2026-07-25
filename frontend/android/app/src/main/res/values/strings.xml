@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GharDestiny</string>
+    <string name="title_activity_main">GharDestiny</string>
+    <string name="package_name">com.ghardestiny.app</string>
+    <string name="custom_url_scheme">com.ghardestiny.app</string>
+</resources>

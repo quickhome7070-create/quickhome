@@ -3,12 +3,66 @@
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+
   const { user, logout, loading } = useAuth();
+
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const router = useRouter();
   
-   
+   const deleteAccount = async () => {
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete your account? This action cannot be undone."
+  );
+
+
+  if (!confirmDelete) return;
+
+
+  try {
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/delete-account`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+
+
+    const data = await res.json();
+
+
+    if (res.ok) {
+
+      alert(data.message);
+
+      router.push("/");
+
+      window.location.reload();
+
+    } else {
+
+      alert(data.message || "Failed to delete account");
+
+    }
+
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert("Something went wrong");
+
+  }
+
+};
 
   return (
   <header className="sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 border-b border-orange-200 shadow-md">
@@ -59,19 +113,88 @@ export default function Header() {
 
   {!loading && user && (
     <>
+      <div className="relative">
+
+  <button
+    onClick={() => setSettingsOpen(!settingsOpen)}
+    className="flex items-center gap-2 hover:opacity-80"
+  >
+
+    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold">
+      {user?.name?.charAt(0)?.toUpperCase()}
+    </div>
+
+    <span>
+      {user?.name}
+    </span>
+
+    <span>
+      ▼
+    </span>
+
+  </button>
+
+
+  {settingsOpen && (
+
+    <div className="
+      absolute
+      right-0
+      mt-3
+      w-48
+      bg-white
+      rounded-lg
+      shadow-lg
+      border
+      py-2
+      z-50
+    ">
+
       <Link
         href="/profile"
-        className="flex items-center gap-2 hover:opacity-80 transition-all duration-300"
+        className="
+        block
+        px-4
+        py-2
+        hover:bg-gray-100
+        "
       >
-        <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold">
-          {user?.name?.charAt(0)?.toUpperCase()}
-        </div>
-        
-
-        <span>
-          {user?.name}
-        </span>
+        Profile
       </Link>
+
+
+      <Link
+        href="/settings"
+        className="
+        block
+        px-4
+        py-2
+        hover:bg-gray-100
+        "
+      >
+        Settings
+      </Link>
+
+
+      <button
+        onClick={deleteAccount}
+        className="
+        w-full
+        text-left
+        px-4
+        py-2
+        text-red-600
+        hover:bg-red-50
+        "
+      >
+        Delete Account
+      </button>
+
+    </div>
+
+  )}
+
+</div>
 
       <Link
         href="/addproperty"
@@ -150,6 +273,33 @@ Logout
               <Link href="/my-properties" onClick={() => setMenuOpen(false)}>
                 <div className="py-2 border-b">My Property</div>
               </Link>
+
+              <Link 
+  href="/settings" 
+  onClick={() => setMenuOpen(false)}
+>
+  <div className="py-2 border-b">
+    Settings
+  </div>
+</Link>
+
+
+<button
+  onClick={() => {
+    deleteAccount();
+    setMenuOpen(false);
+  }}
+  className="
+    text-red-600
+    font-semibold
+    py-2
+    border-b
+    w-full
+    text-left
+  "
+>
+  Delete Account
+</button>
 
               <button
                 onClick={() => {

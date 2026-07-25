@@ -9,7 +9,8 @@ const {
   getMe,
   logout,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  deleteAccount
 } =
 require("../controllers/authController");
 const {
@@ -98,6 +99,12 @@ router.put(
 resetPassword
 );
 
+// DELETE ACCOUNT
+router.delete(
+ "/delete-account",
+ protect,
+ deleteAccount
+);
 
 
 module.exports = router;

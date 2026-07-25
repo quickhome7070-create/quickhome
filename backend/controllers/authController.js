@@ -470,3 +470,47 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// DELETE ACCOUNT
+exports.deleteAccount = async (req, res) => {
+  try {
+
+    const userId = req.user.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
+
+
+    // Delete user account
+    await User.findByIdAndDelete(userId);
+
+
+    // Clear JWT cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      ...(isProd && { domain: ".ghardestiny.com" }),
+    });
+
+
+    res.json({
+      message: "Account deleted successfully"
+    });
+
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+};

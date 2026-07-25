@@ -44,3 +44,11 @@ next-env.d.ts
 *.key
 private/
 keys/
+
+# Android build
+android/.gradle
+android/build
+android/app/build
+
+.idea/
+*.iml
