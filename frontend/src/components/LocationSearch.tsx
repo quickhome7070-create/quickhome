@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import { useEffect, useState } from "react";
 
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
   })=>void;
 };
 
+
 export default function LocationSearch({
  city,
  locality,
@@ -19,11 +20,36 @@ export default function LocationSearch({
 }:Props){
 
 
-const [text, setText] = useState(
-  locality && city ? `${locality}, ${city}` : ""
-);
+const [text,setText]=useState("");
 
 const [results,setResults]=useState<any[]>([]);
+
+
+
+/*
+ Sync value when edit page loads
+*/
+useEffect(()=>{
+
+if(locality && city){
+
+setText(`${locality}, ${city}`);
+
+}
+else if(locality){
+
+setText(locality);
+
+}
+else{
+
+setText("");
+
+}
+
+},[locality,city]);
+
+
 
 
 
@@ -33,7 +59,8 @@ const search=async(value:string)=>{
 setText(value);
 
 
-if(value.length<2){
+
+if(value.length < 2){
 
 setResults([]);
 
@@ -42,16 +69,20 @@ return;
 }
 
 
-const res =
-await fetch(
+
+try{
+
+
+const res = await fetch(
 
 `${process.env.NEXT_PUBLIC_API_URL}/location/search?keyword=${value}`
 
 );
 
 
-const data =
-await res.json();
+
+const data = await res.json();
+
 
 
 setResults(
@@ -59,7 +90,18 @@ data.locations || []
 );
 
 
+
+}catch(error){
+
+console.log(error);
+
+}
+
+
 };
+
+
+
 
 
 
@@ -84,6 +126,9 @@ h-12
 border
 rounded-xl
 px-4
+outline-none
+focus:ring-2
+focus:ring-orange-400
 "
 
 />
@@ -91,9 +136,10 @@ px-4
 
 
 {
-results.length>0 &&
+results.length > 0 && (
 
 <div
+
 className="
 absolute
 bg-white
@@ -102,12 +148,14 @@ rounded-xl
 shadow-xl
 w-full
 z-50
+overflow-hidden
 "
+
 >
 
 
 {
-results.map((item)=>(
+results.map((item:any)=>(
 
 
 <button
@@ -116,19 +164,35 @@ key={item._id}
 
 type="button"
 
-onClick={() => {
-  if (item.locality) {
-    setText(`${item.locality}, ${item.city}`);
-  } else {
-    setText(item.city);
-  }
 
-  setResults([]);
+onClick={()=>{
 
-  onSelect({
-    city: item.city,
-    locality: item.locality,
-  });
+
+const display =
+item.locality
+?
+`${item.locality}, ${item.city}`
+:
+item.city;
+
+
+
+setText(display);
+
+
+setResults([]);
+
+
+
+onSelect({
+
+city:item.city,
+
+locality:item.locality || ""
+
+});
+
+
 }}
 
 
@@ -143,7 +207,15 @@ hover:bg-gray-100
 
 >
 
-{item.locality}, {item.city}
+
+{
+item.locality
+?
+`${item.locality}, ${item.city}`
+:
+item.city
+}
+
 
 </button>
 
@@ -153,7 +225,10 @@ hover:bg-gray-100
 }
 
 
+
 </div>
+
+)
 
 }
 

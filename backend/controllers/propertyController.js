@@ -1,6 +1,75 @@
 const Property = require("../models/Property");
 const User = require("../models/User");
 const mongoose = require("mongoose");
+
+const PropertyEditRequest =
+require("../models/PropertyEditRequest");
+
+
+
+exports.createEditRequest = async(req,res)=>{
+
+try{
+  console.log("USER FROM AUTH:", req.user);
+  
+
+const property = await Property.findById(req.params.id);
+
+
+if(!property){
+ return res.status(404).json({
+  message:"Property not found"
+ });
+}
+
+
+// create edit request
+const editRequest = await PropertyEditRequest.create({
+
+ property: property._id,
+
+ requestedBy:req.user.userId,
+
+ oldData:{
+   title:property.title,
+   price:property.price,
+   city:property.city,
+   locality:property.locality,
+   location:property.location,
+   description:property.description,
+   images:property.images || []
+ },
+
+ changes:req.body,
+
+ addedImages:
+ req.files
+ ?
+ req.files.map(file=>file.path)
+ :
+ [],
+
+ removedImages:
+ req.body.removedImages || []
+
+});
+
+
+res.json({
+ message:"Edit request submitted",
+ editRequest
+});
+
+
+}catch(error){
+
+res.status(500).json({
+ message:error.message
+});
+
+}
+
+};
 // CREATE PROPERTY
 exports.createProperty = async (req, res) => {
   try {
@@ -184,63 +253,85 @@ exports.getFavoriteStatus = async (req, res) => {
 
 
 // UPDATE PROPERTY
-exports.updateProperty = async (req, res) => {
-  try {
-    const property = await Property.findById(req.params.id);
+exports.updateProperty = async(req,res)=>{
 
-    if (!property) {
-      return res.status(404).json({ message: "Property not found" });
-    }
+try{
 
-    // Only owner can update
-    if (property.owner.toString() !== req.user.userId) {
-      return res.status(403).json({ message: "Not authorized" });
-    }
+const property = await Property.findById(req.params.id);
 
-    if (property.status === "sold") {
-  return res.status(400).json({ message: "Sold property cannot be edited" });
+
+if(!property){
+ return res.status(404).json({
+  message:"Property not found"
+ });
 }
 
-    // Text fields
-    property.title = req.body.title || property.title;
-    property.price = req.body.price || property.price;
-    property.location = req.body.location || property.location;
-    property.description = req.body.description || property.description;
-    property.propertyType = req.body.propertyType || property.propertyType;
-    property.seller = req.body.seller || property.seller;
-    property.bhkType =
-  req.body.bhkType ||
-  property.bhkType;
 
-property.plotType =
-  req.body.plotType ||
-  property.plotType;
 
-property.furnishing =
-  req.body.furnishing ||
-  property.furnishing;
 
-property.shopType =
-  req.body.shopType ||
-  property.shopType;
+if(!property){
+  return res.status(404).json({
+    message:"Property not found"
+  });
+}
+// IMPORTANT: create oldData before changing anything
 
-    // Images (append new images)
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => file.path);
-      property.images = [...property.images, ...newImages];
-    }
+const editRequest =
+await PropertyEditRequest.create({
 
-    if (req.body.status) {
-  property.status = req.body.status;
+property: property._id,
+
+requestedBy: req.user.userId,
+
+
+oldData:{
+
+title:property.title,
+price:property.price,
+city:property.city,
+locality:property.locality,
+location:property.location,
+description:property.description,
+images:property.images || []
+
+},
+
+
+changes:req.body,
+
+
+addedImages:
+req.files
+?
+req.files.map(file=>file.path)
+:
+[],
+
+
+removedImages:
+req.body.removedImages || []
+
+});
+
+
+
+res.json({
+message:"Edit request sent for approval",
+editRequest
+});
+
+
+}
+catch(error){
+
+console.log(error);
+
+res.status(500).json({
+message:error.message
+});
+
 }
 
-    const updated = await property.save();
-
-    res.json(updated);
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 };
 
 

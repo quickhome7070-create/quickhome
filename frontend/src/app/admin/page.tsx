@@ -14,7 +14,9 @@ export default function AdminDashboard() {
   // ✅ get loading also
   const { user, loading: authLoading } = useAuth();
   const [showModal, setShowModal] = useState(false);
-const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+const [selectedProperty,setSelectedProperty]
+=useState<any>(null);
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
@@ -53,38 +55,110 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
     fetchProperties();
   }, [user, authLoading]);
 
-  const fetchProperties = async () => {
+  const handleApproveEdit = async(id:string)=>{
+
+
+await fetch(
+`${API}/admin/approve-edit/${id}`,
+{
+method:"PUT",
+credentials:"include"
+}
+);
+await fetchProperties();
+
+setProperties(prev=>
+prev.filter(
+p=>p.editRequestId!==id
+)
+);
+
+
+};
+
+const fetchProperties = async () => {
   try {
     setLoading(true);
 
-    // pending properties
-    const pendingRes = await fetch(`${API}/admin/pending`, {
-      credentials: "include",
-    });
+    const pendingRes = await fetch(
+      `${API}/admin/pending`,
+      {
+        credentials: "include",
+      }
+    );
 
     const pendingData = await pendingRes.json();
 
-    setProperties(pendingData || []);
 
-    // dashboard stats
-    const statsRes = await fetch(`${API}/admin/stats`, {
-     credentials: "include",
-    });
+    const editRes = await fetch(
+      `${API}/admin/pending-edits`,
+      {
+        credentials: "include",
+      }
+    );
 
-    const statsData = await statsRes.json();
+    const editData = await editRes.json();
+
+
+    const combined = [
+      ...(pendingData || []).map((p:any)=>({
+        ...p,
+        type:"new"
+      })),
+
+      ...(editData || []).map((e:any)=>({
+
+   ...e.property,
+
+   editRequestId:e._id,
+
+   oldData:e.oldData,
+
+   changes:e.changes,
+
+   addedImages:e.addedImages,
+
+   removedImages:e.removedImages,
+
+   type:"edit"
+
+}))
+    ];
+
+
+    setProperties(combined);
+
+
+    const statsRes = await fetch(
+      `${API}/admin/stats`,
+      {
+        credentials:"include"
+      }
+    );
+
+
+    const statsData =
+      await statsRes.json();
+
 
     setStats({
-      pending: statsData.pending || 0,
-      approved: statsData.approved || 0,
-      rejected: statsData.rejected || 0,
-      total: statsData.total || 0,
+      pending:statsData.pending || 0,
+      approved:statsData.approved || 0,
+      rejected:statsData.rejected || 0,
+      total:statsData.total || 0,
     });
 
-  } catch (error) {
-    console.log(error);
-  }
 
-  setLoading(false);
+  } catch(error){
+
+    console.log(error);
+
+  }
+  finally{
+
+    setLoading(false);
+
+  }
 };
 
   // ✅ prevent flicker
@@ -124,6 +198,7 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
         method: "PUT",
         credentials: "include",
       });
+      await fetchProperties();
 
       setProperties((prev) => prev.filter((p) => p._id !== id));
     } catch (error) {
@@ -132,22 +207,49 @@ const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null
   };
 
 const handleReject = async () => {
-  try {
 
-    await fetch(`${API}/admin/reject/${selectedPropertyId}`, {
-      method: "PUT",
-     credentials: "include",
-    });
+try {
 
-    setProperties((prev) =>
-      prev.filter((p) => p._id !== selectedPropertyId)
-    );
 
-    setShowModal(false);
+const url =
+selectedProperty?.type === "edit"
 
-  } catch (error) {
-    console.log(error);
-  }
+?
+`${API}/admin/reject-edit/${selectedProperty.editRequestId}`
+
+:
+`${API}/admin/reject/${selectedProperty._id}`;
+
+
+
+await fetch(url,{
+method:"PUT",
+credentials:"include"
+});
+await fetchProperties();
+
+
+setProperties(prev =>
+ prev.filter(p =>
+ selectedProperty.type==="edit"
+ ?
+ p.editRequestId !== selectedProperty.editRequestId
+ :
+ p._id !== selectedProperty._id
+ )
+);
+
+
+
+setShowModal(false);
+
+
+}catch(error){
+
+console.log(error);
+
+}
+
 };
 
   return (
@@ -332,18 +434,39 @@ const handleReject = async () => {
                 className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 border"
               >
 
-                <div className="relative">
-                  <Image
-                    src={property.images?.[0] || "/no-image.png"}
-                    alt={property.title}
-                    width={500}
-                    height={300}
-                    className="w-full h-56 object-cover"
-                  />
+                <div className="relative" >
+                 <Image
+  src={property.images?.[0] || "/no-image.png"}
+  alt={property.title}
+  width={500}
+  height={300}
+  onClick={() =>{
+    console.log(property.images?.[0]);    
+    setPreviewImage(
+      property.images?.[0]
+    )
+  }}
+  className="w-full h-56 object-cover cursor-pointer hover:scale-105 transition"
+/>
+                 <div
+className={`absolute top-3 left-3 text-white text-xs px-3 py-1 rounded-full font-semibold ${
+property.type==="edit"
+?
+"bg-blue-600"
+:
+"bg-orange-500"
+}`}
+>
 
-                   {activeTab === "pending"?<div className="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
-                    Pending Review
-                  </div>:null}
+{
+property.type==="edit"
+?
+"Edit Request"
+:
+"New Property"
+}
+
+</div>
 
                   
                 </div>
@@ -378,21 +501,157 @@ const handleReject = async () => {
                     {property.description || "No description available"}
                   </p>
 
-                 
+                 {property.type === "edit" && (
+
+<div className="mt-6 border-t pt-5">
+
+
+<h3 className="text-lg font-bold mb-4 text-blue-600">
+  Edit Changes
+</h3>
+
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+
+{/* BEFORE */}
+
+<div className="bg-gray-50 rounded-2xl p-4 border">
+
+<h4 className="font-bold text-gray-700 mb-3">
+Before
+</h4>
+
+
+<p>
+<b>Title:</b> {property.oldData?.title}
+</p>
+
+
+<p>
+<b>Price:</b> ₹ {property.oldData?.price}
+</p>
+
+
+<p>
+<b>Location:</b> {property.oldData?.location}
+</p>
+
+
+
+<div className="grid grid-cols-2 gap-2 mt-4">
+
+{
+property.oldData?.images?.map(
+(img:string)=>(
+
+<Image
+  key={img}
+  src={img}
+  width={150}
+  height={100}
+  alt=""
+  onClick={() => setPreviewImage(img)}
+  className="rounded-xl cursor-pointer hover:opacity-80 transition"
+/>
+
+))
+}
+
+</div>
+
+
+</div>
+
+
+
+
+
+{/* AFTER */}
+
+<div className="bg-green-50 rounded-2xl p-4 border">
+
+<h4 className="font-bold text-gray-700 mb-3">
+After
+</h4>
+
+
+<p>
+<b>Title:</b> {property.changes?.title}
+</p>
+
+
+<p>
+<b>Price:</b> ₹ {property.changes?.price}
+</p>
+
+
+<p>
+<b>Location:</b> {property.changes?.location}
+</p>
+
+
+
+<div className="grid grid-cols-2 gap-2 mt-4">
+
+
+{
+
+[
+...(property.oldData?.images || []),
+...(property.addedImages || [])
+]
+
+.map(
+(img:string)=>(
+
+<Image
+  key={img}
+  src={img}
+  width={150}
+  height={100}
+  alt=""
+  onClick={() => setPreviewImage(img)}
+  className="rounded-xl cursor-pointer hover:opacity-80 transition"
+/>
+
+))
+
+}
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+)}
   <div className="flex gap-3 mt-6">
 {activeTab === "pending" && (
     <button
-      onClick={() => handleApprove(property._id)}
+      onClick={() =>
+ property.type==="edit"
+ ?
+ handleApproveEdit(property.editRequestId)
+ :
+ handleApprove(property._id)
+}
       className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition"
     >
       Approve
     </button>
 )}
     <button
-  onClick={() => {
-    setSelectedPropertyId(property._id);
-    setShowModal(true);
-  }}
+  onClick={()=>{
+ setSelectedProperty(property);
+ setShowModal(true);
+}}
   className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition"
 >
   {activeTab === "pending" ? "Reject" : "Delete"}
@@ -447,6 +706,31 @@ const handleReject = async () => {
     </div>
   </div>
 )}
+{previewImage && (
+  <div
+    className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center"
+    onClick={() => setPreviewImage(null)}
+  >
+    <button
+      className="absolute top-6 right-6 text-white text-5xl"
+      onClick={() => setPreviewImage(null)}
+    >
+      ×
+    </button>
+
+    <Image
+      src={previewImage}
+      alt="Preview"
+      width={1200}
+      height={900}
+      className="max-w-[95vw] max-h-[95vh] object-contain rounded-xl"
+      onClick={(e) => e.stopPropagation()}
+    />
+  </div>
+)}
+
     </div>
+    
   );
+  
 }

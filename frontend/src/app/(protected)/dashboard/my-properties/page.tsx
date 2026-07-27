@@ -57,7 +57,7 @@ const markSold = async (id: string) => {
         href="/addproperty"
         className="bg-blue-600 text-white px-4 py-2 rounded-lg"
       >
-        + Create Property
+        Add Property
       </Link>
     </div>
 
@@ -84,7 +84,12 @@ const markSold = async (id: string) => {
               >
                 Delete
               </button>
-
+<Link
+  href={`/dashboard/my-properties/edit/${p._id}`}
+  className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+>
+  Edit
+</Link>
               <button
                 onClick={() => markSold(p._id)}
                 className="bg-green-600 text-white px-3 py-1 rounded"

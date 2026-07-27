@@ -23,7 +23,8 @@ const {
   getRecentlyViewed,
   addRecentlyViewed,
   markAsSold,
-  getSoldProperties,  
+  getSoldProperties,
+  createEditRequest,  
 } = require("../controllers/propertyController");
 const { viewContact } = require("../controllers/contactController");
 // CREATE
@@ -48,9 +49,15 @@ router.put("/:id/sold", protect, markAsSold);
 router.get("/my-sold", protect, getSoldProperties);
 router.get("/:id", getPropertyById);
 
-
+router.post(
+ "/:id/edit-request",
+ protect,
+ upload.array("images"),
+ createEditRequest
+);
 // UPDATE
 router.put("/:id", protect, upload.array("images", 5), updateProperty);
+
 
 // DELETE
 router.delete("/:id", protect, deleteProperty);

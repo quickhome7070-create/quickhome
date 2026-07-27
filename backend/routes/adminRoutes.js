@@ -10,8 +10,12 @@ const {
   getPendingProperties,
   approveProperty,
   rejectProperty,
+  getPendingEdits,
   getAdminStats,
-   getApprovedProperties
+   getApprovedProperties,
+   approveEditRequest,
+   getPendingEditRequests,
+   rejectEditRequest
 } = require("../controllers/adminController");
 
 
@@ -43,5 +47,24 @@ router.put(
 );
 router.get("/stats", protect, adminOnly, getAdminStats);
 router.get("/approved", protect, adminOnly, getApprovedProperties);
+router.get(
+  "/pending-edits",
+  protect,
+  adminOnly,
+  getPendingEdits,
+  
+);
+router.put(
+ "/reject-edit/:id",
+ protect,
+ adminOnly,
+ rejectEditRequest
+);
+router.put(
+  "/approve-edit/:id",
+  protect,
+  adminOnly,
+  approveEditRequest
+);
 
 module.exports = router;
