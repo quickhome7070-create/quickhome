@@ -351,9 +351,11 @@ export default function OTPLogin() {
 
           value={phone}
 
-          onChange={(e)=>
-            setPhone(e.target.value.replace(/\D/g,""))
-          }
+          onChange={(e)=>{
+ const value=e.target.value.replace(/\D/g,"");
+
+ setPhone(value.slice(0,10));
+}}
 
 
           maxLength={10}

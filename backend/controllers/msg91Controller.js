@@ -12,8 +12,11 @@ phone
 }=req.body;
 
 
+const normalizedPhone =
+ phone.replace(/\D/g,"");
+
 let user = await User.findOne({
-phone
+ phone: normalizedPhone
 });
 
 

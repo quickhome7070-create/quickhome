@@ -58,8 +58,13 @@ exports.register =
 
 
 
-      const normalizedPhone =
-        phone.replace(/\D/g, "");
+    let normalizedPhone =
+  phone.replace(/\D/g, "");
+
+
+if(normalizedPhone.startsWith("91") && normalizedPhone.length === 12){
+  normalizedPhone = normalizedPhone.substring(2);
+}
 
 
 
@@ -233,7 +238,11 @@ exports.register =
               "lax",
 
           maxAge:
-            7 * 24 * 60 * 60 * 1000
+            7 * 24 * 60 * 60 * 1000,
+             ...(isProd && {
+   domain:".ghardestiny.com"
+ })
+
 
         }
 

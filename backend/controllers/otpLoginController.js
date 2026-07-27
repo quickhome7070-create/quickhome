@@ -14,15 +14,20 @@ exports.loginWithOTP = async (req, res) => {
       });
     }
 
-
-    const normalizedPhone =
-      phone.replace(/\D/g, "");
-
+let normalizedPhone =
+  phone.replace(/\D/g, "");
 
 
-    const user = await User.findOne({
-      phone: normalizedPhone,
-    });
+console.log("OTP LOGIN PHONE RECEIVED:", phone);
+console.log("OTP LOGIN PHONE SEARCH:", normalizedPhone);
+
+
+const user = await User.findOne({
+  phone: normalizedPhone,
+});
+
+
+console.log("USER FOUND:", user);
 
 
 
@@ -61,6 +66,9 @@ exports.loginWithOTP = async (req, res) => {
         sameSite:isProd ? "none" : "lax",
         maxAge:
           7 * 24 * 60 * 60 * 1000,
+           ...(isProd && {
+   domain:".ghardestiny.com"
+ })
       }
     );
 
