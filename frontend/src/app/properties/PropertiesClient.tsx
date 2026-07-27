@@ -682,7 +682,7 @@ if (locality) {
                 width={500}
                 height={300}
                 loading="lazy"
-                quality={60}
+                
                 className="w-full h-52 object-cover"
               />
 

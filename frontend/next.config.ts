@@ -7,6 +7,7 @@ const nextConfig = {
         hostname: "res.cloudinary.com",
       },
     ],
+    qualities: [60, 75],
   },
 };
 
