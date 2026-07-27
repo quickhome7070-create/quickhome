@@ -270,7 +270,7 @@ Logout
                 <div className="py-2 border-b">+ Add Property</div>
               </Link>
 
-              <Link href="/my-properties" onClick={() => setMenuOpen(false)}>
+              <Link href="/dashboard/my-properties" onClick={() => setMenuOpen(false)}>
                 <div className="py-2 border-b">My Property</div>
               </Link>
 
