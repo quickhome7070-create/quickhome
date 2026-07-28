@@ -54,6 +54,32 @@ const menuButtonRef = useRef<HTMLButtonElement>(null);
   };
 
 }, [menuOpen]);
+useEffect(() => {
+
+  const handleScroll = () => {
+
+    if (menuOpen) {
+      setMenuOpen(false);
+    }
+
+  };
+
+  window.addEventListener(
+    "scroll",
+    handleScroll,
+    { passive: true }
+  );
+
+  return () => {
+
+    window.removeEventListener(
+      "scroll",
+      handleScroll
+    );
+
+  };
+
+}, [menuOpen]);
 
   const router = useRouter();
   
