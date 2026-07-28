@@ -195,6 +195,13 @@ shadow-sm
 
 
 
+
+  
+</div>
+
+ {/* Mobile Post Property Button */}
+ <div className="absolute right-2 top-1/2 -translate-y-1/2 md:hidden">
+
 <div className="relative inline-flex md:hidden">
   <button
     onClick={handlePostProperty}
@@ -215,8 +222,6 @@ shadow-sm
     FREE
   </span>
 </div> 
-
-  
 </div>
 {/* Desktop Nav */}
 <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-900">
