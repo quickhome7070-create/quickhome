@@ -711,8 +711,8 @@ if (locality) {
                       className={`text-xs px-3 py-1 rounded-full font-medium ${
                         property.listingType ===
                         "buy"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-blue-100 text-blue-700"
+                          ? "bg-[#ffb224] text-[#1f1f1f]"
+                          : "bg-[#ffb224] text-[#1f1f1f]"
                       }`}
                     >
                       {property.listingType.toUpperCase()}
@@ -772,7 +772,7 @@ if (locality) {
                 <p className="text-sm text-gray-500 mt-2">
                   Posted By{" "}
 
-                  <b className="text-blue-500">
+                  <b className="text-500 text-[#ff990a] ">
                     {property.seller?.toUpperCase()}
                   </b>
                 </p>

@@ -445,15 +445,13 @@ const [showGallery, setShowGallery] =
 
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-24">
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-center">
 
-              <h2 className="text-2xl font-bold">
+              <h2 className="text-2xl font-bold ">
                 Owner Details
               </h2>
 
-              <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-bold">
-                O
-              </div>
+              
             </div>
 
             {!contact && !locked && (

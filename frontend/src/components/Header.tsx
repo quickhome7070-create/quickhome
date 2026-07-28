@@ -267,7 +267,7 @@ Logout
               </div>
 
               <Link href="/addproperty" onClick={() => setMenuOpen(false)}>
-                <div className="py-2 border-b">+ Add Property</div>
+                <div className="py-2 border-b font-semibold">Post Property</div>
               </Link>
 
               <Link href="/dashboard/my-properties" onClick={() => setMenuOpen(false)}>
@@ -290,8 +290,7 @@ Logout
     setMenuOpen(false);
   }}
   className="
-    text-red-600
-    font-semibold
+    text-600    
     py-2
     border-b
     w-full
@@ -306,7 +305,7 @@ Logout
                   logout();
                   setMenuOpen(false);
                 }}
-                className="text-red-500 font-semibold py-2"
+                className="text-500  py-2"
               >
                 Logout
               </button>
