@@ -200,7 +200,7 @@ shadow-sm
 </div>
 
  {/* Mobile Post Property Button */}
- <div className="absolute right-4 top-1/2 -translate-y-1/2 md:hidden">
+ <div className="absolute right-6 top-1/2 -translate-y-1/2 md:hidden">
 
 <div className="relative inline-flex md:hidden">
   <button
