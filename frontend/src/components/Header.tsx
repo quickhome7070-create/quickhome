@@ -2,16 +2,58 @@
 
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
+
+  const menuRef = useRef<HTMLDivElement>(null);
+
+const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const { user, logout, loading } = useAuth();
 
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => {
+
+  const handleClickOutside = (
+    event: MouseEvent
+  ) => {
+
+    const target = event.target as Node;
+
+    if (
+      menuOpen &&
+      menuRef.current &&
+      !menuRef.current.contains(target) &&
+      menuButtonRef.current &&
+      !menuButtonRef.current.contains(target)
+    ) {
+
+      setMenuOpen(false);
+
+    }
+
+  };
+
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
+
+  return () => {
+
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+
+  };
+
+}, [menuOpen]);
 
   const router = useRouter();
   
@@ -228,6 +270,7 @@ Logout
 </nav>
         {/* Mobile Menu Button */}
         <button
+        ref={menuButtonRef}
           className="md:hidden text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
         >
@@ -237,7 +280,7 @@ Logout
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t px-4 py-4 space-y-3 shadow-lg">
+        <div ref={menuRef} className="md:hidden bg-white border-t px-4 py-4 space-y-3 shadow-lg">
 
           <Link href="/properties" onClick={() => setMenuOpen(false)}>
             <div className="py-2 border-b">Properties</div>
