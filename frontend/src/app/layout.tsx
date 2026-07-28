@@ -12,10 +12,12 @@ const inter = Inter({
 
 export const metadata = {
   title: "Ghar Destiny",
-  //  icons: {
-  //   icon: "/logo.png",
-  // },
   description: "Buy Sell Rent Properties",
+};
+
+export const viewport = {
+  colorScheme: "light",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -24,16 +26,19 @@ export default function RootLayout({
   children: ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased`}>
-        <AuthProvider>  
+    <html lang="en" className="light">
+      <body
+        className={`${inter.className} bg-gray-50 text-gray-900 antialiased`}
+      >
+        <AuthProvider>
           <Header />
-  <main className="min-h-screen container mx-auto p-4">
-    {children}
-  </main> 
-  <Footer />
-</AuthProvider>
 
+          <main className="min-h-screen container mx-auto p-4">
+            {children}
+          </main>
+
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
