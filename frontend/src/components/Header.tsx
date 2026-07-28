@@ -223,14 +223,7 @@ shadow-sm
 
 </div>
 
-  {/* Logo */}
-  {/* <Link
-    href="/"
-    className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight"
-  >
-    Ghar Destiny
-  </Link> */}
-
+ 
 
   
 </div>
@@ -436,23 +429,9 @@ Logout
   "
 >
 
-          <Link href="/properties" onClick={() => setMenuOpen(false)}>
-            <div className="py-2 border-b">Properties</div>
-          </Link>
+         
 
-          {!loading && !user && (
-            <>
-              <Link href="/login" onClick={() => setMenuOpen(false)}>
-                <div className="py-2 border-b">Login</div>
-              </Link>
-
-              <Link href="/register" onClick={() => setMenuOpen(false)}>
-                <div className="py-2 border-b text-blue-600 font-semibold">
-                  Register
-                </div>
-              </Link>
-            </>
-          )}
+        
 
           {!loading && user && (
             <>
@@ -462,47 +441,13 @@ Logout
                 </div>
                 <span className="font-semibold">{user?.name}</span>
               </div>
-
-      {/* <div className="relative inline-block">
-
-  <Link
-    href="/addproperty"
-    onClick={() => setMenuOpen(false)}
-    className="
-      inline-flex
-      bg-white
-      rounded-full
-     
-      font-semibold
-      
-      items-center
-      justify-center
-    "
-  >
-    Post Property
-  </Link>
-
-
-  <span
-    className="
-      absolute
-      -top-2
-      -right-2
-      bg-green-600
-      text-white
-      text-[10px]
-      font-bold
-      px-2
-      py-0.5
-      rounded-full
-      shadow-lg
-    "
-  >
-    FREE
-  </span>
-
-</div> */}
-
+              </>
+          )}
+           <Link href="/properties" onClick={() => setMenuOpen(false)}>
+            <div className="py-2 border-b">Properties</div>
+          </Link>
+  {!loading && user && (
+    <>
               <Link  href="/dashboard/my-properties" onClick={() => setMenuOpen(false)}>
                 <div className="py-2 border-b">My Property</div>
               </Link>
@@ -542,6 +487,19 @@ Logout
               >
                 Logout
               </button>
+            </>
+          )}
+            {!loading && !user && (
+            <>
+              <Link href="/login" onClick={() => setMenuOpen(false)}>
+                <div className="py-2 border-b">Login</div>
+              </Link>
+
+              <Link href="/register" onClick={() => setMenuOpen(false)}>
+                <div className="py-2 border-b text-blue-600 font-semibold">
+                  Register
+                </div>
+              </Link>
             </>
           )}
         </div>
