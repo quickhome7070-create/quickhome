@@ -138,15 +138,89 @@ useEffect(() => {
         
         {/* Logo */}
         {/* Left Side */}
-<div className="flex items-center gap-4">
+<div className="flex items-center gap-8">
+
+  <div className="flex items-center gap-4">
+
+  {/* Mobile Menu Button */}
+  <button
+   ref={menuButtonRef}
+    className="md:hidden text-2xl"
+    onClick={() => setMenuOpen(!menuOpen)}
+  >
+    ☰
+  </button>
+
 
   {/* Logo */}
   <Link
     href="/"
-    className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight"
+    className="
+      text-xl
+      sm:text-2xl
+      font-extrabold
+      bg-gradient-to-r
+      from-blue-600
+      via-purple-600
+      to-pink-500
+      bg-clip-text
+      text-transparent
+    "
   >
     Ghar Destiny
   </Link>
+
+</div>
+
+ <div className="relative inline-flex">
+
+  <Link
+    href="/addproperty"
+    className="
+      bg-white
+      rounded-full
+      px-2
+      py-1
+      
+      shadow-md
+      hover:shadow-lg
+      transition-all
+      relative
+      overflow-visible
+    "
+  >
+    Post Property
+  </Link>
+
+  <span
+    className="
+      absolute
+      -top-2
+      right-0
+      translate-x-1/4
+      bg-green-600
+      text-white
+      text-[10px]
+      font-bold
+      px-2
+      py-0.5
+      rounded-full
+      shadow-lg
+      z-50
+    "
+  >
+    FREE
+  </span>
+
+</div>
+
+  {/* Logo */}
+  {/* <Link
+    href="/"
+    className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight"
+  >
+    Ghar Destiny
+  </Link> */}
 
 
   
@@ -264,12 +338,47 @@ useEffect(() => {
 
 </div>
 
-      <Link
-        href="/addproperty"
-        className="hover:text-black transition-all duration-300"
-      >
-        Post Property
-      </Link>
+     <div className="relative inline-block">
+
+  <Link
+    href="/addproperty"
+    className="
+      bg-white
+      rounded-full
+      px-6
+      py-2.5
+      font-semibold
+      shadow-md
+      hover:shadow-lg
+      transition-all
+      relative
+      overflow-visible
+    "
+  >
+    Post Property
+  </Link>
+
+  <span
+    className="
+      absolute
+      -top-1
+      right-0
+      translate-x-1/4
+      bg-green-600
+      text-white
+      text-[10px]
+      font-bold
+      px-2
+      py-0.5
+      rounded-full
+      shadow-lg
+      z-50
+    "
+  >
+    FREE
+  </span>
+
+</div>
 
       <Link
         href="/dashboard/my-properties"
@@ -294,19 +403,29 @@ Logout
     </>
   )}
 </nav>
-        {/* Mobile Menu Button */}
-        <button
-        ref={menuButtonRef}
-          className="md:hidden text-2xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          ☰
-        </button>
+       
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div ref={menuRef} className="md:hidden bg-white border-t px-4 py-4 space-y-3 shadow-lg">
+        <div
+  ref={menuRef}
+  className="
+    md:hidden
+    fixed
+    top-[64px]
+    left-0
+    w-[75%]
+    h-screen
+    bg-white
+    border-r
+    shadow-xl
+    px-5
+    py-5
+    space-y-3
+    z-50
+  "
+>
 
           <Link href="/properties" onClick={() => setMenuOpen(false)}>
             <div className="py-2 border-b">Properties</div>
@@ -335,11 +454,47 @@ Logout
                 <span className="font-semibold">{user?.name}</span>
               </div>
 
-              <Link href="/addproperty" onClick={() => setMenuOpen(false)}>
-                <div className="py-2 border-b font-semibold">Post Property</div>
-              </Link>
+      {/* <div className="relative inline-block">
 
-              <Link href="/dashboard/my-properties" onClick={() => setMenuOpen(false)}>
+  <Link
+    href="/addproperty"
+    onClick={() => setMenuOpen(false)}
+    className="
+      inline-flex
+      bg-white
+      rounded-full
+     
+      font-semibold
+      
+      items-center
+      justify-center
+    "
+  >
+    Post Property
+  </Link>
+
+
+  <span
+    className="
+      absolute
+      -top-2
+      -right-2
+      bg-green-600
+      text-white
+      text-[10px]
+      font-bold
+      px-2
+      py-0.5
+      rounded-full
+      shadow-lg
+    "
+  >
+    FREE
+  </span>
+
+</div> */}
+
+              <Link  href="/dashboard/my-properties" onClick={() => setMenuOpen(false)}>
                 <div className="py-2 border-b">My Property</div>
               </Link>
 
