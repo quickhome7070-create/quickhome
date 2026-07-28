@@ -357,7 +357,7 @@ userId,
 
 
 "subscription.freeContactsRemaining":
-4,
+2,
 
 
 "subscription.expiresAt":
