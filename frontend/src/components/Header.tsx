@@ -17,6 +17,16 @@ const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const router = useRouter();
+
+const handlePostProperty = () => {
+  if (!user) {
+    router.push("/login");
+    return;
+  }
+
+  router.push("/addproperty");
+};
   useEffect(() => {
 
   const handleClickOutside = (
@@ -81,7 +91,7 @@ useEffect(() => {
 
 }, [menuOpen]);
 
-  const router = useRouter();
+  
   
    const deleteAccount = async () => {
 
@@ -132,6 +142,8 @@ useEffect(() => {
 
 };
 
+
+
   return (
 <header
 className="
@@ -181,49 +193,28 @@ shadow-sm
 
 </div>
 
- <div className="relative inline-flex">
 
-  <Link
-    href="/addproperty"
+
+<div className="relative inline-flex md:hidden">
+  <button
+    onClick={handlePostProperty}
     className="
       bg-white
       rounded-full
-      px-2
-      py-1
-      
+      px-3
+      py-1.5
+      text-sm
+      font-semibold
       shadow-md
-      hover:shadow-lg
-      transition-all
-      relative
-      overflow-visible
     "
   >
     Post Property
-  </Link>
+  </button>
 
-  <span
-    className="
-      absolute
-      -top-2
-      right-0
-      translate-x-1/4
-      bg-green-600
-      text-white
-      text-[10px]
-      font-bold
-      px-2
-      py-0.5
-      rounded-full
-      shadow-lg
-      z-50
-    "
-  >
+  <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] px-2 py-0.5 rounded-full">
     FREE
   </span>
-
-</div>
-
- 
+</div> 
 
   
 </div>
@@ -254,6 +245,44 @@ shadow-sm
       </Link>
     </>
   )}
+  <div className="relative inline-flex ">
+
+  <button
+    onClick={handlePostProperty}
+    className="
+      bg-white
+      rounded-full
+      px-3
+      py-1.5
+      text-sm
+      font-semibold
+      shadow-md
+      hover:shadow-lg
+      transition-all
+    "
+  >
+    Post Property
+  </button>
+
+  <span
+    className="
+      absolute
+      -top-2
+      -right-2
+      bg-green-600
+      text-white
+      text-[10px]
+      font-bold
+      px-2
+      py-0.5
+      rounded-full
+      shadow-lg
+    "
+  >
+    FREE
+  </span>
+
+</div>
 
   {!loading && user && (
     <>
@@ -340,47 +369,7 @@ shadow-sm
 
 </div>
 
-     <div className="relative inline-block">
-
-  <Link
-    href="/addproperty"
-    className="
-      bg-white
-      rounded-full
-      px-6
-      py-2.5
-      font-semibold
-      shadow-md
-      hover:shadow-lg
-      transition-all
-      relative
-      overflow-visible
-    "
-  >
-    Post Property
-  </Link>
-
-  <span
-    className="
-      absolute
-      -top-1
-      right-0
-      translate-x-1/4
-      bg-green-600
-      text-white
-      text-[10px]
-      font-bold
-      px-2
-      py-0.5
-      rounded-full
-      shadow-lg
-      z-50
-    "
-  >
-    FREE
-  </span>
-
-</div>
+   
 
       <Link
         href="/dashboard/my-properties"
@@ -446,6 +435,9 @@ Logout
            <Link href="/properties" onClick={() => setMenuOpen(false)}>
             <div className="py-2 border-b">Properties</div>
           </Link>
+
+       
+          
   {!loading && user && (
     <>
               <Link  href="/dashboard/my-properties" onClick={() => setMenuOpen(false)}>
