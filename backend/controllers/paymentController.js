@@ -107,7 +107,7 @@ orderId,
 
 userId:user._id,
 
-amount:10
+amount:99
 
 });
 
@@ -122,7 +122,7 @@ await cashfree.PGCreateOrder({
 order_id:orderId,
 
 
-order_amount:10,
+order_amount:99,
 
 
 order_currency:"INR",
@@ -357,7 +357,7 @@ userId,
 
 
 "subscription.freeContactsRemaining":
-2,
+10,
 
 
 "subscription.expiresAt":
