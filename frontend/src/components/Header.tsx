@@ -133,7 +133,16 @@ useEffect(() => {
 };
 
   return (
-  <header className="sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 border-b border-orange-200 shadow-md">
+<header
+className="
+sticky top-0 z-50 w-full
+bg-white/80
+backdrop-blur-xl
+border-b border-gray-200
+shadow-sm
+"
+>
+ <div className="h-[3px] bg-gradient-to-r from-orange-400 via-yellow-300 to-orange-500" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
         
         {/* Logo */}

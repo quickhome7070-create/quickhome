@@ -41,3 +41,7 @@ button, link{
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+body {
+  padding-top: env(safe-area-inset-top);
+}
