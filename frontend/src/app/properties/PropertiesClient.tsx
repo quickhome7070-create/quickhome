@@ -7,18 +7,71 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LocationSearch from "@/src/components/LocationSearch";
+import {
+  MapPin,
+} from "lucide-react";
+
+type PropertyResponse = {
+  properties: Property[];
+  pages: number;
+};
 
 type Property = {
   _id: string;
+
   title: string;
+
   price: number;
+
   location: string;
+
+  city?: string;
+
+  locality?: string;
+
+
   images?: string[];
+
+
   listingType?: "buy" | "rent";
-  propertyType?: string;
+
+
   seller?: "owner" | "agent";
+
+
+  propertyType?: string;
+
+
   bhkType?: string;
-   createdAt?: string;
+
+
+  plotType?: string;
+
+
+  furnishing?: string;
+
+
+  shopType?: string;
+
+
+  area?: number;
+
+  areaUnit?: string;
+
+
+  bathrooms?: string;
+
+
+  propertyAge?: string;
+
+
+  floor?: number;
+
+
+  totalFloors?: number;
+
+
+  createdAt?: string;
 };
 
 type Props = {
@@ -28,16 +81,34 @@ totalProperties:number;
   city?: string;
   locality?: string;
   location?: string;
+
   minPrice?: string;
   maxPrice?: string;
+
   listingType?: string;
   sort?: string;
+
   propertyType?: string;
   seller?: string;
+
   bhkType?: string;
+
   plotType?: string;
+
   furnishing?: string;
+
   shopType?: string;
+
+
+  area?: string;
+
+  bathrooms?: string;
+
+  propertyAge?: string;
+
+  floor?: string;
+
+  availableFrom?: string;
 };
 };
 
@@ -73,6 +144,16 @@ export default function PropertiesClient({
 
   const router = useRouter();
 
+  const [area,setArea] = useState("");
+
+const [bathrooms,setBathrooms] = useState("");
+
+const [propertyAge,setPropertyAge] = useState("");
+
+const [floor,setFloor] = useState("");
+
+const [availableFrom,setAvailableFrom] = useState("");
+
   const [properties, setProperties] =
   useState<Property[]>(initialProperties);
 
@@ -80,7 +161,9 @@ const [page, setPage] =
   useState(1);
 
 const [loadingMore, setLoadingMore] =
-  useState(false);
+useState(false);
+
+const loadingRef = useRef(false);
 
 const [hasMore, setHasMore] =
   useState(true);
@@ -176,18 +259,22 @@ setLocality(
 
 useEffect(()=>{
 
+const element = loaderRef.current;
 
-const observer =
-new IntersectionObserver(
+if(!element) return;
+
+
+const observer = new IntersectionObserver(
 (entries)=>{
 
-
-if(entries[0].isIntersecting){
+if(
+entries[0].isIntersecting &&
+!loadingRef.current
+){
 
 loadMoreProperties();
 
 }
-
 
 },
 {
@@ -196,35 +283,17 @@ threshold:1
 );
 
 
-
-if(loaderRef.current){
-
-observer.observe(
-loaderRef.current
-);
-
-}
-
+observer.observe(element);
 
 
 return ()=>{
 
-if(loaderRef.current){
-
-observer.unobserve(
-loaderRef.current
-);
-
-}
+observer.disconnect();
 
 };
 
 
-},[
-page,
-loadingMore
-]);
-
+},[hasMore]);
   const handlePropertyTypeChange = (
     value: string
   ) => {
@@ -278,7 +347,44 @@ loadingMore
         shopType
       );
     }
+if(area){
+ query.append(
+   "area",
+   area
+ );
+}
 
+
+if(bathrooms){
+ query.append(
+   "bathrooms",
+   bathrooms
+ );
+}
+
+
+if(propertyAge){
+ query.append(
+   "propertyAge",
+   propertyAge
+ );
+}
+
+
+if(floor){
+ query.append(
+   "floor",
+   floor
+ );
+}
+
+
+if(availableFrom){
+ query.append(
+   "availableFrom",
+   availableFrom
+ );
+}
    if (city) {
   query.append("city", city);
 }
@@ -329,7 +435,9 @@ if (locality) {
 
  const loadMoreProperties = async () => {
 
-  if (loadingMore || !hasMore) return;
+  if (loadingRef.current || !hasMore) return;
+
+  loadingRef.current = true;
 
   try {
 
@@ -355,17 +463,31 @@ if (locality) {
       }
     );
 
-    const data = await res.json();
+    const data: PropertyResponse = await res.json();
 
     if (data.properties.length === 0) {
       setHasMore(false);
       return;
     }
 
-    setProperties((prev) => [
-      ...prev,
-      ...data.properties,
-    ]);
+   setProperties((prev) => {
+
+  const existingIds = new Set(
+    prev.map(item => item._id)
+  );
+
+  const newProperties =
+    data.properties.filter(
+      item => !existingIds.has(item._id)
+    );
+
+
+  return [
+    ...prev,
+    ...newProperties
+  ];
+
+});
 
     setPage(nextPage);
 
@@ -379,9 +501,51 @@ if (locality) {
 
   } finally {
 
+    loadingRef.current = false;
+
     setLoadingMore(false);
 
   }
+
+};
+
+const getPostedDate = (date?: string) => {
+
+  if (!date) return "";
+
+  const createdDate = new Date(date);
+
+  const today = new Date();
+
+  const yesterday = new Date();
+
+  yesterday.setDate(today.getDate() - 1);
+
+
+  if (
+    createdDate.toDateString() === 
+    today.toDateString()
+  ) {
+    return "Posted Today";
+  }
+
+
+  if (
+    createdDate.toDateString() === 
+    yesterday.toDateString()
+  ) {
+    return "Posted Yesterday";
+  }
+
+
+  return `Posted on ${createdDate.toLocaleDateString(
+    "en-IN",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }
+  )}`;
 
 };
 
@@ -670,7 +834,7 @@ if (locality) {
             href={`/properties/${property._id}`}
           >
             <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition">
-
+<div className="relative">
               <Image
                 src={
                   property.images?.[0]?.replace(
@@ -685,99 +849,161 @@ if (locality) {
                 
                 className="w-full h-52 object-cover"
               />
-
-              <div className="p-4">
-
-                <h2 className="font-semibold text-lg line-clamp-1">
-                  {property.title}
-                </h2>
-
-                <p className="text-sm text-gray-500 mt-1">
-                  {property.propertyType}
-
-                  {property.bhkType &&
-                    ` • ${property.bhkType}`}
-                </p>
-
-                <div className="flex items-center justify-between mt-2">
-
-                  <p className="text-orange-600 text-xl font-bold">
-                    ₹ {property.price}
-                  </p>
-
-                  {property.listingType && (
-
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full font-medium ${
-                        property.listingType ===
-                        "buy"
-                          ? "bg-[#ffb224] text-[#1f1f1f]"
-                          : "bg-[#ffb224] text-[#1f1f1f]"
-                      }`}
-                    >
-                      {property.listingType.toUpperCase()}
-                    </span>
-
-                  )}
-
-                </div>
-
-                <p className="text-sm text-gray-500 mt-2">
-                  {property.location}
-                </p>
-
-                {/* POSTED DATE */}
-<p className="text-sm text-gray-500 mt-2">
-  {(() => {
-    const createdDate = new Date(
-      property.createdAt || ""
-    );
-
-    const today = new Date();
-
-    const yesterday = new Date();
-
-    yesterday.setDate(
-      today.getDate() - 1
-    );
-
-    const isToday =
-      createdDate.toDateString() ===
-      today.toDateString();
-
-    const isYesterday =
-      createdDate.toDateString() ===
-      yesterday.toDateString();
-
-    if (isToday) {
-      return "Posted Today";
-    }
-
-    if (isYesterday) {
-      return "Posted Yesterday";
-    }
-
-    return `Posted on ${createdDate.toLocaleDateString(
-      "en-IN",
-      {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }
-    )}`;
-  })()}
-</p>
-                
-
-                <p className="text-sm text-gray-500 mt-2">
-                  Posted By{" "}
-
-                  <b className="text-500 text-[#ff990a] ">
-                    {property.seller?.toUpperCase()}
-                  </b>
-                </p>
-
               </div>
+
+             <div className="p-5">
+
+  {/* Property Header */}
+
+<div className="flex justify-between items-start">
+
+  <div>
+
+    <h2 className="text-xl font-bold text-gray-900">
+      {property.propertyType}
+      {property.bhkType && (
+        <span className="text-gray-500 font-medium">
+          {" "}• {property.bhkType}
+        </span>
+      )}
+    </h2>
+
+
+    <p className="text-sm text-gray-500 mt-1">
+      {property.furnishing && property.furnishing}
+      
+      {property.propertyAge && (
+        <>
+          {" "} • {" "}
+          {property.propertyAge}
+        </>
+      )}
+    </p>
+
+
+  </div>
+
+
+  <span
+    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+      property.listingType === "rent"
+      ? "bg-gray-100 text-gray-700"
+      : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    {property.listingType === "rent"
+      ? "RENT"
+      : "SALE"}
+  </span>
+
+
+</div>
+
+
+{/* Price Secondary */}
+
+<div className="mt-3">
+
+  <p className="text-md font-semibold text-gray-900">
+    ₹ {Number(property.price).toLocaleString("en-IN")}
+  </p>
+
+</div>
+
+  {/* Title */}
+  {/* <h3 className="mt-4 text-lg font-semibold text-gray-900 line-clamp-1">
+    {property.title}
+  </h3> */}
+
+  {/* Property Type */}
+  <div className="mt-1 flex items-center gap-2">
+
+    <span className="text-sm font-medium text-600">
+      {property.propertyType}
+    </span>
+
+    {property.furnishing && (
+      <>
+        <span className="text-gray-300">•</span>
+
+        <span className="text-sm text-gray-500">
+          {property.furnishing}
+        </span>
+      </>
+    )}
+
+  </div>
+
+  {/* Location */}
+  <div className="flex items-center gap-2 mt-4">
+
+    <MapPin size={16} className="text-gray-400"/>
+
+    <p className="text-sm text-gray-600">
+      {property.locality}, {property.city}
+    </p>
+
+  </div>
+
+  {/* Features */}
+  <div className="grid grid-cols-2 gap-3 mt-5">
+
+    <div className="bg-gray-50 rounded-xl p-3">
+      <p className="text-xs text-gray-500">
+        Area
+      </p>
+
+      <p className="font-semibold">
+        {property.area} {property.areaUnit}
+      </p>
+    </div>
+
+    <div className="bg-gray-50 rounded-xl p-3">
+      <p className="text-xs text-gray-500">
+        Bathrooms
+      </p>
+
+      <p className="font-semibold">
+        {property.bathrooms}
+      </p>
+    </div>
+
+    <div className="bg-gray-50 rounded-xl p-3">
+      <p className="text-xs text-gray-500">
+        Floor
+      </p>
+
+      <p className="font-semibold">
+        {property.floor}/{property.totalFloors}
+      </p>
+    </div>
+
+    <div className="bg-gray-50 rounded-xl p-3">
+      <p className="text-xs text-gray-500">
+        Age
+      </p>
+
+      <p className="font-semibold">
+        {property.propertyAge}
+      </p>
+    </div>
+
+  </div>
+
+  {/* Footer */}
+  <div className="flex justify-between items-center mt-5 pt-4 border-t">
+
+    <span className="text-sm font-medium text-gray-700 capitalize">
+      {property.seller}
+    </span>
+
+    <span className="text-xs text-gray-500">
+      {getPostedDate(property.createdAt)}
+    </span>
+
+  </div>
+
+</div>
 
             </div>
 
