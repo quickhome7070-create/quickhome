@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { CalendarDays } from "lucide-react";
+import { useState, useEffect } from "react";
 import LocationSearch from "./LocationSearch";
 
 
@@ -152,7 +155,56 @@ property?.images || [],
 
 });
 
+useEffect(() => {
 
+  if(mode === "edit" && property){
+
+    setForm({
+
+      ...form,
+
+      title: property.title || "",
+      price: property.price || "",
+
+      city: property.city || "",
+      locality: property.locality || "",
+      location: property.location || "",
+
+      description: property.description || "",
+
+      listingType: property.listingType || "buy",
+
+      propertyType: property.propertyType || "",
+
+      seller: property.seller || "",
+
+      bhkType: property.bhkType || "",
+      plotType: property.plotType || "",
+
+      furnishing: property.furnishing || "",
+      shopType: property.shopType || "",
+
+
+      // new fields
+      area: property.area || "",
+      areaUnit: property.areaUnit || "sqft",
+
+      bathrooms: property.bathrooms || "",
+
+      propertyAge: property.propertyAge || "",
+
+      floor: property.floor || "",
+      totalFloors: property.totalFloors || "",
+
+      amenities: property.amenities || [],
+
+      availableFrom: property.availableFrom || "",
+
+    });
+
+  }
+
+},[mode, property]);
 
 const [errors,setErrors] = useState<any>({});
 
@@ -534,6 +586,9 @@ setLoading(false);
 
 
 };
+
+const selectedDate: Date | null =
+  form.availableFrom ? new Date(form.availableFrom) : null;
 
 return (
 
@@ -1313,26 +1368,49 @@ onChange={()=>toggleAmenity(item)}
 
 {/* AVAILABLE DATE */}
 
-<input
+<div className="bg-white rounded-3xl border border-gray-200 p-5 shadow-sm">
+  <label className="block text-sm font-semibold text-gray-800 mb-3">
+    Available From
+  </label>
 
-type="date"
+  <div className="relative">
 
-name="availableFrom"
+    <CalendarDays
+      size={20}
+      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10"
+    />
 
-value={form.availableFrom}
+    <DatePicker
+      selected={selectedDate}
+      onChange={(date: Date | null) => {
+        setForm((prev) => ({
+          ...prev,
+          availableFrom: date
+            ? date.toISOString().split("T")[0]
+            : "",
+        }));
+      }}
+      placeholderText="Select Available Date"
+      dateFormat="dd MMM yyyy"
+      className="
+        w-full
+        h-12
+        rounded-xl
+        border
+        border-gray-300
+        bg-white
+        pl-12
+        pr-4
+        outline-none
+        focus:border-gray-400
+        focus:ring-2
+        focus:ring-gray-200
+      "
+      wrapperClassName="w-full"
+    />
 
-onChange={handleChange}
-
-className="
-w-full
-h-12
-border
-rounded-xl
-px-4
-"
-
-/>
-
+  </div>
+</div>
 
 
 

@@ -12,6 +12,7 @@ const propertySchema = new mongoose.Schema(
       enum: [
         "Flat",
         "House",
+        "Villa",
         "Plot",
         "Office Space",
         "Shop",
@@ -50,6 +51,57 @@ const propertySchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    // Area Details
+area: {
+  type: Number,
+  default: 0,
+},
+
+areaUnit: {
+  type: String,
+  enum: [
+    "sqft",
+    "sqm",
+    "acre"
+  ],
+  default: "sqft",
+},
+
+// Property Details
+bathrooms: {
+  type: Number,
+  default: 0,
+},
+
+propertyAge: {
+  type: String,
+  default: "",
+},
+
+floor: {
+  type: String,
+  default: "",
+},
+
+totalFloors: {
+  type: Number,
+  default: 0,
+},
+
+
+// Amenities
+amenities: [
+  {
+    type: String,
+  }
+],
+
+
+// Availability
+availableFrom: {
+  type: Date,
+},
 
     price: {
       type: Number,

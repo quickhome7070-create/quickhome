@@ -119,16 +119,13 @@ exports.createProperty = async (req, res) => {
     const {
       title,
       price,
-
       city,
       locality,
       location,
-
       description,
       listingType,
       propertyType,
       seller,
-
       bhkType,
       plotType,
       furnishing,
@@ -769,7 +766,12 @@ bathrooms = "",
 propertyAge = "",
 plotType = "",
 furnishing = "",
+floor="",
+availableFrom="",
+totalFloors="",
 shopType = "",
+amenities="",
+
     } = req.query;
 
     const query = {
@@ -871,6 +873,18 @@ if (shopType.trim()) {
   query.shopType = shopType;
 }
 
+if(floor){
+ query.floor = floor;
+}
+
+
+if(availableFrom){
+ query.availableFrom = availableFrom;
+}
+
+if(amenities){
+ query.amenities = amenities;
+}
     // Price Filter
     if (minPrice || maxPrice) {
       query.price = {};
