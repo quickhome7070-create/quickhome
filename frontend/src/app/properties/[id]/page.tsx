@@ -30,6 +30,7 @@ export default async function PropertyPage({
       fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property/${id}`,
         {
+          cache:"no-store",
           next: {
             revalidate: 120,
           },
@@ -39,6 +40,7 @@ export default async function PropertyPage({
       fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/property/similar/${id}`,
         {
+          cache:"no-store",
           next: {
             revalidate: 120,
           },
@@ -59,6 +61,8 @@ export default async function PropertyPage({
 
   const similar: Property[] =
     await similarRes.json();
+
+ 
 
   return (
     <PropertyDetailsClient

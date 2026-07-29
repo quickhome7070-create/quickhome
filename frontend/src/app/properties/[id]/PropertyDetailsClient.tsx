@@ -2,6 +2,22 @@
 
 "use client";
 
+
+import {
+  MapPin,
+  BedDouble,
+  IndianRupee,
+  KeyRound,
+  Bath,
+  Ruler,
+  Building2,
+  Sofa,
+  Layers,
+  User,
+  CalendarDays,
+  Home,
+} from "lucide-react";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,13 +36,46 @@ import { useAuth } from "@/src/context/AuthContext";
 
 type Property = {
   _id: string;
+
   title: string;
   price: number;
-  location: string;
-  description: string;
-  images: string[];
-};
 
+  location: string;
+  city?: string;
+  locality?: string;
+
+  description: string;
+
+  images: string[];
+
+  listingType?: "buy" | "rent";
+
+  seller?: "owner" | "agent";
+
+  propertyType?: string;
+
+  bhkType?: string;
+
+  plotType?: string;
+
+  furnishing?: string;
+
+  shopType?: string;
+
+  area?: number;
+
+  areaUnit?: string;
+
+  bathrooms?: string;
+
+  propertyAge?: string;
+
+  floor?: number;
+
+  totalFloors?: number;
+
+  createdAt?: string;
+};
 type Contact = {
   name: string;
   phone: string;
@@ -56,7 +105,8 @@ export default function PropertyDetailsClient({
   const sliderRef =
     useRef<HTMLDivElement>(null);
 
-    
+    const [showFullDescription, setShowFullDescription] = useState(false);
+
 const [showGallery, setShowGallery] =
   useState(false);
 
@@ -181,382 +231,399 @@ const [showGallery, setShowGallery] =
       }
     };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f8fafc] to-[#eef2ff] pb-20">
+return (
+<div className="min-h-screen bg-white pb-24">
 
-   {/* HERO CAROUSEL */}
-<div className="relative">
 
-  {/* SLIDER */}
-  <div
-    ref={sliderRef}
-    className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth"
-  >
+{/* IMAGE */}
 
-    {property.images.map(
-      (img, index) => (
+<div className="relative w-full h-[280px] md:h-[450px]">
 
-        <div
-          key={index}
-          onClick={() => {
+<Image
+src={
+property.images?.[0]?.replace(
+"/upload/",
+"/upload/f_auto,q_auto,w_1400/"
+)
+|| "/no-image.png"
+}
+alt={property.title}
+fill
+priority
+className="object-cover"
+/>
 
-            setActiveImage(index);
 
-            setShowGallery(true);
-          }}
-          className="relative min-w-full h-[320px] md:h-[520px] snap-center cursor-pointer"
-        >
-          <Image
-            src={
-              img?.replace(
-                "/upload/",
-                "/upload/f_auto,q_auto,w_1400/"
-              ) || "/no-image.png"
-            }
-            alt={`${property.title}-${index}`}
-            fill
-            priority={index === 0}
-            className="object-cover"
-          />
+<button
+onClick={()=>router.back()}
+className="
+absolute
+top-4
+left-4
+w-9
+h-9
+rounded-full
+bg-white/90
+text-gray-700
+shadow
+"
+>
+←
+</button>
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-        </div>
-      )
-    )}
-  </div>
 
-  {/* TOP ACTIONS */}
-  <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between">
-
-    <button
-      onClick={() =>
-        router.back()
-      }
-      className="bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg text-sm font-medium"
-    >
-      ← Back
-    </button>
-
-    <button
-      onClick={
-        toggleFavorite
-      }
-      className={`w-11 h-11 rounded-full backdrop-blur flex items-center justify-center shadow-lg transition ${
-        isFavorite
-          ? "bg-red-500 text-white"
-          : "bg-white/90 text-black"
-      }`}
-    >
-      ❤️
-    </button>
-  </div>
-
-  {/* IMAGE COUNT */}
-  <div className="absolute bottom-6 right-6 bg-black/50 backdrop-blur text-white px-4 py-2 rounded-full text-sm z-20">
-    {activeImage + 1} / {property.images.length}
-  </div>
-
-  {/* DOTS */}
-  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-
-    {property.images.map(
-      (_, index) => (
-
-        <button
-          key={index}
-          onClick={() => {
-
-            setActiveImage(index);
-
-            sliderRef.current?.scrollTo({
-              left:
-                index *
-                sliderRef.current.clientWidth,
-              behavior: "smooth",
-            });
-          }}
-          className={`h-2.5 rounded-full transition-all duration-300 ${
-            activeImage === index
-              ? "bg-white w-6"
-              : "bg-white/50 w-2.5"
-          }`}
-        />
-      )
-    )}
-  </div>
+<div
+className="
+absolute
+bottom-4
+right-4
+bg-black/60
+text-white
+text-xs
+px-3
+py-1
+rounded-full
+"
+>
+1 / {property.images.length}
 </div>
 
-{/* FULLSCREEN GALLERY */}
-{showGallery && (
 
-  <div className="fixed inset-0 bg-black z-[9999]">
+</div>
 
-    {/* CLOSE BUTTON */}
+
+
+
+
+<div className="px-4 py-4">
+
+  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px]">
+
+    <div className="flex items-center">
+      <Home className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <span className="ml-3 text-gray-700 truncate">
+        {property.propertyType}
+      </span>
+    </div>
+
+    <div className="flex items-center">
+      <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <span className="ml-3 text-gray-700">
+        {property.bhkType}
+      </span>
+    </div>
+
+    <div className="flex items-center">
+      <IndianRupee className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <span className="ml-3 text-gray-700">
+        ₹ {Number(property.price).toLocaleString("en-IN")}
+      </span>
+    </div>
+
+    <div className="flex items-center">
+      <KeyRound className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <span className="ml-3 text-gray-700 capitalize">
+        {property.listingType}
+      </span>
+    </div>
+
+    <div className="flex items-center">
+      <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <span className="ml-3 text-gray-700 truncate">
+        {property.locality}, {property.city}
+      </span>
+    </div>
+
+    <div className="flex items-center">
+      <User className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <span className="ml-3 text-gray-700 capitalize">
+        {property.seller}
+      </span>
+    </div>
+
+  </div>
+
+</div>
+
+<div className="border-t border-gray-100 mx-4"></div>
+
+<div className="px-4 py-4">
+
+  <div className="grid grid-cols-3 gap-y-6">
+
+    <div className="flex flex-col items-center">
+      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+        <Ruler size={18} className="text-gray-400" strokeWidth={1.8} />
+      </div>
+      <p className="mt-2 text-xs text-gray-700 text-center">
+        {property.area} {property.areaUnit}
+      </p>
+    </div>
+
+    <div className="flex flex-col items-center">
+      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+        <Bath size={18} className="text-gray-400" strokeWidth={1.8} />
+      </div>
+      <p className="mt-2 text-xs text-gray-700 text-center">
+        {property.bathrooms}
+      </p>
+    </div>
+
+    <div className="flex flex-col items-center">
+      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+        <Building2 size={18} className="text-gray-400" strokeWidth={1.8} />
+      </div>
+      <p className="mt-2 text-xs text-gray-700 text-center">
+        {property.floor}/{property.totalFloors}
+      </p>
+    </div>
+
+    <div className="flex flex-col items-center">
+      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+        <CalendarDays size={18} className="text-gray-400" strokeWidth={1.8} />
+      </div>
+      <p className="mt-2 text-xs text-gray-700 text-center">
+        {property.propertyAge}
+      </p>
+    </div>
+
+    <div className="flex flex-col items-center">
+      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+        <Sofa size={18} className="text-gray-400" strokeWidth={1.8} />
+      </div>
+      <p className="mt-2 text-xs text-gray-700 text-center">
+        {property.furnishing}
+      </p>
+    </div>
+
+    <div className="flex flex-col items-center">
+      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+        <Home size={18} className="text-gray-400" strokeWidth={1.8} />
+      </div>
+      <p className="mt-2 text-xs text-gray-700 text-center">
+        {property.listingType === "rent" ? "Rent" : "Sale"}
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+<div className="border-t border-gray-100 mx-4"></div>
+
+{/* DESCRIPTION */}
+
+<div className="px-4 mt-4">
+
+  <p className="text-sm text-gray-800 mb-2">
+    About Property
+  </p>
+
+
+  <p
+    className={`
+      text-sm
+      text-gray-600
+      leading-6
+      ${
+        showFullDescription
+          ? ""
+          : "line-clamp-3"
+      }
+    `}
+  >
+    {property.description}
+  </p>
+
+
+  {property.description.length > 150 && (
+
     <button
       onClick={() =>
-        setShowGallery(false)
+        setShowFullDescription(
+          !showFullDescription
+        )
       }
-      className="absolute top-5 right-5 z-50 w-11 h-11 rounded-full bg-white/20 backdrop-blur text-white text-xl"
+      className="
+        mt-2
+        text-xs
+        text-[#c08a00]
+        font-medium
+      "
     >
-      ✕
+      {
+        showFullDescription
+          ? "Show less"
+          : "Read more..."
+      }
     </button>
 
-    {/* FULLSCREEN SLIDER */}
-    <div className="flex overflow-x-auto snap-x snap-mandatory h-full scrollbar-hide scroll-smooth">
+  )}
 
-      {property.images.map(
-        (img, index) => (
+</div>
 
-          <div
-            key={index}
-            className="relative min-w-full h-screen snap-center flex items-center justify-center"
-          >
-            <Image
-              src={
-                img?.replace(
-                  "/upload/",
-                  "/upload/f_auto,q_auto,w_1600/"
-                ) || "/no-image.png"
-              }
-              alt={`gallery-${index}`}
-              fill
-              className="object-contain"
-            />
-          </div>
-        )
-      )}
-    </div>
 
-    {/* GALLERY COUNT */}
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur text-white px-4 py-2 rounded-full text-sm">
-      {activeImage + 1} / {property.images.length}
-    </div>
-  </div>
-)}
 
-      {/* CONTENT */}
-      <div className="max-w-6xl mx-auto px-4 mt-10 grid lg:grid-cols-3 gap-8">
 
-        {/* LEFT */}
-        <div className="lg:col-span-2 space-y-6">
 
-          {/* INFO */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
 
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-              {property.title}
-            </h1>
+{/* SIMILAR PROPERTIES */}
 
-            <div className="flex flex-wrap items-center gap-4 mt-4">
+{
+similar.length > 0 && (
 
-              <p className="text-3xl font-bold text-green-600">
-                ₹ {property.price}
-              </p>
+<div className="px-4 mt-8">
 
-              <p className="text-gray-500">
-                📍 {property.location}
-              </p>
-            </div>
+<p className="
+text-sm
+text-gray-800
+mb-4
+">
+Similar Properties
+</p>
 
-            <div className="flex flex-wrap gap-3 mt-6">
 
-              <div className="bg-gray-100 px-4 py-2 rounded-full text-sm">
-                Verified Property
-              </div>
+<div className="grid grid-cols-2 gap-4">
 
-              <div className="bg-gray-100 px-4 py-2 rounded-full text-sm">
-                Premium Listing
-              </div>
+{
+similar.map((item)=>(
 
-              <div className="bg-gray-100 px-4 py-2 rounded-full text-sm">
-                Ready to Move
-              </div>
-            </div>
-          </div>
+<Link
+key={item._id}
+href={`/properties/${item._id}`}
+>
 
-          {/* DESCRIPTION */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+<div>
 
-            <h2 className="text-2xl font-bold mb-5">
-              About Property
-            </h2>
 
-            <p className="text-gray-600 leading-8">
-              {property.description}
-            </p>
-          </div>
+<div className="
+relative
+h-36
+rounded-xl
+overflow-hidden
+">
 
-          {/* SIMILAR */}
-          {similar.length > 0 && (
+<Image
+src={
+item.images?.[0] ||
+"/no-image.png"
+}
+alt=""
+fill
+className="object-cover"
+/>
 
-            <div>
+</div>
 
-              <h2 className="text-2xl font-bold mb-5">
-                Similar Properties
-              </h2>
 
-              <div className="grid md:grid-cols-2 gap-5">
+<div className="mt-2">
 
-                {similar.map((item) => (
+<p className="
+text-xs
+text-gray-800
+line-clamp-1
+">
+{item.propertyType}
+{" • "}
+{item.bhkType}
+</p>
 
-                  <Link
-                    key={item._id}
-                    href={`/properties/${item._id}`}
-                  >
-                    <div className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
 
-                      <div className="relative h-52">
+<p className="
+text-xs
+text-gray-600
+mt-1
+">
+₹ {Number(item.price).toLocaleString("en-IN")}
+</p>
 
-                        <Image
-                          src={
-                            item.images?.[0] ||
-                            "/no-image.png"
-                          }
-                          alt={item.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
 
-                      <div className="p-5">
+<p className="
+text-xs
+text-gray-500
+mt-1
+">
+📍 {item.location}
+</p>
 
-                        <h3 className="font-semibold text-lg line-clamp-1">
-                          {item.title}
-                        </h3>
 
-                        <p className="text-green-600 font-bold mt-2">
-                          ₹ {item.price}
-                        </p>
+</div>
 
-                        <p className="text-sm text-gray-500 mt-2">
-                          📍 {item.location}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
 
-        {/* SIDEBAR */}
-        <div>
+</div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-24">
 
-            <div className="flex items-center justify-center">
+</Link>
 
-              <h2 className="text-2xl font-bold ">
-                Owner Details
-              </h2>
+))
+}
 
-              
-            </div>
+</div>
 
-            {!contact && !locked && (
+</div>
 
-              <div className="mt-6">
+)
+}
 
-                <p className="text-gray-500 leading-7">
-                  View owner phone number and email instantly.
-                </p>
 
-                <button
-                  onClick={
-                    handleViewContact
-                  }
-                  disabled={
-                    loadingContact
-                  }
-                  className="w-full mt-6 bg-black text-white py-4 rounded-2xl font-semibold hover:bg-gray-900 transition disabled:opacity-70"
-                >
-                  {loadingContact
-                    ? "Checking..."
-                    : "View Contact"}
-                </button>
-              </div>
-            )}
+{/* CONTACT STICKY */}
 
-            {/* LOCKED */}
-            {locked && !contact && (
+<div
+className="
+fixed
+bottom-3
+left-4
+right-4
+bg-white
+border
+border-gray-200
+rounded-full
+px-3
+py-2
+z-50
+shadow-md
+"
+>
 
-              <div className="mt-6 text-center">
+<div className="flex gap-2">
 
-                <div className="text-5xl">
-                  🔒
-                </div>
+<button
+onClick={handleViewContact}
+className="
+flex-1
+h-10
+rounded-full
+bg-[#ffb224]
+text-gray-900
+text-sm
+font-medium
+"
+>
+View Contact
+</button>
 
-                <p className="font-semibold text-xl mt-4">
-                  Premium Access
-                </p>
 
-                {error && (
+<button
+className="
+flex-1
+h-10
+rounded-full
+border
+border-[#ffb224]
+text-gray-800
+text-sm
+font-medium
+"
+>
+Chat
+</button>
 
-                  <p className="text-red-500 text-sm mt-2">
-                    {error}
-                  </p>
-                )}
+</div>
 
-                <button
-                  onClick={() =>
-                    router.push("/plans")
-                  }
-                  className="w-full mt-6 bg-black text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition"
-                >
-                  Upgrade Plan
-                </button>
-              </div>
-            )}
+</div>
 
-            {/* CONTACT */}
-            {contact && (
 
-              <div className="mt-6 space-y-4">
 
-                <div className="bg-gray-50 rounded-2xl p-4">
-
-                  <p className="text-sm text-gray-500">
-                    Name
-                  </p>
-
-                  <p className="font-semibold mt-1">
-                    {contact.name}
-                  </p>
-                </div>
-
-                <div className="bg-gray-50 rounded-2xl p-4">
-
-                  <p className="text-sm text-gray-500">
-                    Phone
-                  </p>
-
-                  <p className="font-semibold mt-1">
-                    {contact.phone}
-                  </p>
-                </div>
-
-                <div className="bg-gray-50 rounded-2xl p-4">
-
-                  <p className="text-sm text-gray-500">
-                    Email
-                  </p>
-
-                  <p className="font-semibold mt-1 break-all">
-                    {contact.email}
-                  </p>
-                </div>
-
-                <p className="text-sm text-center text-gray-500 pt-2">
-                  Remaining contacts:
-                  {" "}
-                  {contact.contactsRemaining}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+</div>
+);
 }

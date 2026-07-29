@@ -581,29 +581,66 @@ exports.getRecentProperties = async (req, res) => {
 // 🔁 Similar Properties
 exports.getSimilarProperties = async (req, res) => {
   try {
+
     const propertyId = req.params.id;
 
-    const currentProperty = await Property.findById(propertyId);
+
+    const currentProperty =
+      await Property.findById(propertyId);
+
+
     if (!currentProperty) {
-      return res.status(404).json({ message: "Property not found" });
+      return res.status(404).json({
+        message: "Property not found"
+      });
     }
 
-    const priceRangeMin = currentProperty.price * 0.7;
-    const priceRangeMax = currentProperty.price * 1.3;
 
-    const similar = await Property.find({
-      _id: { $ne: propertyId },
-      approvalStatus: "approved",
-      status: "active",
-      location: { $regex: currentProperty.location, $options: "i" },
-      price: { $gte: priceRangeMin, $lte: priceRangeMax },
-    })
-      .limit(2)
-      .populate("owner", "name email");
+    const similar =
+      await Property.find({
+
+        _id: {
+          $ne: propertyId
+        },
+
+
+        // SAME TYPE ONLY
+        propertyType:
+          currentProperty.propertyType,
+
+
+        // SAME CITY ONLY
+        city:
+          currentProperty.city,
+
+
+        approvalStatus:
+          "approved",
+
+
+        status:
+          "active"
+
+      })
+      .limit(4)
+      .populate(
+        "owner",
+        "name email"
+      );
+
+
+   
+
 
     res.json(similar);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+
+
+  } catch(error){
+
+    res.status(500).json({
+      error:error.message
+    });
+
   }
 };
 
