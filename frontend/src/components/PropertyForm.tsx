@@ -1,218 +1,197 @@
 "use client";
 
-import Loader from "@/src/components/Loader";
-import LocationSearch from "@/src/components/LocationSearch";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import LocationSearch from "./LocationSearch";
 
 
 const PROPERTY_TYPES = [
   "Flat",
   "House",
+  "Villa",
   "Plot",
-  "Office Space",
   "Shop",
+  "Office Space",
+  "Warehouse",
 ];
 
 
 const BHK_TYPES = [
-  "1BHK",
-  "2BHK",
-  "3BHK",
-  "4BHK",
+  "1 RK",
+  "1 BHK",
+  "2 BHK",
+  "3 BHK",
+  "4 BHK",
+  "5+ BHK",
 ];
 
 
 const SHOP_TYPES = [
-  "Hotel",
-  "Saloon",
-  "Grocery",
-  "Medical",
-  "Clothing",
-  "Mobile Shop",
+  "Retail Shop",
+  "Showroom",
+  "Commercial Space",
 ];
 
 
+const AMENITIES = [
+  "Parking",
+  "Lift",
+  "Security",
+  "Power Backup",
+  "Garden",
+  "Gym",
+  "Swimming Pool",
+  "Club House",
+  "Children Play Area",
+];
 
-const initialForm = {
 
-title:"",
-price:"",
-
-city:"",
-locality:"",
-location:"",
-
-description:"",
-listingType:"buy",
-
-propertyType:"",
-seller:"",
-
-bhkType:"",
-plotType:"",
-furnishing:"",
-shopType:"",
-
+type Props = {
+  mode?: "add" | "edit";
+  property?: any;
 };
 
 
+export default function AddProperty({
+  mode = "add",
+  property,
+}: Props) {
 
-const initialErrors = {
 
-title:"",
-price:"",
+const [loading,setLoading] = useState(false);
 
-city:"",
-locality:"",
-location:"",
 
-description:"",
-seller:"",
+const [form,setForm] = useState({
 
-propertyType:"",
+title:
+property?.title || "",
 
-bhkType:"",
-plotType:"",
-furnishing:"",
-shopType:"",
 
-images:"",
+price:
+property?.price || "",
 
-};
 
+city:
+property?.city || "",
 
 
+locality:
+property?.locality || "",
 
 
-export default function PropertyForm({
+location:
+property?.location || "",
 
-mode="create",
 
-property,
+seller:
+property?.seller || "",
 
-}:{
 
-mode:"create"|"edit";
+propertyType:
+property?.propertyType || "",
 
-property?:any;
 
-}){
+bhkType:
+property?.bhkType || "",
 
 
-const router = useRouter();
+plotType:
+property?.plotType || "",
 
 
+shopType:
+property?.shopType || "",
 
-const [loading,setLoading]=useState(false);
 
+listingType:
+property?.listingType || "buy",
 
 
-const [form,setForm]=useState(initialForm);
+area:
+property?.area || "",
 
 
+areaUnit:
+property?.areaUnit || "sqft",
 
-const [errors,setErrors]=useState(initialErrors);
 
+bathrooms:
+property?.bathrooms || "",
 
 
-const [images,setImages]=useState<File[]>([]);
+furnishing:
+property?.furnishing || "",
 
 
+propertyAge:
+property?.propertyAge || "",
 
 
+floor:
+property?.floor || "",
 
-// Fill data during edit
 
-useEffect(()=>{
+totalFloors:
+property?.totalFloors || "",
 
 
-if(property){
+amenities:
+property?.amenities || [],
 
-setForm({
 
-title:property.title || "",
+availableFrom:
+property?.availableFrom || "",
 
-price:String(property.price || ""),
 
+description:
+property?.description || "",
 
-city:property.city || "",
 
-locality:property.locality || "",
-
-location:property.location || "",
-
-
-description:property.description || "",
-
-
-listingType:property.listingType || "buy",
-
-
-propertyType:property.propertyType || "",
-
-
-seller:property.seller || "",
-
-
-bhkType:property.bhkType || "",
-
-
-plotType:property.plotType || "",
-
-
-furnishing:property.furnishing || "",
-
-
-shopType:property.shopType || "",
+images:
+property?.images || [],
 
 
 });
 
-}
 
 
-},[property]);
+const [errors,setErrors] = useState<any>({});
+
+
+const [newImages,setNewImages] = useState<File[]>([]);
 
 
 
+// input change
 
-
-
-const handleChange=(e:any)=>{
-
-
-const {
-name,
-value
-}=e.target;
+const handleChange = (
+e:React.ChangeEvent<
+HTMLInputElement |
+HTMLSelectElement |
+HTMLTextAreaElement
+>
+)=>{
 
 
 setForm(prev=>({
 
 ...prev,
 
-[name]:value
+[e.target.name]:
+e.target.value
 
 }));
 
 
-setErrors(prev=>({
-
-...prev,
-
-[name]:""
-
-}));
 
 };
 
 
 
+// property type select
 
-
-
-const handlePropertyType=(type:string)=>{
+const handlePropertyType = (
+type:string
+)=>{
 
 
 setForm(prev=>({
@@ -225,9 +204,7 @@ bhkType:"",
 
 plotType:"",
 
-furnishing:"",
-
-shopType:"",
+shopType:""
 
 }));
 
@@ -236,286 +213,327 @@ shopType:"",
 
 
 
+// amenities
+
+const toggleAmenity = (
+item:string
+)=>{
+
+
+setForm(prev=>({
+
+...prev,
+
+
+amenities:
+prev.amenities.includes(item)
+
+?
+prev.amenities.filter(
+(a:string)=>a!==item
+)
+
+:
+[
+...prev.amenities,
+item
+]
+
+
+}));
+
+
+};
 
 
 
-const handleImages=(files:FileList|null)=>{
+// image select
+
+const handleImages = (
+files:FileList | null
+)=>{
 
 
 if(!files)
 return;
 
 
-setImages(
-Array.from(files)
+const selected =
+Array.from(files);
+
+
+setNewImages(selected);
+
+
+};
+const handleSubmit = async (
+e: React.FormEvent
+) => {
+
+e.preventDefault();
+
+
+try {
+
+setLoading(true);
+
+
+
+const formData = new FormData();
+
+
+// basic fields
+
+formData.append(
+"title",
+form.title
 );
 
 
-};
+formData.append(
+"price",
+form.price
+);
+
+
+formData.append(
+"city",
+form.city
+);
+
+
+formData.append(
+"locality",
+form.locality
+);
+
+
+formData.append(
+"location",
+form.location
+);
+
+
+formData.append(
+"seller",
+form.seller
+);
+
+
+formData.append(
+"propertyType",
+form.propertyType
+);
+
+
+formData.append(
+"listingType",
+form.listingType
+);
+
+
+
+formData.append(
+"description",
+form.description
+);
+
+
+
+// conditional fields
+
+formData.append(
+"bhkType",
+form.bhkType
+);
+
+
+formData.append(
+"plotType",
+form.plotType
+);
+
+
+formData.append(
+"shopType",
+form.shopType
+);
+
+
+
+// new fields
+
+formData.append(
+"area",
+form.area
+);
+
+
+formData.append(
+"areaUnit",
+form.areaUnit
+);
+
+
+formData.append(
+"bathrooms",
+form.bathrooms
+);
+
+
+formData.append(
+"furnishing",
+form.furnishing
+);
+
+
+formData.append(
+"propertyAge",
+form.propertyAge
+);
+
+
+formData.append(
+"availableFrom",
+form.availableFrom
+);
+
+
+formData.append(
+"floor",
+form.floor
+);
+
+
+formData.append(
+"totalFloors",
+form.totalFloors
+);
+
+
+
+// arrays
+
+formData.append(
+"amenities",
+JSON.stringify(
+form.amenities
+)
+);
+
+
+
+// images
+
+newImages.forEach(
+(file)=>{
+
+formData.append(
+"images",
+file
+);
+
+});
 
 
 
 
+// API
+
+const API =
+process.env.NEXT_PUBLIC_API_URL;
 
 
 
-const validateForm=()=>{
+const url =
+mode==="edit"
+
+?
+
+`${API}/property/${property._id}`
+
+:
+
+`${API}/property`;
 
 
-let valid=true;
+
+const method =
+mode==="edit"
+?
+"PUT"
+:
+"POST";
 
 
-const newErrors={
-...initialErrors
-};
+
+
+const res =
+await fetch(
+url,
+{
+
+method,
+
+credentials:"include",
+
+body:formData
+
+}
+
+);
 
 
 
-if(!form.title.trim()){
+const data =
+await res.json();
 
-newErrors.title="Title is required";
 
-valid=false;
+
+if(!res.ok){
+
+throw new Error(
+data.message ||
+"Something went wrong"
+);
 
 }
 
 
 
-if(!form.price){
+alert(
+mode==="edit"
+?
+"Edit request sent for approval"
+:
+"Property created successfully"
+);
 
-newErrors.price="Price is required";
 
-valid=false;
+
+window.location.href="/properties";
+
+
+
+}
+catch(error:any){
+
+console.log(error);
+
+alert(
+error.message
+);
+
+
+}
+finally{
+
+setLoading(false);
 
 }
 
-
-
-if(!form.city){
-
-newErrors.city="Select city";
-
-valid=false;
-
-}
-
-
-
-if(!form.locality){
-
-newErrors.locality="Select locality";
-
-valid=false;
-
-}
-
-
-
-if(!form.description){
-
-newErrors.description="Description is required";
-
-valid=false;
-
-}
-
-
-
-if(!form.seller){
-
-newErrors.seller="Select seller";
-
-valid=false;
-
-}
-
-
-
-if(!form.propertyType){
-
-newErrors.propertyType="Select property type";
-
-valid=false;
-
-}
-
-
-
-if(
-mode==="create" &&
-images.length===0
-){
-
-newErrors.images="Upload image";
-
-valid=false;
-
-}
-
-
-
-setErrors(newErrors);
-
-
-return valid;
-
-
-};
-
-
-
-
-
-
-
-const handleSubmit = async (
-  e: React.FormEvent
-) => {
-
-  e.preventDefault();
-
-
-  if (!validateForm()) {
-    return;
-  }
-
-
-  try {
-
-    setLoading(true);
-
-
-    const formData = new FormData();
-
-
-    Object.entries(form).forEach(
-      ([key,value]) => {
-
-        formData.append(
-          key,
-          value
-        );
-
-      }
-    );
-
-
-
-    images.forEach((image)=>{
-
-      formData.append(
-        "images",
-        image
-      );
-
-    });
-
-
-
-    let url = "";
-    let method = "POST";
-
-
-
-    if(mode === "edit"){
-
-      // send edit request for admin approval
-
-      url =
-      `${process.env.NEXT_PUBLIC_API_URL}/property/${property._id}/edit-request`;
-
-      method="POST";
-
-    }
-    else{
-
-      // new property
-
-      url =
-      `${process.env.NEXT_PUBLIC_API_URL}/property`;
-
-      method="POST";
-
-    }
-
-
-
-    const res = await fetch(
-      url,
-      {
-
-        method,
-
-        credentials:"include",
-
-        body:formData,
-
-      }
-    );
-
-
-
-    const data =
-    await res.json();
-
-
-
-    if(!res.ok){
-
-      throw new Error(
-        data.message ||
-        "Something went wrong"
-      );
-
-    }
-
-
-
-    alert(
-      mode==="edit"
-      ?
-      "Edit request sent for admin approval"
-      :
-      "Property sent for admin approval"
-    );
-
-
-
-    router.push(
-      "/dashboard/my-properties"
-    );
-
-
-
-  }
-  catch(error:any){
-
-    alert(
-      error.message
-    );
-
-  }
-  finally{
-
-    setLoading(false);
-
-  }
 
 };
-
-
-
-
-
-
-if(loading)
-
-return <Loader/>;
-
-
-
-
-
 
 return (
 
@@ -546,362 +564,843 @@ mode==="edit"
 
 
     <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-6 space-y-5"
-      >
-        <h1 className="text-2xl font-bold">
-  {mode === "edit"
-    ? "Edit Property"
-    : "Add Property"}
+onSubmit={handleSubmit}
+className="
+w-full
+max-w-2xl
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+space-y-5
+"
+>
+
+<h1 className="text-2xl font-bold">
+{
+mode==="edit"
+?
+"Edit Property"
+:
+"Add Property"
+}
 </h1>
 
-        {/* TITLE */}
-        <div>
-          <input
-            type="text"
-            name="title"
-            placeholder="Property Title"
-            value={form.title}
-            onChange={handleChange}
-            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-          />
 
-          {errors.title && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.title}
-            </p>
-          )}
-        </div>
 
-        {/* PRICE */}
-        <div>
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            value={form.price}
-            onChange={handleChange}
-            className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-          />
+{/* TITLE */}
 
-          {errors.price && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.price}
-            </p>
-          )}
-        </div>
-
-        {/* LOCATION */}
-        <div>
-   <LocationSearch
-  city={form.city}
-  locality={form.locality}
-  onSelect={({ city, locality }) => {
-    setForm((prev) => ({
-      ...prev,
-      city,
-      locality,
-      location: `${locality}, ${city}`,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      location: "",
-    }));
-  }}
+<input
+type="text"
+name="title"
+placeholder="Property Title"
+value={form.title}
+onChange={handleChange}
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
 />
 
 
-          {errors.location && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.location}
-            </p>
-          )}
-        </div>
 
-        {/* SELLER */}
-        <div>
-          <p className="font-medium mb-3">
-            Seller
-          </p>
+{/* PRICE */}
 
-          <div className="grid grid-cols-2 gap-3">
+<input
+type="number"
+name="price"
+placeholder="Price"
+value={form.price}
+onChange={handleChange}
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+/>
 
-            {["owner", "agent"].map(
-              (type) => (
 
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() =>
-                    setForm((prev) => ({
-                      ...prev,
-                      seller: type,
-                    }))
-                  }
-                  className={`h-12 rounded-xl border text-sm font-medium transition ${
-                    form.seller === type
-                      ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                      : "bg-white text-gray-700"
-                  }`}
-                >
-                  {type === "owner"
-                    ? "Owner"
-                    : "Agent"}
-                </button>
 
-              )
-            )}
+{/* LOCATION */}
 
-          </div>
+<LocationSearch
 
-          {errors.seller && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.seller}
-            </p>
-          )}
-        </div>
+city={form.city}
 
-        {/* PROPERTY TYPE */}
-        <div>
-          <p className="font-medium mb-3">
-            Property Type
-          </p>
+locality={form.locality}
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+onSelect={({city,locality})=>{
 
-            {PROPERTY_TYPES.map((type) => (
+setForm(prev=>({
 
-              <button
-                key={type}
-                type="button"
-                onClick={() =>
-                  handlePropertyType(type)
-                }
-                className={`rounded-xl border p-3 text-sm font-medium transition ${
-                  form.propertyType ===
-                  type
-                    ? "bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 text-white border-orange-400"
-                    : "bg-white text-gray-700"
-                }`}
-              >
-                {type}
-              </button>
+...prev,
 
-            ))}
+city,
 
-          </div>
+locality,
 
-          {errors.propertyType && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.propertyType}
-            </p>
-          )}
-        </div>
+location:
+`${locality}, ${city}`
 
-        {/* BHK */}
-        {[
-          "Flat",
-          "House",
-        ].includes(form.propertyType) && (
+}));
 
-          <div>
-            <select
-              name="bhkType"
-              value={form.bhkType}
-              onChange={handleChange}
-              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-            >
-              <option value="">
-                Select BHK
-              </option>
+}}
 
-              {BHK_TYPES.map((type) => (
+/>
 
-                <option
-                  key={type}
-                  value={type}
-                >
-                  {type}
-                </option>
 
-              ))}
 
-            </select>
+{/* SELLER */}
 
-            {errors.bhkType && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.bhkType}
-              </p>
-            )}
-          </div>
+<div>
 
-        )}
+<p className="font-medium mb-3">
+Posted By
+</p>
 
-        {/* PLOT */}
-        {form.propertyType ===
-          "Plot" && (
 
-          <div>
-            <select
-              name="plotType"
-              value={form.plotType}
-              onChange={handleChange}
-              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-            >
-              <option value="">
-                Plot Type
-              </option>
+<div className="grid grid-cols-2 gap-3">
 
-              <option value="Residential">
-                Residential
-              </option>
 
-              <option value="Commercial">
-                Commercial
-              </option>
-            </select>
+{
+["owner","agent"].map(item=>(
 
-            {errors.plotType && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.plotType}
-              </p>
-            )}
-          </div>
 
-        )}
+<button
 
-        {/* FURNISHING */}
-        {form.propertyType ===
-          "Office Space" && (
+key={item}
 
-          <div>
-            <select
-              name="furnishing"
-              value={form.furnishing}
-              onChange={handleChange}
-              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-            >
-              <option value="">
-                Furnishing
-              </option>
+type="button"
 
-              <option value="Furnished">
-                Furnished
-              </option>
+onClick={()=>setForm(prev=>({
 
-              <option value="Unfurnished">
-                Unfurnished
-              </option>
-            </select>
+...prev,
 
-            {errors.furnishing && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.furnishing}
-              </p>
-            )}
-          </div>
+seller:item
 
-        )}
+}))}
 
-        {/* SHOP */}
-        {form.propertyType ===
-          "Shop" && (
 
-          <div>
-            <select
-              name="shopType"
-              value={form.shopType}
-              onChange={handleChange}
-              className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-            >
-              <option value="">
-                Shop Type
-              </option>
+className={`
+h-12
+rounded-xl
+border
 
-              {SHOP_TYPES.map((type) => (
+${
+form.seller===item
 
-                <option
-                  key={type}
-                  value={type}
-                >
-                  {type}
-                </option>
+?
+"bg-orange-500 text-white"
 
-              ))}
+:
+"bg-white"
+}
 
-            </select>
+`}
 
-            {errors.shopType && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.shopType}
-              </p>
-            )}
-          </div>
+>
 
-        )}
+{
+item==="owner"
+?
+"Owner"
+:
+"Agent"
+}
 
-        {/* BUY RENT */}
-        <select
-          name="listingType"
-          value={form.listingType}
-          onChange={handleChange}
-          className="w-full h-12 border rounded-xl px-4 outline-none focus:ring-2 focus:ring-orange-400"
-        >
-          <option value="buy">
-            Buy
-          </option>
+</button>
 
-          <option value="rent">
-            Rent
-          </option>
-        </select>
 
-        {/* DESCRIPTION */}
-        <div>
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={form.description}
-            onChange={handleChange}
-            rows={5}
-            className="w-full border rounded-xl p-4 outline-none focus:ring-2 focus:ring-orange-400"
-          />
+))
+}
 
-          {errors.description && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.description}
-            </p>
-          )}
-        </div>
 
-        {/* IMAGES */}
-        <div>
-          <input
-            type="file"
-            multiple
-            onChange={(e) =>
-              handleImages(
-                e.target.files
-              )
-            }
-            className="w-full"
-          />
+</div>
 
-          {errors.images && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.images}
-            </p>
-          )}
-        </div>
+</div>
 
-        {/* SUBMIT */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full h-12 rounded-xl text-white font-medium bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 shadow-md"
-        >
-         {
+
+
+
+{/* PROPERTY TYPE */}
+
+<div>
+
+<p className="font-medium mb-3">
+Property Type
+</p>
+
+
+<div className="
+grid
+grid-cols-2
+md:grid-cols-4
+gap-3
+">
+
+
+{
+PROPERTY_TYPES.map(type=>(
+
+
+<button
+
+type="button"
+
+key={type}
+
+onClick={()=>handlePropertyType(type)}
+
+className={`
+p-3
+rounded-xl
+border
+
+${
+form.propertyType===type
+?
+"bg-orange-500 text-white"
+:
+"bg-white"
+}
+
+`}
+
+>
+
+{type}
+
+</button>
+
+
+))
+
+}
+
+
+</div>
+
+</div>
+
+
+
+
+
+{/* BHK */}
+
+{
+["Flat","House","Villa"]
+.includes(form.propertyType)
+
+&&
+
+<select
+
+name="bhkType"
+
+value={form.bhkType}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+<option value="">
+Select BHK
+</option>
+
+
+{
+BHK_TYPES.map(x=>(
+
+<option
+key={x}
+value={x}
+>
+
+{x}
+
+</option>
+
+))
+
+}
+
+
+</select>
+
+}
+
+
+
+
+{/* PLOT */}
+
+{
+
+form.propertyType==="Plot"
+
+&&
+
+<select
+
+name="plotType"
+
+value={form.plotType}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+<option value="">
+Plot Type
+</option>
+
+<option>
+Residential
+</option>
+
+<option>
+Commercial
+</option>
+
+
+</select>
+
+
+}
+
+
+
+
+
+{/* SHOP */}
+
+{
+
+form.propertyType==="Shop"
+
+&&
+
+<select
+
+name="shopType"
+
+value={form.shopType}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+
+<option value="">
+Shop Type
+</option>
+
+
+{
+SHOP_TYPES.map(x=>(
+
+<option
+key={x}
+value={x}
+>
+{x}
+</option>
+
+))
+
+}
+
+
+</select>
+
+
+}
+
+
+
+
+
+{/* BUY RENT */}
+
+<select
+
+name="listingType"
+
+value={form.listingType}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+<option value="buy">
+Sell
+</option>
+
+
+<option value="rent">
+Rent
+</option>
+
+
+</select>
+
+
+
+
+
+{/* AREA */}
+
+<div className="
+grid
+grid-cols-2
+gap-3
+">
+
+
+<input
+
+type="number"
+
+name="area"
+
+placeholder="Area"
+
+value={form.area}
+
+onChange={handleChange}
+
+className="
+h-12
+border
+rounded-xl
+px-4
+"
+
+/>
+
+
+
+<select
+
+name="areaUnit"
+
+value={form.areaUnit}
+
+onChange={handleChange}
+
+className="
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+<option value="sqft">
+Sq Ft
+</option>
+
+
+<option value="sqm">
+Sq Meter
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+{/* BATHROOM */}
+
+<select
+
+name="bathrooms"
+
+value={form.bathrooms}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+
+<option value="">
+Bathrooms
+</option>
+
+<option>
+1
+</option>
+
+<option>
+2
+</option>
+
+<option>
+3
+</option>
+
+<option>
+4+
+</option>
+
+
+</select>
+
+
+
+
+
+{/* FURNISHING */}
+
+<select
+
+name="furnishing"
+
+value={form.furnishing}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+<option value="">
+Furnishing
+</option>
+
+
+<option>
+Fully Furnished
+</option>
+
+
+<option>
+Semi Furnished
+</option>
+
+
+<option>
+Unfurnished
+</option>
+
+
+</select>
+
+
+
+
+
+{/* AGE */}
+
+<select
+
+name="propertyAge"
+
+value={form.propertyAge}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+>
+
+<option value="">
+Property Age
+</option>
+
+
+<option>
+New Construction
+</option>
+
+<option>
+0-5 Years
+</option>
+
+<option>
+5-10 Years
+</option>
+
+<option>
+10+ Years
+</option>
+
+
+</select>
+
+
+
+
+
+{/* FLOOR */}
+
+<div className="
+grid
+grid-cols-2
+gap-3
+">
+
+
+<input
+
+type="number"
+
+name="floor"
+
+placeholder="Floor"
+
+value={form.floor}
+
+onChange={handleChange}
+
+className="
+h-12
+border
+rounded-xl
+px-4
+"
+
+/>
+
+
+<input
+
+type="number"
+
+name="totalFloors"
+
+placeholder="Total Floors"
+
+value={form.totalFloors}
+
+onChange={handleChange}
+
+className="
+h-12
+border
+rounded-xl
+px-4
+"
+
+/>
+
+
+</div>
+
+
+
+
+
+{/* AMENITIES */}
+
+<div>
+
+<p className="font-medium mb-3">
+Amenities
+</p>
+
+
+<div className="
+grid
+grid-cols-2
+gap-3
+">
+
+
+{
+AMENITIES.map(item=>(
+
+
+<label
+key={item}
+className="flex gap-2"
+>
+
+<input
+
+type="checkbox"
+
+checked={
+form.amenities.includes(item)
+}
+
+onChange={()=>toggleAmenity(item)}
+
+/>
+
+{item}
+
+</label>
+
+
+))
+
+}
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+{/* AVAILABLE DATE */}
+
+<input
+
+type="date"
+
+name="availableFrom"
+
+value={form.availableFrom}
+
+onChange={handleChange}
+
+className="
+w-full
+h-12
+border
+rounded-xl
+px-4
+"
+
+/>
+
+
+
+
+
+{/* DESCRIPTION */}
+
+<textarea
+
+name="description"
+
+placeholder="Description"
+
+value={form.description}
+
+onChange={handleChange}
+
+rows={5}
+
+className="
+w-full
+border
+rounded-xl
+p-4
+"
+
+/>
+
+
+
+
+
+{/* IMAGES */}
+
+<input
+
+type="file"
+
+multiple
+
+onChange={(e)=>
+handleImages(e.target.files)
+}
+
+/>
+
+
+
+
+
+<button
+
+disabled={loading}
+
+className="
+w-full
+h-12
+rounded-xl
+text-white
+font-medium
+bg-gradient-to-r
+from-orange-500
+via-amber-400
+to-yellow-300
+"
+
+>
+
+{
 loading
 ?
 "Uploading..."
@@ -912,9 +1411,13 @@ mode==="edit"
 :
 "Create Property"
 }
-        </button>
 
-      </form>
+
+</button>
+
+
+
+</form>
 
 
 

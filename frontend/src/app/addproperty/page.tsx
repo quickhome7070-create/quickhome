@@ -661,7 +661,7 @@ export default function AddProperty() {
 
 //     </div>
 <PropertyForm
-mode="create"
+mode="add"
 />
   );
 }

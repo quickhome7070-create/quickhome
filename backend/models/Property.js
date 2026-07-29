@@ -33,11 +33,17 @@ const propertySchema = new mongoose.Schema(
     },
 
     // NEW
-    furnishing: {
-      type: String,
-      enum: ["Furnished", "Unfurnished", ""],
-      default: "",
-    },
+  furnishing: {
+ type:String,
+ enum:[
+   "Furnished",
+   "Semi Furnished",
+   "Fully Furnished",
+   "Unfurnished",
+   ""
+ ],
+ default:""
+},
 
     // NEW
     shopType: {
@@ -67,7 +73,61 @@ locality:{
   index:true
 },
 
-   
+ // AREA
+area: {
+  type: Number,
+  default: 0,
+},
+
+areaUnit: {
+  type: String,
+  enum: ["sqft", "sqm"],
+  default: "sqft",
+},
+
+
+// BATHROOM
+bathrooms: {
+  type: String,
+  default: "",
+},
+
+views:{
+ type:Number,
+ default:0
+},
+
+// PROPERTY AGE
+propertyAge: {
+  type: String,
+  default: "",
+},
+
+
+// FLOOR DETAILS
+floor: {
+  type: Number,
+  default: 0,
+},
+
+totalFloors: {
+  type: Number,
+  default: 0,
+},
+
+
+// AMENITIES
+amenities: [
+  {
+    type: String,
+  },
+],
+
+
+// AVAILABILITY
+availableFrom: {
+  type: Date,
+},  
 
     description: {
       type: String,

@@ -30,15 +30,57 @@ const editRequest = await PropertyEditRequest.create({
 
  requestedBy:req.user.userId,
 
- oldData:{
-   title:property.title,
-   price:property.price,
-   city:property.city,
-   locality:property.locality,
-   location:property.location,
-   description:property.description,
-   images:property.images || []
- },
+oldData:{
+
+   title: property.title,
+
+   price: property.price,
+
+   city: property.city,
+
+   locality: property.locality,
+
+   location: property.location,
+
+   description: property.description,
+
+
+   propertyType: property.propertyType,
+
+   seller: property.seller,
+
+   listingType: property.listingType,
+
+
+   bhkType: property.bhkType,
+
+   plotType: property.plotType,
+
+   furnishing: property.furnishing,
+
+   shopType: property.shopType,
+
+
+   area: property.area,
+
+   areaUnit: property.areaUnit,
+
+   bathrooms: property.bathrooms,
+
+   propertyAge: property.propertyAge,
+
+   floor: property.floor,
+
+   totalFloors: property.totalFloors,
+
+   amenities: property.amenities || [],
+
+   availableFrom: property.availableFrom,
+
+
+   images: property.images || []
+
+},
 
  changes:req.body,
 
@@ -73,55 +115,128 @@ res.status(500).json({
 // CREATE PROPERTY
 exports.createProperty = async (req, res) => {
   try {
- const {
-  title,
-  price,
 
-  city,
-  locality,
-  location,
+    const {
+      title,
+      price,
 
-  description,
-  listingType,
-  propertyType,
-  seller,
-  bhkType,
-  plotType,
-  furnishing,
-  shopType,
+      city,
+      locality,
+      location,
 
-} = req.body;
+      description,
+      listingType,
+      propertyType,
+      seller,
+
+      bhkType,
+      plotType,
+      furnishing,
+      shopType,
+
+      // NEW FIELDS
+      area,
+      areaUnit,
+      bathrooms,
+      propertyAge,
+      floor,
+      totalFloors,
+      amenities,
+      availableFrom,
+
+    } = req.body;
+
+
 
     const images = req.files
       ? req.files.map((file) => file.path)
       : [];
 
+
+
     const property = await Property.create({
+
       title,
+
       price,
-       city,
-  locality,
-  location,
+
+
+      city,
+
+      locality,
+
+      location,
+
+
       description,
+
+
       listingType,
-      images,
+
+
       propertyType,
+
+
       seller,
+
+
       bhkType,
-plotType,
-furnishing,
-shopType,
+
+      plotType,
+
+      furnishing,
+
+      shopType,
+
+
+      // NEW FIELDS
+
+      area,
+
+      areaUnit,
+
+      bathrooms,
+
+      propertyAge,
+
+      floor,
+
+      totalFloors,
+
+
+      amenities:
+        amenities
+        ?
+        JSON.parse(amenities)
+        :
+        [],
+
+
+      availableFrom,
+
+
+      images,
+
+
       owner: req.user.userId,
+
     });
+
+
 
     res.status(201).json(property);
 
+
+
   } catch (error) {
+
     console.log(error);
+
 
     res.status(500).json({
       message: error.message,
     });
+
   }
 };
 
@@ -286,13 +401,53 @@ requestedBy: req.user.userId,
 
 oldData:{
 
-title:property.title,
-price:property.price,
-city:property.city,
-locality:property.locality,
-location:property.location,
-description:property.description,
-images:property.images || []
+   title: property.title,
+
+   price: property.price,
+
+   city: property.city,
+
+   locality: property.locality,
+
+   location: property.location,
+
+   description: property.description,
+
+
+   propertyType: property.propertyType,
+
+   seller: property.seller,
+
+   listingType: property.listingType,
+
+
+   bhkType: property.bhkType,
+
+   plotType: property.plotType,
+
+   furnishing: property.furnishing,
+
+   shopType: property.shopType,
+
+
+   area: property.area,
+
+   areaUnit: property.areaUnit,
+
+   bathrooms: property.bathrooms,
+
+   propertyAge: property.propertyAge,
+
+   floor: property.floor,
+
+   totalFloors: property.totalFloors,
+
+   amenities: property.amenities || [],
+
+   availableFrom: property.availableFrom,
+
+
+   images: property.images || []
 
 },
 
@@ -500,7 +655,7 @@ exports.getDashboardStats = async (req, res) => {
       totalProperties,
       myProperties: myProperties,
   sold: soldCount,
-  favorites: favoritesCount,
+  favorites: favorites,
   views: user.contactViews || 0,
       recentlyViewed,
       isSubscribed,
@@ -609,6 +764,9 @@ exports.getAllProperties = async (req, res) => {
       limit = 6,
       seller ="",
       bhkType = "",
+      area = "",
+bathrooms = "",
+propertyAge = "",
 plotType = "",
 furnishing = "",
 shopType = "",
@@ -682,6 +840,20 @@ $options:"i"
 // BHK
 if (bhkType.trim()) {
   query.bhkType = bhkType;
+}
+
+if(area.trim()){
+ query.area = Number(area);
+}
+
+
+if(bathrooms.trim()){
+ query.bathrooms = bathrooms;
+}
+
+
+if(propertyAge.trim()){
+ query.propertyAge = propertyAge;
 }
 
 // Plot Type

@@ -95,7 +95,7 @@ const markSold = async (id: string) => {
         transition-all
       "
     >
-      + Add Property
+      Post Property
     </Link>
 
   </div>
