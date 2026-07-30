@@ -80,7 +80,8 @@ type Contact = {
   name: string;
   phone: string;
   email: string;
-  contactsRemaining: number;
+  premium?: boolean;
+   contactsRemaining?: number;
 };
 
 type Props = {
@@ -104,6 +105,7 @@ export default function PropertyDetailsClient({
 
   const sliderRef =
     useRef<HTMLDivElement>(null);
+    const [showContactSheet, setShowContactSheet] = useState(false);
 
     const [showFullDescription, setShowFullDescription] = useState(false);
 
@@ -161,6 +163,7 @@ const [showGallery, setShowGallery] =
   }, []);
 
   const handleViewContact = async () => {
+    
   if (!user) {
     router.push("/login");
     return;
@@ -179,6 +182,7 @@ const [showGallery, setShowGallery] =
     );
 
     const data = await response.json();
+    console.log("CONTACT API:", data);
 
     // Free contacts exhausted
     if (response.status === 403) {
@@ -198,8 +202,8 @@ const [showGallery, setShowGallery] =
       return;
     }
 
-    setContact(data);
-
+setContact(data);
+setShowContactSheet(true);
   } catch (error) {
     console.error(error);
     setError("Something went wrong");
@@ -566,63 +570,211 @@ mt-1
 }
 
 
-{/* CONTACT STICKY */}
+{/* STICKY BUTTONS */}
 
 <div
-className="
-fixed
-bottom-3
-left-4
-right-4
-bg-white
-border
-border-gray-200
-rounded-full
-px-3
-py-2
-z-50
-shadow-md
-"
+  className="
+    fixed
+    bottom-3
+    left-4
+    right-4
+    bg-white
+    border
+    border-gray-200
+    rounded-full
+    px-3
+    py-2
+    shadow-md
+    z-40
+  "
 >
 
-<div className="flex gap-2">
+  <div className="flex gap-2">
 
-<button
-onClick={handleViewContact}
-className="
-flex-1
-h-10
-rounded-full
-bg-[#ffb224]
-text-gray-900
-text-sm
-font-medium
-"
->
-View Contact
-</button>
+    <button
+      onClick={handleViewContact}
+      disabled={loadingContact}
+      className="
+        flex-1
+        h-10
+        rounded-full
+        bg-[#ffb224]
+        text-gray-900
+        text-sm
+        font-medium
+      "
+    >
+      {loadingContact ? "Loading..." : "View Contact"}
+    </button>
 
+    <button
+      className="
+        flex-1
+        h-10
+        rounded-full
+        border
+        border-[#ffb224]
+        text-sm
+        text-gray-800
+      "
+    >
+      Chat
+    </button>
 
-<button
-className="
-flex-1
-h-10
-rounded-full
-border
-border-[#ffb224]
-text-gray-800
-text-sm
-font-medium
-"
->
-Chat
-</button>
+  </div>
 
 </div>
 
+{showContactSheet && contact && (
+
+  <>
+    {/* BACKDROP */}
+
+    <div
+      onClick={() => setShowContactSheet(false)}
+      className="
+        fixed
+        inset-0
+        bg-black/40
+        z-50
+      "
+    />
+
+    {/* SHEET */}
+
+    <div
+      className="
+        fixed
+        bottom-0
+        left-0
+        right-0
+        bg-white
+        rounded-t-3xl
+        px-6
+        pt-5
+        pb-8
+        z-50
+        animate-in
+        slide-in-from-bottom
+      "
+    >
+
+      {/* HANDLE */}
+
+      <div className="flex justify-center mb-5">
+
+        <div className="w-10 h-1 rounded-full bg-gray-300" />
+
+      </div>
+
+      <p className="text-base text-gray-900 text-center mb-6">
+        Owner Details
+      </p>
+
+      <div className="space-y-5">
+
+        <div>
+
+          <p className="text-xs text-gray-400">
+            Name
+          </p>
+
+          <p className="text-sm text-gray-800 mt-1">
+            {contact.name}
+          </p>
+
+        </div>
+
+        <div>
+
+          <p className="text-xs text-gray-400">
+            Phone
+          </p>
+
+          <a
+            href={`tel:${contact.phone}`}
+            className="text-sm text-gray-800 mt-1 block"
+          >
+            {contact.phone}
+          </a>
+
+        </div>
+
+        <div>
+
+          <p className="text-xs text-gray-400">
+            Email
+          </p>
+
+          <a
+            href={`mailto:${contact.email}`}
+            className="text-sm text-gray-800 mt-1 break-all block"
+          >
+            {contact.email}
+          </a>
+
+        </div>
+
+      </div>
+
+      <div className="flex items-center justify-center my-10">
+
+  <span
+    className="
+      text-xs
+      text-[#c08a00]
+      border
+      border-[#f3d27a]
+      rounded-full
+      px-3
+      py-1
+    "
+  >
+    {contact.contactsRemaining} contacts remaining
+  </span>
+
 </div>
 
+      {/* <div className="flex gap-3 mt-7">
 
+        <a
+          // href={`tel:${contact.phone}`}
+          className="
+            flex-1
+            h-11
+            rounded-full
+            bg-[#ffb224]
+            text-gray-900
+            flex
+            items-center
+            justify-center
+            text-sm
+            font-medium
+          "
+        >
+          Call
+        </a>
+
+        <button
+          className="
+            flex-1
+            h-11
+            rounded-full
+            border
+            border-[#ffb224]
+            text-sm
+          "
+        >
+          Chat
+        </button>
+
+      </div> */}
+
+    </div>
+
+  </>
+
+)}
 
 </div>
 );
