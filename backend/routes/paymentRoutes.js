@@ -9,7 +9,8 @@ const {
 
 
 const {
-  createOrder
+  createOrder,
+  verifyPayment
 } = require("../controllers/paymentController");
 
 
@@ -20,5 +21,10 @@ router.post(
   createOrder
 );
 
+router.get(
+  "/verify/:orderId",
+  protect,
+  verifyPayment
+);
 
 module.exports = router;

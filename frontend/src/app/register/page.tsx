@@ -300,9 +300,6 @@ data.message
 
 
 
-alert(
-"Registered successfully 🎉"
-);
 
 
 await fetchUser();

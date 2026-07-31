@@ -431,3 +431,30 @@ return res.status(500).send(
 
 
 };
+
+exports.verifyPayment = async (req, res) => {
+  try {
+    const payment = await Payment.findOne({
+      orderId: req.params.orderId,
+    });
+
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        status: "FAILED",
+      });
+    }
+
+    return res.json({
+      success: true,
+      status: payment.status,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      status: "FAILED",
+    });
+  }
+};
