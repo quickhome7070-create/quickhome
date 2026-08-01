@@ -13,9 +13,7 @@ const inter = Inter({
 export const metadata = {
   title: "Ghar Destiny",
   description: "Buy Sell Rent Properties",
-   icons: {
-    icon: "/ghardestiny_icon.png",
-  },
+  
 };
 
 export const viewport = {
