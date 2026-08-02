@@ -190,7 +190,7 @@ const [showGallery, setShowGallery] =
     );
 
     const data = await response.json();
-    console.log("CONTACT API:", data);
+   
 
     // Free contacts exhausted
     if (response.status === 403) {
@@ -220,6 +220,19 @@ setShowContactSheet(true);
   }
 };
 
+const handleChat = async () => {
+
+  // Already have contact
+  if (contact?.phone) {
+    window.location.href = whatsappUrl;
+    return;
+  }
+
+  // Need to get contact first
+  await handleViewContact();
+
+};
+
   const toggleFavorite =
     async () => {
 
@@ -243,7 +256,7 @@ setShowContactSheet(true);
       }
     };
 
-    console.log("USER:", user);
+    
 
 return (
 <div className="min-h-screen bg-white pb-24">
@@ -614,14 +627,8 @@ mt-1
       {loadingContact ? "Loading..." : "Contact"}
     </button>
 
-    <button
-  onClick={() => {
-    if (user?.subscription?.status === "premium") {
-      window.open(whatsappUrl, "_blank");
-    } else {
-      router.push("/plans");
-    }
-  }}
+  <button
+  onClick={handleChat}
   className="
     flex-1
     h-11
