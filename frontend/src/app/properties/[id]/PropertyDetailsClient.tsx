@@ -376,7 +376,7 @@ rounded-full
 
 <div className="px-4 py-4">
 
-  <div className="grid grid-cols-3 gap-y-6">
+  <div className="grid grid-cols-4 gap-x-8 gap-y-4">
 
     <div className="flex flex-col items-center">
       <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
@@ -392,8 +392,9 @@ rounded-full
         <Bath size={18} className="text-gray-400" strokeWidth={1.8} />
       </div>
       <p className="mt-2 text-xs text-gray-700 text-center">
-        {property.bathrooms}
-      </p>
+  {property.bathrooms}{" "}
+  {Number(property.bathrooms) === 1 ? "Bathroom" : "Bathrooms"}
+</p>
     </div>
 
     <div className="flex flex-col items-center">
