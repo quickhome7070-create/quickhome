@@ -105,6 +105,8 @@ export default function PropertyDetailsClient({
 
   const sliderRef =
     useRef<HTMLDivElement>(null);
+
+    
     const [showContactSheet, setShowContactSheet] = useState(false);
 
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -120,9 +122,15 @@ const [showGallery, setShowGallery] =
 
   const [contact, setContact] =
     useState<Contact | null>(null);
+    
 
   const [loadingContact, setLoadingContact] =
     useState(false);
+      const whatsappUrl = contact?.phone
+    ? `https://wa.me/91${contact.phone.replace(/\D/g, "").replace(/^91/, "")}?text=${encodeURIComponent(
+        `Hi ${contact.name}, I'm interested in your property on GharDestiny. Is it still available?`
+      )}`
+    : "";
 
   const [locked, setLocked] =
     useState(false);
@@ -234,6 +242,8 @@ setShowContactSheet(true);
         console.log(error);
       }
     };
+
+    console.log("USER:", user);
 
 return (
 <div className="min-h-screen bg-white pb-24">
@@ -575,28 +585,25 @@ mt-1
 <div
   className="
     fixed
-    bottom-3
-    left-4
-    right-4
+    bottom-0
+    left-0
+    right-0
     bg-white
-    border
+    border-t
     border-gray-200
-    rounded-full
-    px-3
-    py-2
-    shadow-md
+    px-4
+    py-3
     z-40
+    shadow-[0_-2px_10px_rgba(0,0,0,0.08)]
   "
 >
-
-  <div className="flex gap-2">
-
+  <div className="flex gap-2 max-w-md mx-auto">
     <button
       onClick={handleViewContact}
       disabled={loadingContact}
       className="
         flex-1
-        h-10
+        h-11
         rounded-full
         bg-[#ffb224]
         text-gray-900
@@ -604,25 +611,30 @@ mt-1
         font-medium
       "
     >
-      {loadingContact ? "Loading..." : "View Contact"}
+      {loadingContact ? "Loading..." : "Contact"}
     </button>
 
     <button
-      className="
-        flex-1
-        h-10
-        rounded-full
-        border
-        border-[#ffb224]
-        text-sm
-        text-gray-800
-      "
-    >
-      Chat
-    </button>
-
+  onClick={() => {
+    if (user?.subscription?.status === "premium") {
+      window.open(whatsappUrl, "_blank");
+    } else {
+      router.push("/plans");
+    }
+  }}
+  className="
+    flex-1
+    h-11
+    rounded-full
+    border
+    border-[#ffb224]
+    text-sm
+    text-gray-800
+  "
+>
+  Chat
+</button>
   </div>
-
 </div>
 
 {showContactSheet && contact && (
@@ -755,18 +767,26 @@ mt-1
           Call
         </a>
 
-        <button
-          className="
-            flex-1
-            h-11
-            rounded-full
-            border
-            border-[#ffb224]
-            text-sm
-          "
-        >
-          Chat
-        </button>
+       <button
+  onClick={() => {
+    if (user?.subscription?.status === "premium") {
+      window.open(whatsappUrl, "_blank");
+    } else {
+      router.push("/plans");
+    }
+  }}
+  className="
+    flex-1
+    h-11
+    rounded-full
+    border
+    border-[#ffb224]
+    text-sm
+    text-gray-800
+  "
+>
+  Chat
+</button>
 
       </div>
 
