@@ -735,7 +735,7 @@ mt-1
 
 </div>
 
-      {/* <div className="flex gap-3 mt-7">
+      <div className="flex gap-3 mt-7">
 
         <a
           // href={`tel:${contact.phone}`}
@@ -768,7 +768,7 @@ mt-1
           Chat
         </button>
 
-      </div> */}
+      </div>
 
     </div>
 
