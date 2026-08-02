@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 type Props = {
   images?: string[];
@@ -17,10 +17,43 @@ export default function ImageCarousel({
 
   const [open, setOpen] = useState(false);
 
+  const [currentImage, setCurrentImage] = useState(0);
+  const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const [disableTransition, setDisableTransition] = useState(false);
 
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+
+ 
+useEffect(() => {
+  if (!open) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const index = Number(
+            entry.target.getAttribute("data-index")
+          );
+
+          setCurrentImage(index);
+        }
+      });
+    },
+    {
+      threshold: 0.6,
+    }
+  );
+
+  imageRefs.current.forEach((img) => {
+    if (img) observer.observe(img);
+  });
+
+  return () => observer.disconnect();
+
+}, [open]);
+
 
 
   if (!images.length) {
@@ -341,34 +374,65 @@ open &&
     snap-mandatory
   "
 >
-
-<button
+<div
 className="
 fixed
 top-5
-right-5
+left-1/2
+-translate-x-1/2
 z-[60]
+bg-black/50
+backdrop-blur-md
 text-white
-text-4xl
+text-sm
+font-medium
+px-4
+py-2
+rounded-full
 "
-onClick={() => setOpen(false)}
 >
-×
+{currentImage + 1} / {images.length}
+</div>
+<button
+  onClick={() => setOpen(false)}
+  className="
+    fixed
+    top-4
+    right-4
+    z-[60]
+    w-10
+    h-10
+    rounded-full
+    bg-black/50
+    backdrop-blur-md
+    text-white
+    text-2xl
+    flex
+    items-center
+    justify-center
+    hover:bg-black/70
+    transition
+  "
+>
+  ✕
 </button>
 
 {images.map((img, i) => (
 
 <div
   key={i}
+  ref={(el) => {
+    imageRefs.current[i] = el;
+  }}
+  data-index={i}
   className="
     relative
     w-full
     h-screen
+    snap-start
     flex
     items-center
     justify-center
-    bg-black
-    snap-start
   "
 >
   <Image

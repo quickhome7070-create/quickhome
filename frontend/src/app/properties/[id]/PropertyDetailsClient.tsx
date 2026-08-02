@@ -258,32 +258,29 @@ return (
 
 
   {/* Favorite */}
-  <Heart
-    onClick={(e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleFavorite(id);
-    }}
-    size={24}
-    className={`
-      absolute
-      top-4
-      right-4
-      z-10
-      cursor-pointer
-      bg-white/90
-      rounded-full
-      p-2
-      w-10
-      h-10
-      shadow
-      ${
-        isFavorite(id)
-          ? "fill-[#ffb224] text-[#ffb224]"
-          : "text-gray-700"
-      }
-    `}
-  />
+<Heart
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite(id);
+  }}
+  size={28}
+  className={`
+    absolute
+    top-4
+    right-4
+    z-10
+    cursor-pointer
+    drop-shadow-md
+    transition-all
+    duration-200
+    ${
+      isFavorite(id)
+        ? "fill-[#ffb224] text-[#ffb224]"
+        : "text-white hover:text-[#ffb224]"
+    }
+  `}
+/>
 
 
   {/* Back Button */}
