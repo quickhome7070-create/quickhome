@@ -297,7 +297,82 @@ item
 
 };
 
+const [generating,setGenerating] = useState(false);
 
+
+
+const generateDescription = async()=>{
+
+try{
+
+if(!form.propertyType || !form.city || !form.locality){
+alert("Please fill property type and location first");
+return;
+}
+
+
+setGenerating(true);
+
+
+const res = await fetch(
+`${process.env.NEXT_PUBLIC_API_URL}/ai/property-description`,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+propertyType: form.propertyType,
+bhkType: form.bhkType,
+city: form.city,
+locality: form.locality,
+area: form.area,
+areaUnit: form.areaUnit,
+furnishing: form.furnishing,
+propertyAge: form.propertyAge,
+amenities: form.amenities,
+listingType: form.listingType
+
+})
+}
+);
+
+
+const data = await res.json();
+
+
+if(!res.ok){
+throw new Error(
+data.message || "AI generation failed"
+);
+}
+
+
+setForm(prev=>({
+
+...prev,
+
+description:data.description
+
+}));
+
+
+}
+catch(error:any){
+
+console.log(error);
+
+alert(error.message);
+
+}
+finally{
+
+setGenerating(false);
+
+}
+
+};
 
 // image select
 
@@ -1380,34 +1455,41 @@ onChange={()=>toggleAmenity(item)}
       className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10"
     />
 
-    <DatePicker
-      selected={selectedDate}
-      onChange={(date: Date | null) => {
-        setForm((prev) => ({
-          ...prev,
-          availableFrom: date
-            ? date.toISOString().split("T")[0]
-            : "",
-        }));
-      }}
-      placeholderText="Select Available Date"
-      dateFormat="dd MMM yyyy"
-      className="
-        w-full
-        h-12
-        rounded-xl
-        border
-        border-gray-300
-        bg-white
-        pl-12
-        pr-4
-        outline-none
-        focus:border-gray-400
-        focus:ring-2
-        focus:ring-gray-200
-      "
-      wrapperClassName="w-full"
-    />
+   <DatePicker
+  selected={selectedDate}
+
+  onChange={(date: Date | null) => {
+    setForm((prev) => ({
+      ...prev,
+      availableFrom: date
+        ? date.toISOString().split("T")[0]
+        : "",
+    }));
+  }}
+
+  minDate={new Date()}
+
+  placeholderText="Select Available Date"
+
+  dateFormat="dd MMM yyyy"
+
+  className="
+    w-full
+    h-12
+    rounded-xl
+    border
+    border-gray-300
+    bg-white
+    pl-12
+    pr-4
+    outline-none
+    focus:border-gray-400
+    focus:ring-2
+    focus:ring-gray-200
+  "
+
+  wrapperClassName="w-full"
+/>
 
   </div>
 </div>
@@ -1416,6 +1498,11 @@ onChange={()=>toggleAmenity(item)}
 
 
 {/* DESCRIPTION */}
+
+<label>✨ AI Generated Description (Editable)</label>
+{/* DESCRIPTION */}
+
+<div className="relative">
 
 <textarea
 
@@ -1427,16 +1514,58 @@ value={form.description}
 
 onChange={handleChange}
 
-rows={5}
+rows={6}
 
 className="
 w-full
 border
 rounded-xl
 p-4
+pr-40
+resize-none
 "
 
-/>
+></textarea>
+
+
+{
+!form.description && (
+
+<button
+  type="button"
+  onClick={generateDescription}
+  disabled={generating}
+  className="
+    absolute
+    right-3
+    bottom-3
+    bg-emerald-600
+    hover:bg-emerald-700
+    text-white
+    px-4
+    py-2
+    rounded-lg
+    text-sm
+    font-medium
+    transition
+  "
+>
+  {
+  generating
+  ?
+  "Generating..."
+  :
+  "✨ Generate AI"
+  }
+
+</button>
+
+)
+
+}
+
+
+</div>
 
 
 

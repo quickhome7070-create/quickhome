@@ -8,8 +8,10 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LocationSearch from "@/src/components/LocationSearch";
 import {
+  Heart,
   MapPin,
 } from "lucide-react";
+import { useFavorite } from "@/src/context/FavoriteContext";
 
 type PropertyResponse = {
   properties: Property[];
@@ -145,6 +147,9 @@ export default function PropertiesClient({
   const router = useRouter();
 
   const [area,setArea] = useState("");
+
+
+
 
 const [bathrooms,setBathrooms] = useState("");
 
@@ -294,6 +299,13 @@ observer.disconnect();
 
 
 },[hasMore]);
+
+const {
+ isFavorite,
+ toggleFavorite
+}=useFavorite();
+
+
   const handlePropertyTypeChange = (
     value: string
   ) => {
@@ -835,22 +847,57 @@ const getPostedDate = (date?: string) => {
           >
             <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition">
 <div className="relative">
-              <Image
-                src={
-                  property.images?.[0]?.replace(
-                    "/upload/",
-                    "/upload/f_auto,q_auto,w_800/"
-                  ) || "/no-image.png"
-                }
-                alt={property.title}
-                width={500}
-                height={300}
-                loading="lazy"
-                
-                className="w-full h-52 object-cover"
-              />
-              </div>
 
+  <Image
+    src={
+      property.images?.[0]?.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto,w_800/"
+      ) || "/no-image.png"
+    }
+    alt={property.title}
+    width={500}
+    height={300}
+    loading="lazy"
+    className="w-full h-52 object-cover"
+  />
+
+
+  {/* Favorite Button */}
+  <button
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(property._id);
+    }}
+    className="
+      absolute
+      top-3
+      right-3
+      z-10
+      w-10
+      h-10
+      rounded-full
+      bg-white/90
+      shadow-md
+      flex
+      items-center
+      justify-center
+    "
+  >
+
+    <Heart
+      size={22}
+      className={
+        isFavorite(property._id)
+          ? "fill-[#ffb224] text-[#ffb224]"
+          : "text-gray-500"
+      }
+    />
+
+  </button>
+
+</div>
              <div className="p-5">
 
   {/* Property Header */}

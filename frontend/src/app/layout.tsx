@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
+import { FavoriteProvider } from "../context/FavoriteContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
         className={`${inter.className} bg-gray-50 text-gray-900 antialiased`}
       >
         <AuthProvider>
+          <FavoriteProvider>
           <Header />
 
           <main className="min-h-screen container mx-auto p-4">
@@ -39,6 +41,7 @@ export default function RootLayout({
           </main>
 
           <Footer />
+          </FavoriteProvider>
         </AuthProvider>
       </body>
     </html>

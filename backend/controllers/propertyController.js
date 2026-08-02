@@ -10,17 +10,13 @@ require("../models/PropertyEditRequest");
 exports.createEditRequest = async(req,res)=>{
 
 try{
-  console.log("USER FROM AUTH:", req.user);
+ 
   
 
 const property = await Property.findById(req.params.id);
 
 
-if(!property){
- return res.status(404).json({
-  message:"Property not found"
- });
-}
+
 
 
 // create edit request
@@ -130,6 +126,7 @@ exports.createProperty = async (req, res) => {
       plotType,
       furnishing,
       shopType,
+      
 
       // NEW FIELDS
       area,
@@ -144,7 +141,22 @@ exports.createProperty = async (req, res) => {
     } = req.body;
 
 
+if (availableFrom) {
 
+  const selectedDate = new Date(availableFrom);
+  const today = new Date();
+
+  today.setHours(0,0,0,0);
+
+  if (selectedDate < today) {
+
+    return res.status(400).json({
+      message:"Available date cannot be in the past"
+    });
+
+  }
+
+}
     const images = req.files
       ? req.files.map((file) => file.path)
       : [];
@@ -378,14 +390,29 @@ if(!property){
  });
 }
 
+// ✅ Available date validation
+
+const { availableFrom } = req.body;
+
+if (availableFrom) {
+
+  const selectedDate = new Date(availableFrom);
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
 
 
+  if(selectedDate < today){
 
-if(!property){
-  return res.status(404).json({
-    message:"Property not found"
-  });
+    return res.status(400).json({
+      message:"Available date cannot be in the past"
+    });
+
+  }
+
 }
+
+
 // IMPORTANT: create oldData before changing anything
 
 const editRequest =

@@ -9,6 +9,9 @@ require("express");
 
 const cors =
 require("cors");
+const aiDescriptionRoutes = require("./routes/aiDescriptionRoutes");
+
+
 
 const {
   cashfreeWebhook
@@ -102,7 +105,10 @@ extended:true
 );
 
 
-
+app.use(
+  "/api/ai",
+  aiDescriptionRoutes
+);
 
 // Auth rate limit
 
@@ -152,6 +158,8 @@ require("./routes/locationRoutes")
 
 
 
+
+
 app.get(
 "/",
 (req,res)=>{
@@ -183,3 +191,4 @@ console.log(
 
 }
 );
+

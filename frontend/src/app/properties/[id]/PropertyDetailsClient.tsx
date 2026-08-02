@@ -16,6 +16,7 @@ import {
   User,
   CalendarDays,
   Home,
+  Heart
 } from "lucide-react";
 
 import Image from "next/image";
@@ -33,6 +34,7 @@ import {
 } from "next/navigation";
 
 import { useAuth } from "@/src/context/AuthContext";
+import { useFavorite } from "@/src/context/FavoriteContext";
 
 type Property = {
   _id: string;
@@ -117,13 +119,12 @@ const [showGallery, setShowGallery] =
   const [activeImage, setActiveImage] =
     useState(0);
 
-  const [isFavorite, setIsFavorite] =
-    useState(false);
+  
 
   const [contact, setContact] =
     useState<Contact | null>(null);
     
-
+const [favorites, setFavorites] = useState<string[]>([]);
   const [loadingContact, setLoadingContact] =
     useState(false);
       const whatsappUrl = contact?.phone
@@ -170,6 +171,10 @@ const [showGallery, setShowGallery] =
 
   }, []);
 
+const {
+ isFavorite,
+ toggleFavorite
+}=useFavorite();
   const handleViewContact = async () => {
     
   if (!user) {
@@ -233,28 +238,7 @@ const handleChat = async () => {
 
 };
 
-  const toggleFavorite =
-    async () => {
 
-      try {
-
-        await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/property/favorite/${id}`,
-          {
-            method: "POST",
-            credentials: "include",
-          }
-        );
-
-        setIsFavorite(
-          (prev) => !prev
-        );
-
-      } catch (error) {
-
-        console.log(error);
-      }
-    };
 
     
 
@@ -266,58 +250,87 @@ return (
 
 <div className="relative w-full h-[280px] md:h-[450px]">
 
-<Image
-src={
-property.images?.[0]?.replace(
-"/upload/",
-"/upload/f_auto,q_auto,w_1400/"
-)
-|| "/no-image.png"
-}
-alt={property.title}
-fill
-priority
-className="object-cover"
-/>
+  <Image
+    src={
+      property.images?.[0]?.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto,w_1400/"
+      ) || "/no-image.png"
+    }
+    alt={property.title}
+    fill
+    priority
+    className="object-cover"
+  />
 
 
-<button
-onClick={()=>router.back()}
-className="
-absolute
-top-4
-left-4
-w-9
-h-9
-rounded-full
-bg-white/90
-text-gray-700
-shadow
-"
->
-←
-</button>
+  {/* Favorite */}
+  <Heart
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(id);
+    }}
+    size={24}
+    className={`
+      absolute
+      top-4
+      right-4
+      z-10
+      cursor-pointer
+      bg-white/90
+      rounded-full
+      p-2
+      w-10
+      h-10
+      shadow
+      ${
+        isFavorite(id)
+          ? "fill-[#ffb224] text-[#ffb224]"
+          : "text-gray-700"
+      }
+    `}
+  />
 
 
-<div
-className="
-absolute
-bottom-4
-right-4
-bg-black/60
-text-white
-text-xs
-px-3
-py-1
-rounded-full
-"
->
-1 / {property.images.length}
+  {/* Back Button */}
+  <button
+    onClick={() => router.back()}
+    className="
+      absolute
+      top-4
+      left-4
+      w-9
+      h-9
+      rounded-full
+      bg-white/90
+      text-gray-700
+      shadow
+      z-10
+    "
+  >
+    ←
+  </button>
+
+
+  {/* Image Count */}
+  <div
+    className="
+      absolute
+      bottom-4
+      right-4
+      bg-black/60
+      text-white
+      text-xs
+      px-3
+      py-1
+      rounded-full
+    "
+  >
+    1 / {property.images.length}
+  </div>
+
 </div>
-
-
-</div>
-
 
 
 
@@ -540,7 +553,34 @@ alt=""
 fill
 className="object-cover"
 />
+  <button
+    onClick={toggleFavorite}
+    className="
+      absolute
+      top-4
+      right-4
+      w-10
+      h-10
+      rounded-full
+      bg-white
+      shadow-md
+      flex
+      items-center
+      justify-center
+      z-10
+    "
+  >
 
+    <Heart
+      size={22}
+      className={
+        isFavorite
+          ? "fill-[#ffb224] text-[#ffb224]"
+          : "text-gray-500"
+      }
+    />
+
+  </button>
 </div>
 
 
@@ -625,7 +665,7 @@ mt-1
         font-medium
       "
     >
-      {loadingContact ? "Loading..." : "Contact"}
+     Contact
     </button>
 
   <button

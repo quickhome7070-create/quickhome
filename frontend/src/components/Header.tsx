@@ -328,7 +328,7 @@ shadow-sm
       z-50
     ">
 
-      <Link
+      {/* <Link
         href="/profile"
         className="
         block
@@ -338,7 +338,7 @@ shadow-sm
         "
       >
         Profile
-      </Link>
+      </Link> */}
 
 
       <Link
@@ -354,20 +354,7 @@ shadow-sm
       </Link>
 
 
-      <button
-        onClick={deleteAccount}
-        className="
-        w-full
-        text-left
-        px-4
-        py-2
-        text-red-600
-        hover:bg-red-50
-        "
-      >
-        Delete Account
-      </button>
-
+     
     </div>
 
   )}
@@ -382,6 +369,13 @@ shadow-sm
       >
         My Property
       </Link>
+
+      <Link
+  href="/favorites"
+  className="hover:text-black transition-all duration-300"
+>
+  My Favorites
+</Link>
 
       <button
 onClick={async()=>{
@@ -448,8 +442,16 @@ Logout
               <Link  href="/dashboard/my-properties" onClick={() => setMenuOpen(false)}>
                 <div className="py-2 border-b">My Property</div>
               </Link>
-
+<Link
+  href="/favorites"
+  onClick={() => setMenuOpen(false)}
+>
+  <div className="py-2 border-b">
+    My Favorites
+  </div>
+</Link>
               <Link 
+              
   href="/settings" 
   onClick={() => setMenuOpen(false)}
 >
@@ -459,7 +461,7 @@ Logout
 </Link>
 
 
-<button
+{/* <button
   onClick={() => {
     deleteAccount();
     setMenuOpen(false);
@@ -473,7 +475,7 @@ Logout
   "
 >
   Delete Account
-</button>
+</button> */}
 
               <button
                 onClick={() => {
