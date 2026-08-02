@@ -1499,33 +1499,30 @@ onChange={()=>toggleAmenity(item)}
 
 {/* DESCRIPTION */}
 
-<label>✨ AI Generated Description (Editable)</label>
+<label>✨ AI Generated Description</label>
 {/* DESCRIPTION */}
 
 <div className="relative">
 
 <textarea
-
 name="description"
-
 placeholder="Description"
-
 value={form.description}
-
 onChange={handleChange}
-
 rows={6}
-
 className="
 w-full
+min-h-[150px]
 border
 rounded-xl
 p-4
-pr-40
+text-sm
+leading-6
 resize-none
+break-words
+whitespace-normal
 "
-
-></textarea>
+/>
 
 
 {

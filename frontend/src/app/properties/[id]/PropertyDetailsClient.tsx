@@ -35,6 +35,7 @@ import {
 
 import { useAuth } from "@/src/context/AuthContext";
 import { useFavorite } from "@/src/context/FavoriteContext";
+import ImageCarousel from "@/src/components/ImageCarousel";
 
 type Property = {
   _id: string;
@@ -250,18 +251,10 @@ return (
 
 <div className="relative w-full h-[280px] md:h-[450px]">
 
-  <Image
-    src={
-      property.images?.[0]?.replace(
-        "/upload/",
-        "/upload/f_auto,q_auto,w_1400/"
-      ) || "/no-image.png"
-    }
-    alt={property.title}
-    fill
-    priority
-    className="object-cover"
-  />
+  <ImageCarousel
+  images={property.images}
+  title={property.title}
+/>
 
 
   {/* Favorite */}

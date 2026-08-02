@@ -12,6 +12,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useFavorite } from "@/src/context/FavoriteContext";
+import ImageCarousel from "@/src/components/ImageCarousel";
 
 type PropertyResponse = {
   properties: Property[];
@@ -848,19 +849,10 @@ const getPostedDate = (date?: string) => {
             <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition">
 <div className="relative">
 
-  <Image
-    src={
-      property.images?.[0]?.replace(
-        "/upload/",
-        "/upload/f_auto,q_auto,w_800/"
-      ) || "/no-image.png"
-    }
-    alt={property.title}
-    width={500}
-    height={300}
-    loading="lazy"
-    className="w-full h-52 object-cover"
-  />
+  <ImageCarousel
+   images={property.images}
+   title={property.title}
+ />
 
 
   {/* Favorite Button */}
