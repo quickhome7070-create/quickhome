@@ -594,7 +594,8 @@ mode==="edit"
 
 
 
-
+console.log("Property ID:", property?._id);
+console.log("Request URL:", url);
 const res =
 await fetch(
 url,
@@ -614,7 +615,6 @@ body:formData
 
 const data =
 await res.json();
-
 
 
 if(!res.ok){

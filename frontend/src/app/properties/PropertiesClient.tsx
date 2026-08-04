@@ -146,6 +146,7 @@ export default function PropertiesClient({
 }: Props) {
 
   const router = useRouter();
+    const pageRef = useRef(1);
 
   const [area,setArea] = useState("");
 
@@ -299,7 +300,7 @@ observer.disconnect();
 };
 
 
-},[hasMore]);
+},[hasMore, page]);
 
 const {
  isFavorite,
@@ -456,7 +457,9 @@ if (locality) {
 
     setLoadingMore(true);
 
-    const nextPage = page + 1;
+  
+
+    
 
     const query = new URLSearchParams();
 
@@ -465,7 +468,7 @@ if (locality) {
         query.append(key, String(value));
       }
     });
-
+    const nextPage = pageRef.current + 1;
     query.set("page", String(nextPage));
     query.set("limit", "6");
 
@@ -493,7 +496,12 @@ if (locality) {
     data.properties.filter(
       item => !existingIds.has(item._id)
     );
-
+console.log(
+  "Fetched:",
+  data.properties.length,
+  "New:",
+  newProperties.length
+);
 
   return [
     ...prev,
@@ -501,16 +509,25 @@ if (locality) {
   ];
 
 });
-
+pageRef.current = nextPage;
     setPage(nextPage);
 
     if (nextPage >= data.pages) {
       setHasMore(false);
     }
+     console.log("Current page:", page);
+    console.log({
+  page,
+  nextPage,
+  hasMore,
+});
 
   } catch (error) {
 
     console.log("LOAD MORE ERROR", error);
+   
+    
+
 
   } finally {
 
@@ -519,6 +536,7 @@ if (locality) {
     setLoadingMore(false);
 
   }
+  
 
 };
 
@@ -561,6 +579,7 @@ const getPostedDate = (date?: string) => {
   )}`;
 
 };
+
 
   return (
     <div>

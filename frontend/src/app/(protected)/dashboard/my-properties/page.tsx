@@ -100,6 +100,8 @@ const markSold = async (id: string) => {
 
   </div>
 
+  <p className="text-bold py-2">Total Prorties Posted: <b>{properties.length}</b></p>
+
 
   {/* Empty State */}
   {properties.length === 0 ? (

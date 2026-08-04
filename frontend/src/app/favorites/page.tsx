@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
+import PropertiesClient from "../properties/PropertiesClient";
 
 export default function FavoritesPage() {
 
@@ -86,6 +87,8 @@ export default function FavoritesPage() {
         ))}
 
       </div>
+
+  
 
     </div>
   );
