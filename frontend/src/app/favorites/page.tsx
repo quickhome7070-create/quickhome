@@ -76,7 +76,7 @@ export default function FavoritesPage() {
       </h1>
 
 
-      <div className="grid md:grid-cols-3 gap-5">
+      {/* <div className="grid md:grid-cols-3 gap-5">
 
         {properties.map((property:any)=>(
 
@@ -86,9 +86,11 @@ export default function FavoritesPage() {
 
         ))}
 
-      </div>
+      </div> */}
 
-  
+  <PropertiesClient
+  initialProperties={properties}
+/>
 
     </div>
   );

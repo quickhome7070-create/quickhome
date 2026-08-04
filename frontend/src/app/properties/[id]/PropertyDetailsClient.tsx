@@ -276,8 +276,8 @@ return (
     duration-200
     ${
       isFavorite(id)
-        ? "fill-[#ffb224] text-[#ffb224]"
-        : "text-white hover:text-[#ffb224]"
+       ? "fill-red-500 text-red-500"
+          : "text-red-500"
     }
   `}
 />

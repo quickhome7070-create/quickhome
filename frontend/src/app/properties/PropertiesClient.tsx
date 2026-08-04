@@ -78,41 +78,32 @@ type Property = {
 };
 
 type Props = {
-  initialProperties: Property[];
-totalProperties:number;
- searchParams: {
-  city?: string;
-  locality?: string;
-  location?: string;
+  initialProperties?: Property[];
+  totalProperties?: number;
 
-  minPrice?: string;
-  maxPrice?: string;
+  showFavoriteCount?: boolean;
+  showFavoriteIcon?: boolean;
 
-  listingType?: string;
-  sort?: string;
-
-  propertyType?: string;
-  seller?: string;
-
-  bhkType?: string;
-
-  plotType?: string;
-
-  furnishing?: string;
-
-  shopType?: string;
-
-
-  area?: string;
-
-  bathrooms?: string;
-
-  propertyAge?: string;
-
-  floor?: string;
-
-  availableFrom?: string;
-};
+  searchParams?: {
+    city?: string;
+    locality?: string;
+    location?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    listingType?: string;
+    sort?: string;
+    propertyType?: string;
+    seller?: string;
+    bhkType?: string;
+    plotType?: string;
+    furnishing?: string;
+    shopType?: string;
+    area?: string;
+    bathrooms?: string;
+    propertyAge?: string;
+    floor?: string;
+    availableFrom?: string;
+  };
 };
 
 const PROPERTY_TYPES = [
@@ -140,9 +131,11 @@ const SHOP_TYPES = [
 ];
 
 export default function PropertiesClient({
-  initialProperties,
-  totalProperties,
-  searchParams,
+    initialProperties = [],
+  totalProperties = 0,
+  searchParams = {},
+  showFavoriteCount = false,
+  showFavoriteIcon = true,
 }: Props) {
 
   const router = useRouter();
@@ -266,6 +259,10 @@ setLocality(
 
 useEffect(()=>{
 
+if(initialProperties.length > 0){
+  return;
+}
+
 const element = loaderRef.current;
 
 if(!element) return;
@@ -300,7 +297,9 @@ observer.disconnect();
 };
 
 
-},[hasMore, page]);
+},[hasMore, page, initialProperties]);
+
+
 
 const {
  isFavorite,
@@ -875,38 +874,32 @@ const getPostedDate = (date?: string) => {
 
 
   {/* Favorite Button */}
-  <button
+ {showFavoriteIcon && (
+  <Heart
     onClick={(e) => {
       e.preventDefault();
       e.stopPropagation();
       toggleFavorite(property._id);
     }}
-    className="
+    size={28}
+    strokeWidth={2}
+    className={`
       absolute
-      top-3
-      right-3
+      top-4
+      right-4
       z-10
-      w-10
-      h-10
-      rounded-full
-      bg-white/90
-      shadow-md
-      flex
-      items-center
-      justify-center
-    "
-  >
+      cursor-pointer
+      transition-all
+      duration-200
 
-    <Heart
-      size={22}
-      className={
+      ${
         isFavorite(property._id)
-          ? "fill-[#ffb224] text-[#ffb224]"
-          : "text-gray-500"
+          ? "fill-red-500 text-red-500"
+          : "text-red-500"
       }
-    />
-
-  </button>
+    `}
+  />
+)}
 
 </div>
              <div className="p-5">
