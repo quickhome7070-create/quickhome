@@ -145,7 +145,7 @@ searchAI();
 
 }}
 
-placeholder="AI Search: 2 BHK flat in Wakad Pune"
+placeholder="Speak: Looking Flat in Pune.."
 
 className="
 w-full
