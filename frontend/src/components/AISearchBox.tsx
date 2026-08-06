@@ -145,7 +145,7 @@ searchAI();
 
 }}
 
-placeholder="Speak: Looking Flat in Pune.."
+placeholder="Speak: 2 Bhk Flat in Baner.."
 
 className="
 w-full
