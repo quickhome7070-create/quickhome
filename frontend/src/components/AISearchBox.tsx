@@ -84,7 +84,7 @@ export default function AISearchBox() {
 
 
 
-    recognition.onresult=(event:SpeechRecognitionEvent)=>{
+    recognition.onresult=(event:any)=>{
 
 
       const text =
