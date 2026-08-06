@@ -79,10 +79,7 @@ propertyAge: {
   default: "",
 },
 
-floor: {
-  type: String,
-  default: "",
-},
+
 
 totalFloors: {
   type: Number,
@@ -125,11 +122,7 @@ locality:{
   index:true
 },
 
- // AREA
-area: {
-  type: Number,
-  default: 0,
-},
+
 
 areaUnit: {
   type: String,
@@ -139,10 +132,7 @@ areaUnit: {
 
 
 // BATHROOM
-bathrooms: {
-  type: String,
-  default: "",
-},
+
 
 views:{
  type:Number,

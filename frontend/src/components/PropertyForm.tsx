@@ -592,10 +592,6 @@ mode==="edit"
 :
 "POST";
 
-
-
-console.log("Property ID:", property?._id);
-console.log("Request URL:", url);
 const res =
 await fetch(
 url,
@@ -669,31 +665,7 @@ return (
 
 <div className="min-h-screen bg-gray-100 flex justify-center p-4">
 
-
-{/* <form
-
-onSubmit={handleSubmit}
-
-className="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-6 space-y-5"
-
->
-
-
-<h1 className="text-2xl font-bold">
-
-{
-mode==="edit"
-?
-"Edit Property"
-:
-"Add Property"
-}
-
-</h1> */}
-
-
-
-    <form
+<form
 onSubmit={handleSubmit}
 className="
 w-full
@@ -821,11 +793,12 @@ h-12
 rounded-xl
 border
 
+
 ${
 form.seller===item
 
 ?
-"bg-orange-500 text-white"
+" bg-[#ffb224] text-gray-900"
 
 :
 "bg-white"
@@ -894,7 +867,7 @@ border
 ${
 form.propertyType===type
 ?
-"bg-orange-500 text-white"
+" bg-[#ffb224] text-gray-900"
 :
 "bg-white"
 }
@@ -1552,7 +1525,7 @@ whitespace-normal
   ?
   "Generating..."
   :
-  "✨ Generate AI"
+  "✨Generate AI Description"
   }
 
 </button>
@@ -1596,10 +1569,8 @@ h-12
 rounded-xl
 text-white
 font-medium
-bg-gradient-to-r
-from-orange-500
-via-amber-400
-to-yellow-300
+ bg-[#ffb224]
+text-gray-900
 "
 
 >

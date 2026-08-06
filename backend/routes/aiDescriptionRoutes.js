@@ -1,10 +1,11 @@
 const express=require("express");
-
+const Property = require("../models/Property");
 const router=express.Router();
 
 const {
-generatePropertyDescription
-}=require("../controllers/aiDescriptionController");
+generatePropertyDescription,
+aiPropertySearch
+}=require("../controllers/aiController");
 
 
 router.post(
@@ -12,5 +13,9 @@ router.post(
 generatePropertyDescription
 );
 
+router.post(
+"/ai-search",
+aiPropertySearch
+);
 
 module.exports=router;

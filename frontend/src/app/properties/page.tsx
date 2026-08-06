@@ -1,174 +1,215 @@
-// app/properties/page.tsx
-
 import PropertiesClient from "./PropertiesClient";
 
-type Props = {
-  searchParams: Promise<{
-    keyword?: string;
-    city?: string;
-    locality?: string;
-    location?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    listingType?: string;
-    sort?: string;
-    propertyType?: string;
-    seller?: string;
-    bhkType?: string;
-    plotType?: string;
-    furnishing?: string;
-    shopType?: string;
-  }>;
+
+type SearchParams = {
+
+ai?:string;
+
+keyword?:string;
+city?:string;
+locality?:string;
+location?:string;
+
+minPrice?:string;
+maxPrice?:string;
+
+listingType?:string;
+sort?:string;
+
+propertyType?:string;
+seller?:string;
+
+bhkType?:string;
+plotType?:string;
+
+furnishing?:string;
+shopType?:string;
+
 };
 
+
+
+type Props={
+
+searchParams:
+Promise<SearchParams>;
+
+};
+
+
+
+
+
 export default async function PropertiesPage({
-  searchParams,
-}: Props) {
 
-  const params =
-    await searchParams;
+searchParams
 
-  const query =
-    new URLSearchParams();
+}:Props){
 
-  if (params.keyword) {
-    query.append(
-      "keyword",
-      params.keyword
-    );
-  }
 
-  if (params.location) {
-    query.append(
-      "location",
-      params.location
-    );
-  }
 
-  if (params.city) {
-  query.append(
-    "city",
-    params.city
-  );
+const params =
+await searchParams;
+
+
+
+console.log(
+"PAGE PARAMS",
+params
+);
+
+
+
+let data:any={
+
+properties:[],
+count:0
+
+};
+
+
+
+
+
+if(params.ai){
+
+
+
+const response =
+await fetch(
+
+`${process.env.NEXT_PUBLIC_API_URL}/ai/ai-search`,
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+query:params.ai
+
+}),
+
+cache:"no-store"
+
+}
+
+);
+
+
+
+
+data =
+await response.json();
+
+
+
+console.log(
+"AI SERVER RESULT",
+data
+);
+
+
+
+}
+
+else {
+
+
+
+const query =
+new URLSearchParams();
+
+
+
+Object.entries(params)
+.forEach(([key,value])=>{
+
+
+if(value){
+
+query.append(
+key,
+value
+);
+
 }
 
 
-if (params.locality) {
-  query.append(
-    "locality",
-    params.locality
-  );
-}
-if (params.plotType) {
-  query.append(
-    "plotType",
-    params.plotType
-  );
-}
-if (params.bhkType) {
-  query.append(
-    "bhkType",
-    params.bhkType
-  );
+});
+
+
+
+
+const response =
+await fetch(
+
+`${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`,
+
+{
+
+cache:"no-store"
+
 }
 
-if (params.furnishing) {
-  query.append(
-    "furnishing",
-    params.furnishing
-  );
+);
+
+
+
+data =
+await response.json();
+
+
 }
 
-if (params.shopType) {
-  query.append(
-    "shopType",
-    params.shopType
-  );
+
+
+
+
+return (
+
+<main className="min-h-screen bg-gray-50 p-4">
+
+
+<div className="max-w-7xl mx-auto">
+
+
+<PropertiesClient
+
+
+initialProperties={
+data.properties || []
 }
-  if (params.propertyType) {
-    query.append(
-      "propertyType",
-      params.propertyType
-    );
-  }
 
-  if (params.minPrice) {
-    query.append(
-      "minPrice",
-      params.minPrice
-    );
-  }
 
-  if (params.maxPrice) {
-    query.append(
-      "maxPrice",
-      params.maxPrice
-    );
-  }
 
-  if (params.listingType) {
-    query.append(
-      "listingType",
-      params.listingType
-    );
-  }
+totalProperties={
+data.count || 0
+}
 
-  // ✅ SELLER
-  if (params.seller) {
-    query.append(
-      "seller",
-      params.seller
-    );
-  }
 
-  if (params.sort) {
-    query.append(
-      "sort",
-      params.sort
-    );
-  }
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`,
-    {
-      next: {
-        revalidate: 60,
-      },
-    }
-  );
+searchParams={
+params
+}
 
-  const data =
-    await res.json();
 
-  return (
-    <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
 
-      <div className="max-w-7xl mx-auto mb-6">
+/>
 
-        <h1 className="text-3xl font-bold text-gray-800">
-          Discover Properties
-        </h1>
 
-        <p className="text-sm text-gray-500 mt-1">
-          Find your dream home
-        </p>
+</div>
 
-      </div>
 
-      <div className="max-w-7xl mx-auto">
+</main>
 
-        <PropertiesClient
-          initialProperties={
-            data.properties || []
-          }
-            totalProperties={
-    data.total || 0
-  }
-          searchParams={params}
-        />
+);
 
-      </div>
 
-    </main>
-  );
 }

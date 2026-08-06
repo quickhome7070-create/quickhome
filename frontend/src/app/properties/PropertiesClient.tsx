@@ -1,284 +1,682 @@
-// app/properties/PropertiesClient.tsx
-
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+
 import LocationSearch from "@/src/components/LocationSearch";
+import ImageCarousel from "@/src/components/ImageCarousel";
+import AISearchBox from "@/src/components/AISearchBox";
+
 import {
   Heart,
   MapPin,
 } from "lucide-react";
+
 import { useFavorite } from "@/src/context/FavoriteContext";
-import ImageCarousel from "@/src/components/ImageCarousel";
 
 type PropertyResponse = {
   properties: Property[];
   pages: number;
 };
 
+
 type Property = {
-  _id: string;
-
-  title: string;
-
-  price: number;
-
-  location: string;
-
-  city?: string;
-
-  locality?: string;
-
-
-  images?: string[];
-
-
+  _id:string;
+  title:string;
+  price:number;
+  location:string;
+  city?:string;
+  locality?:string;
+  images?:string[];
   listingType?: "buy" | "rent";
-
-
   seller?: "owner" | "agent";
-
-
-  propertyType?: string;
-
-
-  bhkType?: string;
-
-
-  plotType?: string;
-
-
-  furnishing?: string;
-
-
-  shopType?: string;
-
-
-  area?: number;
-
-  areaUnit?: string;
-
-
-  bathrooms?: string;
-
-
-  propertyAge?: string;
-
-
-  floor?: number;
-
-
-  totalFloors?: number;
-
-
-  createdAt?: string;
+  propertyType?:string;
+  bhkType?:string;
+  plotType?:string;
+  furnishing?:string;
+  shopType?:string;
+  area?:number;
+  areaUnit?:string;
+  bathrooms?:string;
+  propertyAge?:string;
+  floor?:number;
+  totalFloors?:number;
+  createdAt?:string;
 };
+
 
 type Props = {
-  initialProperties?: Property[];
-  totalProperties?: number;
+ initialProperties?:Property[];
+ totalProperties?:number;
+ showFavoriteCount?:boolean;
+ showFavoriteIcon?:boolean;
 
-  showFavoriteCount?: boolean;
-  showFavoriteIcon?: boolean;
-
-  searchParams?: {
-    city?: string;
-    locality?: string;
-    location?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    listingType?: string;
-    sort?: string;
-    propertyType?: string;
-    seller?: string;
-    bhkType?: string;
-    plotType?: string;
-    furnishing?: string;
-    shopType?: string;
-    area?: string;
-    bathrooms?: string;
-    propertyAge?: string;
-    floor?: string;
-    availableFrom?: string;
-  };
+ searchParams?:{
+  ai?:string;
+  city?:string;
+  locality?:string;
+  location?:string;
+  minPrice?:string;
+  maxPrice?:string;
+  listingType?:string;
+  sort?:string;
+  propertyType?:string;
+  seller?:string;
+  bhkType?:string;
+  plotType?:string;
+  furnishing?:string;
+  shopType?:string;
+  area?:string;
+  bathrooms?:string;
+  propertyAge?:string;
+  floor?:string;
+  availableFrom?:string;
+ };
 };
 
-const PROPERTY_TYPES = [
-  "Flat",
-  "House",
-  "Plot",
-  "Office Space",
-  "Shop",
+
+
+const PROPERTY_TYPES=[
+ "Flat",
+ "House",
+ "Plot",
+ "Office Space",
+ "Shop"
 ];
 
-const BHK_TYPES = [
-  "1BHK",
-  "2BHK",
-  "3BHK",
-  "4BHK",
+
+const BHK_TYPES=[
+ "1BHK",
+ "2BHK",
+ "3BHK",
+ "4BHK"
 ];
 
-const SHOP_TYPES = [
-  "Hotel",
-  "Saloon",
-  "Grocery",
-  "Medical",
-  "Clothing",
-  "Mobile Shop",
+
+const SHOP_TYPES=[
+ "Hotel",
+ "Saloon",
+ "Grocery",
+ "Medical",
+ "Clothing",
+ "Mobile Shop"
 ];
+
+
 
 export default function PropertiesClient({
-    initialProperties = [],
-  totalProperties = 0,
-  searchParams = {},
-  showFavoriteCount = false,
-  showFavoriteIcon = true,
-}: Props) {
+  
 
-  const router = useRouter();
-    const pageRef = useRef(1);
+initialProperties=[],
+totalProperties=0,
+searchParams={},
+showFavoriteIcon=true
 
-  const [area,setArea] = useState("");
+}:Props){
 
 
+const router=useRouter();
 
 
-const [bathrooms,setBathrooms] = useState("");
 
-const [propertyAge,setPropertyAge] = useState("");
+const pageRef=useRef(1);
 
-const [floor,setFloor] = useState("");
+const loadingRef=useRef(false);
 
-const [availableFrom,setAvailableFrom] = useState("");
+const loaderRef =
+useRef<HTMLDivElement|null>(null);
 
-  const [properties, setProperties] =
-  useState<Property[]>(initialProperties);
 
-const [page, setPage] =
-  useState(1);
 
-const [loadingMore, setLoadingMore] =
+const [properties,setProperties] =
+useState<Property[]>([]);
+
+
+
+const [hasMore,setHasMore]=
+useState(true);
+
+
+
+const [loadingMore,setLoadingMore]=
 useState(false);
 
-const loadingRef = useRef(false);
 
-const [hasMore, setHasMore] =
-  useState(true);
 
-const loaderRef = useRef<HTMLDivElement | null>(null);
-
- const [propertyType, setPropertyType] =
-  useState(
-    searchParams.propertyType || "Flat"
-  );
-
-const [bhkType, setBhkType] =
-  useState(
-    searchParams.bhkType || ""
-  );
-
-  const [plotType, setPlotType] =
-    useState("");
-
-  const [furnishing, setFurnishing] =
-    useState("");
-
-  const [shopType, setShopType] =
-    useState("");
-
-  const [city, setCity] = useState(
-  searchParams.city || ""
+const [propertyType,setPropertyType]=
+useState(
+ searchParams.propertyType || "Flat"
 );
 
-const [locality, setLocality] = useState(
-  searchParams.locality || ""
-);
-    
 
-  const [minPrice, setMinPrice] =
-    useState("");
 
-  const [maxPrice, setMaxPrice] =
-    useState("");
-
-  const [listingType, setListingType] =
-    useState("");
-
-  const [seller, setSeller] =
-    useState("");
-
-  const [sort, setSort] =
-    useState("");
-
-  useEffect(() => {
-
-  setPlotType(
-    searchParams.plotType || ""
-  );
-
-  setFurnishing(
-    searchParams.furnishing || ""
-  );
-
-  setShopType(
-    searchParams.shopType || ""
-  );
-
- setCity(
-  searchParams.city || ""
+const [bhkType,setBhkType]=
+useState(
+ searchParams.bhkType || ""
 );
 
-setLocality(
-  searchParams.locality || ""
+
+const [plotType,setPlotType]=
+useState("");
+
+
+const [furnishing,setFurnishing]=
+useState("");
+
+
+const [shopType,setShopType]=
+useState("");
+
+
+const [city,setCity]=
+useState(
+ searchParams.city || ""
 );
 
-  setMinPrice(
-    searchParams.minPrice || ""
-  );
 
-  setMaxPrice(
-    searchParams.maxPrice || ""
-  );
+const [locality,setLocality]=
+useState(
+ searchParams.locality || ""
+);
 
-  setListingType(
-    searchParams.listingType || ""
-  );
 
-  setSeller(
-    searchParams.seller || ""
-  );
 
-  setSort(
-    searchParams.sort || ""
-  );
+const [minPrice,setMinPrice]=
+useState("");
 
-}, [searchParams]);
+
+const [maxPrice,setMaxPrice]=
+useState("");
+
+
+const [listingType,setListingType]=
+useState("");
+
+
+const [seller,setSeller]=
+useState("");
+
+
+const [sort,setSort]=
+useState("");
+
+
+
+const [area,setArea]=
+useState("");
+
+const [bathrooms,setBathrooms]=
+useState("");
+
+const [propertyAge,setPropertyAge]=
+useState("");
+
+const [floor,setFloor]=
+useState("");
+
+const [availableFrom,setAvailableFrom]=
+useState("");
+
+
 
 useEffect(()=>{
 
-if(initialProperties.length > 0){
-  return;
+
+
+
+
+setProperties(
+ initialProperties || []
+);
+
+
+
+if(searchParams?.ai){
+
+ setHasMore(false);
+
+}
+else{
+
+ setHasMore(true);
+
 }
 
-const element = loaderRef.current;
 
-if(!element) return;
+pageRef.current=1;
 
 
-const observer = new IntersectionObserver(
-(entries)=>{
+},[
+initialProperties,
+searchParams?.ai
+]);
+/*
+ AI SEARCH RESULT HANDLER
+*/
+
+
+/*
+ NORMAL FILTER SYNC
+*/
+
+useEffect(()=>{
+
+
+setCity(
+ searchParams.city || ""
+);
+
+
+setLocality(
+ searchParams.locality || ""
+);
+
+
+setPlotType(
+ searchParams.plotType || ""
+);
+
+
+setFurnishing(
+ searchParams.furnishing || ""
+);
+
+
+setShopType(
+ searchParams.shopType || ""
+);
+
+
+setMinPrice(
+ searchParams.minPrice || ""
+);
+
+
+setMaxPrice(
+ searchParams.maxPrice || ""
+);
+
+
+setListingType(
+ searchParams.listingType || ""
+);
+
+
+setSeller(
+ searchParams.seller || ""
+);
+
+
+setSort(
+ searchParams.sort || ""
+);
+
+
+
+},[
+searchParams
+]);
+
+
+
+
+
+useEffect(() => {
+
+
+setProperties(initialProperties);
+
+
+if(searchParams?.ai){
+
+ setHasMore(false);
+
+}
+else{
+
+ setHasMore(true);
+
+}
+
+
+pageRef.current=1;
+
+
+},[
+initialProperties,
+searchParams?.ai
+]);
+
+const {
+
+isFavorite,
+toggleFavorite
+
+}=useFavorite();
+
+
+
+
+
+const handlePropertyTypeChange=
+(value:string)=>{
+
+
+setPropertyType(value);
+
+
+setBhkType("");
+
+setPlotType("");
+
+setFurnishing("");
+
+setShopType("");
+
+};
+
+
+
+
+
+
+
+
+const handleSearch=()=>{
+
+
+const query =
+new URLSearchParams();
+
+
+
+if(propertyType)
+query.append(
+"propertyType",
+propertyType
+);
+
+
+if(bhkType)
+query.append(
+"bhkType",
+bhkType
+);
+
+
+
+if(plotType)
+query.append(
+"plotType",
+plotType
+);
+
+
+
+if(furnishing)
+query.append(
+"furnishing",
+furnishing
+);
+
+
+
+if(shopType)
+query.append(
+"shopType",
+shopType
+);
+
+
+
+if(city)
+query.append(
+"city",
+city
+);
+
+
+
+if(locality)
+query.append(
+"locality",
+locality
+);
+
+
+
+if(minPrice)
+query.append(
+"minPrice",
+minPrice
+);
+
+
+
+if(maxPrice)
+query.append(
+"maxPrice",
+maxPrice
+);
+
+
+
+if(listingType)
+query.append(
+"listingType",
+listingType
+);
+
+
+
+if(seller)
+query.append(
+"seller",
+seller
+);
+
+
+
+
+
+
+router.push(
+`/properties?${query.toString()}`
+);
+
+
+};
+
+
+
+
+
+
+
+
+/*
+ INFINITE SCROLL
+*/
+
+const loadMoreProperties=
+async()=>{
+if(searchParams.ai){
+  return;
+}
+if(
+loadingRef.current ||
+!hasMore
+)
+return;
+
+
+
+loadingRef.current=true;
+
+
+try{
+
+
+setLoadingMore(true);
+
+
+
+const query =
+new URLSearchParams();
+
+
+
+Object.entries(searchParams)
+.forEach(([key,value])=>{
+
+
+if(value){
+
+query.append(
+key,
+String(value)
+);
+
+}
+
+
+});
+
+
+
+const nextPage =
+pageRef.current+1;
+
+
+
+query.set(
+"page",
+String(nextPage)
+);
+
+
+
+query.set(
+"limit",
+"6"
+);
+
+
+
+const res =
+await fetch(
+`${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`,
+{
+cache:"no-store"
+}
+);
+
+
+
+const data:
+PropertyResponse =
+await res.json();
+
+
 
 if(
-entries[0].isIntersecting &&
-!loadingRef.current
+data.properties.length===0
+){
+
+setHasMore(false);
+
+return;
+
+}
+
+
+
+setProperties(prev=>[
+
+...prev,
+
+...data.properties.filter(
+item =>
+!prev.some(
+p=>p._id===item._id
+)
+)
+
+]);
+
+
+
+pageRef.current=
+nextPage;
+
+
+
+if(
+nextPage>=data.pages
+){
+
+setHasMore(false);
+
+}
+
+
+
+}
+
+catch(error){
+
+
+
+
+}
+
+finally{
+
+
+loadingRef.current=false;
+
+setLoadingMore(false);
+
+
+}
+
+
+};
+
+
+
+
+
+useEffect(()=>{
+
+
+
+
+const element =
+loaderRef.current;
+
+
+
+if(!element)
+return;
+
+
+
+const observer =
+new IntersectionObserver(
+(entries)=>{
+
+
+if(
+entries[0].isIntersecting
 ){
 
 loadMoreProperties();
 
 }
+
 
 },
 {
@@ -287,301 +685,61 @@ threshold:1
 );
 
 
+
 observer.observe(element);
 
 
-return ()=>{
+
+return()=>{
 
 observer.disconnect();
 
 };
 
 
-},[hasMore, page, initialProperties]);
+},[
+hasMore,
+
+]);
 
 
 
-const {
- isFavorite,
- toggleFavorite
-}=useFavorite();
 
 
-  const handlePropertyTypeChange = (
-    value: string
-  ) => {
 
-    setPropertyType(value);
 
-    setBhkType("");
-    setPlotType("");
-    setFurnishing("");
-    setShopType("");
-  };
+const getPostedDate=
+(date?:string)=>{
 
-  const handleSearch = () => {
-    
 
-    const query =
-      new URLSearchParams();
-      console.log(query.toString());
+if(!date)
+return "";
 
-    if (propertyType) {
-      query.append(
-        "propertyType",
-        propertyType
-      );
-    }
 
-    if (bhkType) {
-      query.append(
-        "bhkType",
-        bhkType
-      );
-    }
 
-    if (plotType) {
-      query.append(
-        "plotType",
-        plotType
-      );
-    }
+const createdDate =
+new Date(date);
 
-    if (furnishing) {
-      query.append(
-        "furnishing",
-        furnishing
-      );
-    }
 
-    if (shopType) {
-      query.append(
-        "shopType",
-        shopType
-      );
-    }
-if(area){
- query.append(
-   "area",
-   area
- );
+
+return `Posted on ${
+createdDate.toLocaleDateString(
+"en-IN",
+{
+day:"numeric",
+month:"short",
+year:"numeric"
 }
-
-
-if(bathrooms){
- query.append(
-   "bathrooms",
-   bathrooms
- );
-}
-
-
-if(propertyAge){
- query.append(
-   "propertyAge",
-   propertyAge
- );
-}
-
-
-if(floor){
- query.append(
-   "floor",
-   floor
- );
-}
-
-
-if(availableFrom){
- query.append(
-   "availableFrom",
-   availableFrom
- );
-}
-   if (city) {
-  query.append("city", city);
-}
-
-if (locality) {
-  query.append("locality", locality);
-}
-
-    if (minPrice) {
-      query.append(
-        "minPrice",
-        minPrice
-      );
-    }
-
-    if (maxPrice) {
-      query.append(
-        "maxPrice",
-        maxPrice
-      );
-    }
-
-    if (listingType) {
-      query.append(
-        "listingType",
-        listingType
-      );
-    }
-
-    if (seller) {
-      query.append(
-        "seller",
-        seller
-      );
-    }
-
-    if (sort) {
-      query.append(
-        "sort",
-        sort
-      );
-    }
-
-    router.push(
-      `/properties?${query.toString()}`
-    );
-  };
-
- const loadMoreProperties = async () => {
-
-  if (loadingRef.current || !hasMore) return;
-
-  loadingRef.current = true;
-
-  try {
-
-    setLoadingMore(true);
-
-  
-
-    
-
-    const query = new URLSearchParams();
-
-    Object.entries(searchParams).forEach(([key, value]) => {
-      if (value) {
-        query.append(key, String(value));
-      }
-    });
-    const nextPage = pageRef.current + 1;
-    query.set("page", String(nextPage));
-    query.set("limit", "6");
-
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/property?${query.toString()}`,
-      {
-        cache: "no-store",
-      }
-    );
-
-    const data: PropertyResponse = await res.json();
-
-    if (data.properties.length === 0) {
-      setHasMore(false);
-      return;
-    }
-
-   setProperties((prev) => {
-
-  const existingIds = new Set(
-    prev.map(item => item._id)
-  );
-
-  const newProperties =
-    data.properties.filter(
-      item => !existingIds.has(item._id)
-    );
-console.log(
-  "Fetched:",
-  data.properties.length,
-  "New:",
-  newProperties.length
-);
-
-  return [
-    ...prev,
-    ...newProperties
-  ];
-
-});
-pageRef.current = nextPage;
-    setPage(nextPage);
-
-    if (nextPage >= data.pages) {
-      setHasMore(false);
-    }
-     console.log("Current page:", page);
-    console.log({
-  page,
-  nextPage,
-  hasMore,
-});
-
-  } catch (error) {
-
-    console.log("LOAD MORE ERROR", error);
-   
-    
-
-
-  } finally {
-
-    loadingRef.current = false;
-
-    setLoadingMore(false);
-
-  }
-  
-
-};
-
-const getPostedDate = (date?: string) => {
-
-  if (!date) return "";
-
-  const createdDate = new Date(date);
-
-  const today = new Date();
-
-  const yesterday = new Date();
-
-  yesterday.setDate(today.getDate() - 1);
-
-
-  if (
-    createdDate.toDateString() === 
-    today.toDateString()
-  ) {
-    return "Posted Today";
-  }
-
-
-  if (
-    createdDate.toDateString() === 
-    yesterday.toDateString()
-  ) {
-    return "Posted Yesterday";
-  }
-
-
-  return `Posted on ${createdDate.toLocaleDateString(
-    "en-IN",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  )}`;
+)
+}`;
 
 };
 
 
   return (
     <div>
+
+      <AISearchBox/>
 
       {/* MOBILE FILTER */}
       <div className="md:hidden mb-5">
@@ -595,7 +753,7 @@ const getPostedDate = (date?: string) => {
           className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 shadow-sm text-left"
         >
           <p className="text-sm text-gray-400">
-            Search...
+            Manual Search...
           </p>
 
         </button>
@@ -848,7 +1006,7 @@ const getPostedDate = (date?: string) => {
 
 <div className="flex justify-end items-center flex-wrap gap-1 mb-5">
   <span className="text-lg font-bold text-gray-800">
-    {totalProperties}
+    {properties.length}
   </span>
   <span className="text-sm text-gray-500">
     Properties Found
@@ -857,8 +1015,9 @@ const getPostedDate = (date?: string) => {
 
       {/* PROPERTY GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
-        {properties.map((property) => (
+        {/* properties{properties.length} */}
+        { properties.map((property) => (
+      
 
           <Link
             key={property._id}
@@ -1015,7 +1174,8 @@ const getPostedDate = (date?: string) => {
       </p>
 
       <p className="font-semibold">
-        {property.bathrooms}
+        {property.bathrooms}{" "}
+  {Number(property.bathrooms) === 1 ? "Bathroom" : "Bathrooms"}
       </p>
     </div>
 
@@ -1025,7 +1185,7 @@ const getPostedDate = (date?: string) => {
       </p>
 
       <p className="font-semibold">
-        {property.floor}/{property.totalFloors}
+        {property.floor}/{property.totalFloors} 
       </p>
     </div>
 

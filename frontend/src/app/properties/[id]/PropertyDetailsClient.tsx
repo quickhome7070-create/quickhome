@@ -405,7 +405,7 @@ return (
         <Building2 size={18} className="text-gray-400" strokeWidth={1.8} />
       </div>
       <p className="mt-2 text-xs text-gray-700 text-center">
-        {property.floor}/{property.totalFloors}
+       Floor {property.floor}/{property.totalFloors} 
       </p>
     </div>
 
