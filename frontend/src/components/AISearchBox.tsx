@@ -4,6 +4,12 @@ import { useState } from "react";
 import { Search, Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+declare global {
+  interface Window {
+    SpeechRecognition:any;
+    webkitSpeechRecognition:any;
+  }
+}
 
 export default function AISearchBox() {
 
