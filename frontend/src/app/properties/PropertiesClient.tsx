@@ -1079,7 +1079,7 @@ year:"numeric"
     </h2>
 
 
-    <p className="text-sm text-gray-500 mt-1">
+    {/* <p className="text-sm text-gray-500 mt-1">
       {property.furnishing && property.furnishing}
       
       {property.propertyAge && (
@@ -1088,7 +1088,7 @@ year:"numeric"
           {property.propertyAge}
         </>
       )}
-    </p>
+    </p> */}
 
 
   </div>
@@ -1128,13 +1128,13 @@ year:"numeric"
   {/* Property Type */}
   <div className="mt-1 flex items-center gap-2">
 
-    <span className="text-sm font-medium text-600">
+    {/* <span className="text-sm font-medium text-600">
       {property.propertyType}
-    </span>
+    </span> */}
 
     {property.furnishing && (
       <>
-        <span className="text-gray-300">•</span>
+        {/* <span className="text-gray-300">•</span> */}
 
         <span className="text-sm text-gray-500">
           {property.furnishing}
