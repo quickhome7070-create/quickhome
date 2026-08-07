@@ -126,7 +126,17 @@ export default function AISearchBox() {
 
 
 return (
-
+<><label className="
+  
+  
+    text-emerald-600
+    mx-4
+    mb-10
+    
+    text-large
+    font-medium
+  
+  ">✨AI Search✨</label>
 <div className="w-full max-w-3xl mx-auto relative mb-2">
 
 
@@ -230,7 +240,7 @@ ${listening ? "bg-red-500 text-white":""}
 
 
 </div>
-
+</>
 
 );
 

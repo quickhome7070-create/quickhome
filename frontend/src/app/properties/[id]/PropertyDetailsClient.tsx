@@ -2,7 +2,20 @@
 
 "use client";
 
+import {
 
+  ShieldCheck,
+  Dumbbell,
+  Trees,
+  Waves,
+  Car,
+  Zap,
+  Camera,
+  Baby,
+  Wifi,
+  CircleParking,
+  Store,
+} from "lucide-react";
 import {
   MapPin,
   BedDouble,
@@ -78,6 +91,8 @@ type Property = {
   totalFloors?: number;
 
   createdAt?: string;
+
+  amenities?:[];
 };
 type Contact = {
   name: string;
@@ -250,38 +265,35 @@ return (
 {/* IMAGE */}
 
 <div className="relative w-full h-[280px] md:h-[450px]">
-
   <ImageCarousel
-  images={property.images}
-  title={property.title}
-/>
-
+    images={property.images}
+    title={property.title}
+  />
 
   {/* Favorite */}
-<Heart
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleFavorite(id);
-  }}
-  size={28}
-  className={`
-    absolute
-    top-4
-    right-4
-    z-10
-    cursor-pointer
-    drop-shadow-md
-    transition-all
-    duration-200
-    ${
-      isFavorite(id)
-       ? "fill-red-500 text-red-500"
+  <Heart
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(id);
+    }}
+    size={28}
+    className={`
+      absolute
+      top-4
+      right-4
+      z-10
+      cursor-pointer
+      drop-shadow-md
+      transition-all
+      duration-200
+      ${
+        isFavorite(id)
+          ? "fill-red-500 text-red-500"
           : "text-red-500"
-    }
-  `}
-/>
-
+      }
+    `}
+  />
 
   {/* Back Button */}
   <button
@@ -323,49 +335,75 @@ return (
 </div>
 
 
-
-
 <div className="px-4 py-4">
 
   <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px]">
 
     <div className="flex items-center">
-      <Home className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <Home
+        className="w-4 h-4 text-gray-400 flex-shrink-0"
+        strokeWidth={1.8}
+      />
       <span className="ml-3 text-gray-700 truncate">
         {property.propertyType}
       </span>
     </div>
 
-    <div className="flex items-center">
-      <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
-      <span className="ml-3 text-gray-700">
-        {property.bhkType}
-      </span>
-    </div>
+
+    {/* BHK - only Flat / House / Villa */}
+    {["Flat", "House", "Villa"].includes(
+      property.propertyType ?? ""
+    ) && property.bhkType && (
+      <div className="flex items-center">
+        <Building2
+          className="w-4 h-4 text-gray-400 flex-shrink-0"
+          strokeWidth={1.8}
+        />
+        <span className="ml-3 text-gray-700">
+          {property.bhkType}
+        </span>
+      </div>
+    )}
+
 
     <div className="flex items-center">
-      <IndianRupee className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <IndianRupee
+        className="w-4 h-4 text-gray-400 flex-shrink-0"
+        strokeWidth={1.8}
+      />
       <span className="ml-3 text-gray-700">
         ₹ {Number(property.price).toLocaleString("en-IN")}
       </span>
     </div>
 
+
     <div className="flex items-center">
-      <KeyRound className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <KeyRound
+        className="w-4 h-4 text-gray-400 flex-shrink-0"
+        strokeWidth={1.8}
+      />
       <span className="ml-3 text-gray-700 capitalize">
         {property.listingType}
       </span>
     </div>
 
+
     <div className="flex items-center">
-      <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <MapPin
+        className="w-4 h-4 text-gray-400 flex-shrink-0"
+        strokeWidth={1.8}
+      />
       <span className="ml-3 text-gray-700 truncate">
         {property.locality}, {property.city}
       </span>
     </div>
 
+
     <div className="flex items-center">
-      <User className="w-4 h-4 text-gray-400 flex-shrink-0" strokeWidth={1.8} />
+      <User
+        className="w-4 h-4 text-gray-400 flex-shrink-0"
+        strokeWidth={1.8}
+      />
       <span className="ml-3 text-gray-700 capitalize">
         {property.seller}
       </span>
@@ -375,64 +413,184 @@ return (
 
 </div>
 
+
 <div className="border-t border-gray-100 mx-4"></div>
+
 
 <div className="px-4 py-4">
 
   <div className="grid grid-cols-4 gap-x-8 gap-y-4">
 
+    {/* AREA */}
+
     <div className="flex flex-col items-center">
       <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
-        <Ruler size={18} className="text-gray-400" strokeWidth={1.8} />
+        <Ruler
+          size={18}
+          className="text-gray-400"
+          strokeWidth={1.8}
+        />
       </div>
+
       <p className="mt-2 text-xs text-gray-700 text-center">
         {property.area} {property.areaUnit}
       </p>
     </div>
 
-    <div className="flex flex-col items-center">
-      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
-        <Bath size={18} className="text-gray-400" strokeWidth={1.8} />
+
+    {/* BATHROOMS */}
+
+    {["Flat", "House", "Villa", "Office Space", "Shop"].includes(
+      property.propertyType ?? ""
+    ) && Number(property.bathrooms) > 0 && (
+
+      <div className="flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+          <Bath
+            size={18}
+            className="text-gray-400"
+            strokeWidth={1.8}
+          />
+        </div>
+
+        <p className="mt-2 text-xs text-gray-700 text-center">
+          {property.bathrooms}{" "}
+          {Number(property.bathrooms) === 1
+            ? "Bathroom"
+            : "Bathrooms"}
+        </p>
       </div>
-      <p className="mt-2 text-xs text-gray-700 text-center">
-  {property.bathrooms}{" "}
-  {Number(property.bathrooms) === 1 ? "Bathroom" : "Bathrooms"}
-</p>
-    </div>
+
+    )}
+
+
+    {/* FLOOR */}
+
+    {["Flat", "Office Space", "Shop"].includes(
+      property.propertyType ?? ""
+    ) && Number(property.floor) > 0 && (
+
+      <div className="flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+          <Building2
+            size={18}
+            className="text-gray-400"
+            strokeWidth={1.8}
+          />
+        </div>
+
+        <p className="mt-2 text-xs text-gray-700 text-center">
+          Floor {property.floor}
+          {/* /{property.totalFloors}  */}
+        </p>
+      </div>
+
+    )}
+
+
+    {/* PROPERTY AGE */}
+
+    {property.propertyAge && (
+
+      <div className="flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+          <CalendarDays
+            size={18}
+            className="text-gray-400"
+            strokeWidth={1.8}
+          />
+        </div>
+
+        <p className="mt-2 text-xs text-gray-700 text-center">
+          {property.propertyAge}
+        </p>
+      </div>
+
+    )}
+
+
+    {/* FURNISHING */}
+
+    {["Flat", "House", "Villa", "Office Space", "Shop"].includes(
+      property.propertyType ?? ""
+    ) && property.furnishing && (
+
+      <div className="flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+          <Sofa
+            size={18}
+            className="text-gray-400"
+            strokeWidth={1.8}
+          />
+        </div>
+
+        <p className="mt-2 text-xs text-gray-700 text-center">
+          {property.furnishing}
+        </p>
+      </div>
+
+    )}
+
+
+    {/* PLOT TYPE */}
+
+    {property.propertyType === "Plot" &&
+      property.plotType && (
+
+      <div className="flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+          <Trees
+            size={18}
+            className="text-gray-400"
+            strokeWidth={1.8}
+          />
+        </div>
+
+        <p className="mt-2 text-xs text-gray-700 text-center">
+          {property.plotType}
+        </p>
+      </div>
+
+    )}
+
+
+    {/* SHOP TYPE */}
+
+    {property.propertyType === "Shop" &&
+      property.shopType && (
+
+      <div className="flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
+          <Store
+            size={18}
+            className="text-gray-400"
+            strokeWidth={1.8}
+          />
+        </div>
+
+        <p className="mt-2 text-xs text-gray-700 text-center">
+          {property.shopType}
+        </p>
+      </div>
+
+    )}
+
+
+    {/* LISTING TYPE */}
 
     <div className="flex flex-col items-center">
       <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
-        <Building2 size={18} className="text-gray-400" strokeWidth={1.8} />
+        <Home
+          size={18}
+          className="text-gray-400"
+          strokeWidth={1.8}
+        />
       </div>
-      <p className="mt-2 text-xs text-gray-700 text-center">
-       Floor {property.floor}/{property.totalFloors} 
-      </p>
-    </div>
 
-    <div className="flex flex-col items-center">
-      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
-        <CalendarDays size={18} className="text-gray-400" strokeWidth={1.8} />
-      </div>
       <p className="mt-2 text-xs text-gray-700 text-center">
-        {property.propertyAge}
-      </p>
-    </div>
-
-    <div className="flex flex-col items-center">
-      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
-        <Sofa size={18} className="text-gray-400" strokeWidth={1.8} />
-      </div>
-      <p className="mt-2 text-xs text-gray-700 text-center">
-        {property.furnishing}
-      </p>
-    </div>
-
-    <div className="flex flex-col items-center">
-      <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent">
-        <Home size={18} className="text-gray-400" strokeWidth={1.8} />
-      </div>
-      <p className="mt-2 text-xs text-gray-700 text-center">
-        {property.listingType === "rent" ? "Rent" : "Sale"}
+        {property.listingType === "rent"
+          ? "Rent"
+          : "Sale"}
       </p>
     </div>
 
@@ -440,14 +598,125 @@ return (
 
 </div>
 
-<div className="border-t border-gray-100 mx-4"></div>
+
+{/* Amenities Section */}
+
+{property.amenities && property.amenities.length > 0 && (
+
+  <div className="mt-6 border-t border-gray-100 pt-5 ">
+
+    <p className="text-sm text-gray-800 mb-2">
+      Amenities
+    </p>
+
+
+    <div className="grid grid-cols-4 gap-x-6 gap-y-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+
+      {property.amenities.map(
+        (amenity: string, index: number) => {
+
+          let Icon = Home;
+
+          switch (amenity) {
+
+            case "Security":
+              Icon = ShieldCheck;
+              break;
+
+            case "Lift":
+              Icon = Building2;
+              break;
+
+            case "Children Play Area":
+              Icon = Baby;
+              break;
+
+            case "Gym":
+              Icon = Dumbbell;
+              break;
+
+            case "Garden":
+              Icon = Trees;
+              break;
+
+            case "Swimming Pool":
+              Icon = Waves;
+              break;
+
+            case "Parking":
+              Icon = CircleParking;
+              break;
+
+            case "Power Backup":
+              Icon = Zap;
+              break;
+
+            case "CCTV":
+              Icon = Camera;
+              break;
+
+            case "WiFi":
+              Icon = Wifi;
+              break;
+
+            case "Club House":
+              Icon = Home;
+              break;
+
+            default:
+              Icon = Home;
+          }
+
+
+          return (
+
+            <div
+              key={`${amenity}-${index}`}
+              className="flex flex-col items-center"
+            >
+
+              {/* Transparent Icon */}
+
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-transparent">
+
+                <Icon
+                  size={18}
+                  className="text-gray-400"
+                  strokeWidth={1.8}
+                />
+
+              </div>
+
+
+              {/* Amenity Name */}
+
+              <p className="mt-2 text-center text-xs text-gray-700">
+                {amenity}
+              </p>
+
+            </div>
+
+          );
+
+        }
+      )}
+
+    </div>
+
+  </div>
+
+)}
+
+
+<div className="border-t border-gray-100 mt-6"></div>
+
 
 {/* DESCRIPTION */}
 
-<div className="px-4 mt-4">
+<div className=" mt-4">
 
   <p className="text-sm text-gray-800 mb-2">
-    About Property
+    Property Description
   </p>
 
 
@@ -495,133 +764,132 @@ return (
 
 
 
-
-
-
 {/* SIMILAR PROPERTIES */}
 
 {
-similar.length > 0 && (
+  similar.length > 0 && (
 
-<div className="px-4 mt-8">
+    <div className=" mt-4">
 
-<p className="
-text-sm
-text-gray-800
-mb-4
-">
-Similar Properties
-</p>
-
-
-<div className="grid grid-cols-2 gap-4">
-
-{
-similar.map((item)=>(
-
-<Link
-key={item._id}
-href={`/properties/${item._id}`}
->
-
-<div>
+      <p className="
+        text-sm
+        text-gray-800
+        mb-4
+      ">
+        Similar Properties
+      </p>
 
 
-<div className="
-relative
-h-36
-rounded-xl
-overflow-hidden
-">
+      <div className="grid grid-cols-2 gap-4">
 
-<Image
-src={
-item.images?.[0] ||
-"/no-image.png"
+        {
+          similar.map((item) => (
+
+            <Link
+              key={item._id}
+              href={`/properties/${item._id}`}
+            >
+
+              <div>
+
+
+                <div className="
+                  relative
+                  h-36
+                  rounded-xl
+                  overflow-hidden
+                ">
+
+                  <Image
+                    src={
+                      item.images?.[0] ||
+                      "/no-image.png"
+                    }
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
+
+
+                  {/* <button
+                    onClick={toggleFavorite}
+                    className="
+                      absolute
+                      top-4
+                      right-4
+                      w-10
+                      h-10
+                      rounded-full
+                      bg-white
+                      shadow-md
+                      flex
+                      items-center
+                      justify-center
+                      z-10
+                    "
+                  >
+
+                    <Heart
+                      size={22}
+                      className={
+                        isFavorite
+                          ? "fill-[#ffb224] text-[#ffb224]"
+                          : "text-gray-500"
+                      }
+                    />
+
+                  </button> */}
+
+                </div>
+
+
+                <div className="mt-2">
+
+                  <p className="
+                    text-xs
+                    text-gray-800
+                    line-clamp-1
+                  ">
+                    {item.propertyType}
+                    {" • "}
+                    {item.bhkType}
+                  </p>
+
+
+                  <p className="
+                    text-xs
+                    text-gray-600
+                    mt-1
+                  ">
+                    ₹ {Number(item.price).toLocaleString("en-IN")}
+                  </p>
+
+
+                  <p className="
+                    text-xs
+                    text-gray-500
+                    mt-1
+                  ">
+                    📍 {item.location}
+                  </p>
+
+                </div>
+
+
+              </div>
+
+            </Link>
+
+          ))
+        }
+
+      </div>
+
+    </div>
+
+  )
 }
-alt=""
-fill
-className="object-cover"
-/>
-  <button
-    onClick={toggleFavorite}
-    className="
-      absolute
-      top-4
-      right-4
-      w-10
-      h-10
-      rounded-full
-      bg-white
-      shadow-md
-      flex
-      items-center
-      justify-center
-      z-10
-    "
-  >
 
-    <Heart
-      size={22}
-      className={
-        isFavorite
-          ? "fill-[#ffb224] text-[#ffb224]"
-          : "text-gray-500"
-      }
-    />
-
-  </button>
-</div>
-
-
-<div className="mt-2">
-
-<p className="
-text-xs
-text-gray-800
-line-clamp-1
-">
-{item.propertyType}
-{" • "}
-{item.bhkType}
-</p>
-
-
-<p className="
-text-xs
-text-gray-600
-mt-1
-">
-₹ {Number(item.price).toLocaleString("en-IN")}
-</p>
-
-
-<p className="
-text-xs
-text-gray-500
-mt-1
-">
-📍 {item.location}
-</p>
-
-
-</div>
-
-
-</div>
-
-
-</Link>
-
-))
-}
-
-</div>
-
-</div>
-
-)
-}
 
 
 {/* STICKY BUTTONS */}
@@ -641,7 +909,9 @@ mt-1
     shadow-[0_-2px_10px_rgba(0,0,0,0.08)]
   "
 >
+
   <div className="flex gap-2 max-w-md mx-auto">
+
     <button
       onClick={handleViewContact}
       disabled={loadingContact}
@@ -655,29 +925,34 @@ mt-1
         font-medium
       "
     >
-     Contact
+      Contact
     </button>
 
-  <button
-  onClick={handleChat}
-  className="
-    flex-1
-    h-11
-    rounded-full
-    border
-    border-[#ffb224]
-    text-sm
-    text-gray-800
-  "
->
-  Chat
-</button>
+
+    <button
+      onClick={handleChat}
+      className="
+        flex-1
+        h-11
+        rounded-full
+        border
+        border-[#ffb224]
+        text-sm
+        text-gray-800
+      "
+    >
+      Chat
+    </button>
+
   </div>
+
 </div>
+
 
 {showContactSheet && contact && (
 
   <>
+
     {/* BACKDROP */}
 
     <div
@@ -689,6 +964,7 @@ mt-1
         z-50
       "
     />
+
 
     {/* SHEET */}
 
@@ -709,6 +985,7 @@ mt-1
       "
     >
 
+
       {/* HANDLE */}
 
       <div className="flex justify-center mb-5">
@@ -717,9 +994,11 @@ mt-1
 
       </div>
 
+
       <p className="text-base text-gray-900 text-center mb-6">
         Owner Details
       </p>
+
 
       <div className="space-y-5">
 
@@ -735,6 +1014,7 @@ mt-1
 
         </div>
 
+
         <div>
 
           <p className="text-xs text-gray-400">
@@ -749,6 +1029,7 @@ mt-1
           </a>
 
         </div>
+
 
         <div>
 
@@ -767,23 +1048,25 @@ mt-1
 
       </div>
 
+
       <div className="flex items-center justify-center my-10">
 
-  <span
-    className="
-      text-xs
-      text-[#c08a00]
-      border
-      border-[#f3d27a]
-      rounded-full
-      px-3
-      py-1
-    "
-  >
-    {contact.contactsRemaining} contacts remaining
-  </span>
+        <span
+          className="
+            text-xs
+            text-[#c08a00]
+            border
+            border-[#f3d27a]
+            rounded-full
+            px-3
+            py-1
+          "
+        >
+          {contact.contactsRemaining} contacts remaining
+        </span>
 
-</div>
+      </div>
+
 
       <div className="flex gap-3 mt-7">
 
@@ -805,26 +1088,27 @@ mt-1
           Call
         </a>
 
-       <button
-  onClick={() => {
-    if (user?.subscription?.status === "premium") {
-      window.open(whatsappUrl, "_blank");
-    } else {
-      router.push("/plans");
-    }
-  }}
-  className="
-    flex-1
-    h-11
-    rounded-full
-    border
-    border-[#ffb224]
-    text-sm
-    text-gray-800
-  "
->
-  Chat
-</button>
+
+        <button
+          onClick={() => {
+            if (user?.subscription?.status === "premium") {
+              window.open(whatsappUrl, "_blank");
+            } else {
+              router.push("/plans");
+            }
+          }}
+          className="
+            flex-1
+            h-11
+            rounded-full
+            border
+            border-[#ffb224]
+            text-sm
+            text-gray-800
+          "
+        >
+          Chat
+        </button>
 
       </div>
 

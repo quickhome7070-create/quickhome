@@ -1015,7 +1015,7 @@ year:"numeric"
 
       {/* PROPERTY GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {/* properties{properties.length} */}
+        
         { properties.map((property) => (
       
 
@@ -1168,6 +1168,9 @@ year:"numeric"
       </p>
     </div>
 
+     {["Flat", "House", "Villa", "Office Space", "Shop"].includes(
+    property.propertyType ?? ""
+  ) && Number(property.bathrooms) > 0 && (
     <div className="bg-gray-50 rounded-xl p-3">
       <p className="text-xs text-gray-500">
         Bathrooms
@@ -1175,20 +1178,32 @@ year:"numeric"
 
       <p className="font-semibold">
         {property.bathrooms}{" "}
-  {Number(property.bathrooms) === 1 ? "Bathroom" : "Bathrooms"}
+        {Number(property.bathrooms) === 1
+          ? "Bathroom"
+          : "Bathrooms"}
       </p>
     </div>
+  )}
 
+
+
+    {/* Floor */}
+  {["Flat", "Office Space", "Shop"].includes(
+    property.propertyType ?? ""
+  ) && Number(property.floor) > 0 && (
     <div className="bg-gray-50 rounded-xl p-3">
       <p className="text-xs text-gray-500">
         Floor
       </p>
 
       <p className="font-semibold">
-        {property.floor}/{property.totalFloors} 
+        {property.floor}/{property.totalFloors}
       </p>
     </div>
+  )}
 
+  {/* Age - always shown when available */}
+  {property.propertyAge && (
     <div className="bg-gray-50 rounded-xl p-3">
       <p className="text-xs text-gray-500">
         Age
@@ -1198,6 +1213,8 @@ year:"numeric"
         {property.propertyAge}
       </p>
     </div>
+  )}
+
 
   </div>
 
